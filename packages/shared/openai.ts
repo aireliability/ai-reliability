@@ -1,4 +1,7 @@
-export async function sayHelloWithOpenAI(): Promise<string> {
+export async function generateTextWithOpenAI(input: {
+  model: string;
+  prompt: string;
+}): Promise<string> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
     throw new Error("OPENAI_API_KEY is not set");
@@ -11,8 +14,8 @@ export async function sayHelloWithOpenAI(): Promise<string> {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: "gpt-4.1-mini",
-      input: "Say hello",
+      model: input.model,
+      input: input.prompt,
     }),
   });
 

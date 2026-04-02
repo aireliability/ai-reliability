@@ -1,8 +1,11 @@
 {
   "name": "ai-eval-gate",
   "private": true,
+  "scripts": {
+    "dev:api": "tsx apps/api/main.ts"
+  },
   "devDependencies": {
-    "@types/node": "^24.0.0"
+    "@types/node": "^24.0.0",
+    "tsx": "^4.21.0"
   }
 }
-
