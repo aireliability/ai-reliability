@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "dev:api": "tsx apps/api/main.ts",
-    "dev:api:openai": "tsx apps/api/dev-run-openai.ts"
+    "dev:api:openai": "node --env-file=.env --import tsx apps/api/dev-run-openai.ts"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

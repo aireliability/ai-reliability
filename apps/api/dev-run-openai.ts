@@ -92,3 +92,10 @@ export async function runDevOpenAIExample(): Promise<
   return completeRun({ run, results });
 }
 
+runDevOpenAIExample()
+  .then((result) => {
+    console.log("OPENAI DEV RUN RESULT:\n", JSON.stringify(result, null, 2));
+  })
+  .catch((err) => {
+    console.error("OPENAI DEV RUN ERROR:", err);
+  });
