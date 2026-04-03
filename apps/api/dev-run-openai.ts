@@ -5,14 +5,16 @@ import type {
   SampleResult,
   Usage,
 } from "../../packages/shared/types";
+import { buildReport } from "../../packages/engine/report";
 import { createDataset, validateDataset } from "../../packages/shared/dataset";
 import { generateModelOutput } from "../../packages/engine/generate";
 import { buildSampleResult } from "../../packages/engine/classify";
 import { completeRun } from "../../packages/engine/run";
 
-export async function runDevOpenAIExample(): Promise<
-  EvalRun & { finalStatus: "PASS" | "FAIL"; finalized: true }
-> {
+export async function runDevOpenAIExample(): Promise<{
+  finalizedRun: EvalRun & { finalStatus: "PASS" | "FAIL"; finalized: true };
+  results: SampleResult[];
+}> {
   const dataset = createDataset({
     id: "dataset_demo",
     name: "Demo Dataset",
@@ -89,12 +91,14 @@ export async function runDevOpenAIExample(): Promise<
     );
   }
 
-  return completeRun({ run, results });
+  const finalizedRun = completeRun({ run, results });
+  return { finalizedRun, results };
 }
 
 runDevOpenAIExample()
-  .then((result) => {
-    console.log("OPENAI DEV RUN RESULT:\n", JSON.stringify(result, null, 2));
+  .then(({ finalizedRun, results }) => {
+    const report = buildReport({ run: finalizedRun, results });
+    console.log("OPENAI DEV RUN REPORT:\n", JSON.stringify(report, null, 2));
   })
   .catch((err) => {
     console.error("OPENAI DEV RUN ERROR:", err);
