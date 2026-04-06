@@ -2,6 +2,7 @@
   "name": "ai-eval-gate",
   "private": true,
   "scripts": {
+    "dev": "tsx apps/api/main.ts",
     "dev:api": "tsx apps/api/main.ts",
     "dev:api:openai": "node --env-file=.env --import tsx apps/api/dev-run-openai.ts"
   },
