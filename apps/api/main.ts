@@ -1,5 +1,5 @@
 import type { EvalRun, Usage, RuleResult, SampleResult } from "../../packages/shared/types";
-import { buildReport } from "../../packages/engine/report";
+import { buildReport, formatReportHuman } from "../../packages/engine/report";
 import { buildSampleResult } from "../../packages/engine/classify";
 import { completeRun } from "../../packages/engine/run";
 
@@ -70,5 +70,7 @@ const results: SampleResult[] = [
 
 const finalizedRun = completeRun({ run, results });
 const report = buildReport({ run: finalizedRun, results });
-console.log("DEV RUN REPORT:\n", JSON.stringify(report, null, 2));
+const human = formatReportHuman(report);
+console.log("DEV RUN SUMMARY:\n" + human);
+console.log("\nDEV RUN REPORT JSON:\n", JSON.stringify(report, null, 2));
 

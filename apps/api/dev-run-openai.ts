@@ -1,15 +1,11 @@
 import type {
   EvalRun,
   ModelConfig,
-  RuleResult,
   SampleResult,
-  Usage,
 } from "../../packages/shared/types";
-import { buildReport } from "../../packages/engine/report";
+import { buildReport, formatReportHuman } from "../../packages/engine/report";
 import { createDataset, validateDataset } from "../../packages/shared/dataset";
-import { generateModelOutput } from "../../packages/engine/generate";
-import { buildSampleResult } from "../../packages/engine/classify";
-import { completeRun } from "../../packages/engine/run";
+import { executeRun } from "../../packages/engine/execute";
 
 export async function runDevOpenAIExample(): Promise<{
   finalizedRun: EvalRun & { finalStatus: "PASS" | "FAIL"; finalized: true };
@@ -44,61 +40,19 @@ export async function runDevOpenAIExample(): Promise<{
     model: "gpt-4.1-mini",
   };
 
-  const results: SampleResult[] = [];
-
-  for (const sample of dataset.samples) {
-    const start = Date.now();
-    const output = await generateModelOutput({
-      sampleInput: sample.input,
-      expected: sample.expected,
-      config,
-    });
-    const latencyMs = Date.now() - start;
-
-    const score = output.includes(sample.expected) ? 1 : 0;
-    const classification = score === 1 ? "PASS" : "RULE_FAIL";
-
-    const rules: RuleResult[] = [
-      {
-        ruleName: "expected_includes",
-        passed: score === 1,
-        confidence: 1,
-        reason:
-          score === 1
-            ? "Output includes expected"
-            : "Output does not include expected",
-      },
-    ];
-
-    const usage: Usage = {
-      tokensInput: 0,
-      tokensOutput: 0,
-      estimatedCost: 0,
-      costVersion: "unknown",
-    };
-
-    results.push(
-      buildSampleResult({
-        runId: run.id,
-        sampleId: sample.id,
-        output,
-        score,
-        classification,
-        latencyMs,
-        usage,
-        rules,
-      }),
-    );
-  }
-
-  const finalizedRun = completeRun({ run, results });
-  return { finalizedRun, results };
+  return executeRun({
+    dataset,
+    run,
+    config,
+  });
 }
 
 runDevOpenAIExample()
   .then(({ finalizedRun, results }) => {
     const report = buildReport({ run: finalizedRun, results });
-    console.log("OPENAI DEV RUN REPORT:\n", JSON.stringify(report, null, 2));
+    const human = formatReportHuman(report);
+    console.log("OPENAI DEV RUN SUMMARY:\n" + human);
+    console.log("\nOPENAI DEV RUN REPORT JSON:\n", JSON.stringify(report, null, 2));
   })
   .catch((err) => {
     console.error("OPENAI DEV RUN ERROR:", err);

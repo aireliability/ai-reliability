@@ -45,3 +45,26 @@ export function buildReport(input: {
   };
 }
 
+export function formatReportHuman(report: EvalReport): string {
+  const total = report.samples.length;
+  const failed = report.samples.filter((s) => !s.passed).length;
+  const passed = total - failed;
+  const firstLine = `${report.status} — ${failed} failed, ${passed} passed (${total} total)`;
+
+  const failingBlocks = report.samples
+    .filter((s) => !s.passed)
+    .map((s) => {
+      const lines = [`${s.sampleId}:`, `Output: ${s.output}`];
+      if (s.reason !== undefined && s.reason.length > 0) {
+        lines.push(`Reason: ${s.reason}`);
+      }
+      return lines.join("\n");
+    });
+
+  if (failingBlocks.length === 0) {
+    return firstLine;
+  }
+
+  return [firstLine, failingBlocks.join("\n\n")].join("\n\n");
+}
+
