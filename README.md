@@ -1,6 +1,6 @@
-# AI Reliability — Stop bad AI outputs before they hit production
+# AI Reliability — Catch AI failures before they ship
 
-Stop bad AI outputs and uncontrolled API costs before they reach production.
+Evaluate outputs, policy behavior, tool execution, and API cost before deployment.
 
 ## Problem
 
@@ -33,7 +33,7 @@ Bad outputs reach users unnoticed.
 
 FAIL — 1 failed, 1 passed (2 total)
 
-Deployment can be blocked before impact.
+Fail the run, block the deploy, and fix the issue before impact.
 
 ## Why This Matters
 
