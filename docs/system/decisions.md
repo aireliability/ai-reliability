@@ -12,4 +12,4 @@
 - Final result uses baseline-relative delta
 - PASS only when classification is PASS
 - GitHub is the primary distribution channel
-- Repo is ai-reliability, first module is AI Eval Gate
+- Repo is ai-reliability, first module is AI Reliability

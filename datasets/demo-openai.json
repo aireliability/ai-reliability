@@ -1,0 +1,9 @@
+{
+  "id": "dataset_demo",
+  "name": "Demo Dataset",
+  "version": 1,
+  "samples": [
+    { "id": "s1", "input": "2 + 2", "expected": "4" },
+    { "id": "s2", "input": "Say hello", "expected": "hello" }
+  ]
+}
