@@ -6,7 +6,9 @@
     "dev:api": "tsx apps/api/main.ts",
     "dev:api:openai": "node --env-file=.env --import tsx apps/api/dev-run-openai.ts",
     "dev:file:openai": "node --env-file=.env --import tsx apps/api/run-from-files.ts",
-    "dev:file:deterministic": "tsx apps/api/run-from-files-deterministic.ts"
+    "dev:file:deterministic": "tsx apps/api/run-from-files-deterministic.ts",
+    "ci:eval": "node --env-file=.env --import tsx apps/api/ci-eval.ts",
+    "ci:eval:deterministic": "tsx apps/api/ci-eval-deterministic.ts"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

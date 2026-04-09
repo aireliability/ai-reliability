@@ -43,6 +43,18 @@ Fail the run, block the deploy, and fix the issue before impact.
 - Silent failures look like success until customers complain
 - AI costs grow without visibility or control
 
+## Business Overview
+
+AI Reliability is a developer infrastructure product for teams shipping AI into production.
+
+It helps teams:
+- catch faulty AI outputs before deploy
+- enforce policy and tool correctness
+- monitor and control AI-related API cost
+- block regressions in CI workflows
+
+The product is sold as a subscription with usage-based expansion, targeting product teams, engineering teams, and AI-enabled software businesses.
+
 ## Requirements
 
 - Node.js 20+
@@ -84,9 +96,9 @@ npm run dev:api:openai
 - Detects output, policy, and system failures
 - Produces human-readable summaries and JSON reports
 - Enables pass/fail gating decisions before production
+- Returns a non-zero exit code on failure so CI can block bad deploys
 
 ## Coming Next
 
-- CI gating (block deploys on failures)
 - Cost guardrails (prevent runaway API spend)
 - Hosted eval runs and team workflows
