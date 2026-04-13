@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AI Reliability</title>
+    <meta
+      name="description"
+      content="Run evals, detect failures, and block broken AI before production."
+    />
+    <style>
+      :root {
+        --bg: #0b0d12;
+        --card: #121725;
+        --text: #e9edf7;
+        --muted: #a9b4cf;
+        --line: rgba(255, 255, 255, 0.12);
+        --cta: #5b8cff;
+        --ctaText: #0b0d12;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial,
+          "Apple Color Emoji", "Segoe UI Emoji";
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.5;
+      }
+      .wrap {
+        max-width: 920px;
+        margin: 0 auto;
+        padding: 56px 20px 72px;
+      }
+      h1 {
+        font-size: 44px;
+        line-height: 1.1;
+        margin: 0 0 12px;
+        letter-spacing: -0.02em;
+      }
+      p {
+        margin: 0;
+      }
+      .sub {
+        color: var(--muted);
+        font-size: 18px;
+        max-width: 64ch;
+        margin-bottom: 22px;
+      }
+      .row {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin: 18px 0 28px;
+      }
+      .btn {
+        display: inline-block;
+        padding: 12px 16px;
+        border-radius: 10px;
+        border: 1px solid var(--line);
+        text-decoration: none;
+        color: var(--text);
+        font-weight: 600;
+      }
+      .btn.primary {
+        background: var(--cta);
+        color: var(--ctaText);
+        border-color: transparent;
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 18px;
+      }
+      pre {
+        margin: 0;
+        padding: 14px;
+        border-radius: 12px;
+        background: rgba(0, 0, 0, 0.35);
+        border: 1px solid var(--line);
+        overflow: auto;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+          "Courier New", monospace;
+        font-size: 14px;
+        color: #f2f5ff;
+      }
+      .section {
+        margin-top: 28px;
+      }
+      h2 {
+        font-size: 18px;
+        margin: 0 0 12px;
+        color: #dbe4ff;
+        letter-spacing: -0.01em;
+      }
+      .pricing {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+      .tier {
+        padding: 14px;
+        border-radius: 12px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.03);
+      }
+      .tier strong {
+        font-weight: 700;
+      }
+      .foot {
+        margin-top: 18px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+      a.link {
+        color: #bcd0ff;
+        text-decoration: none;
+        border-bottom: 1px solid rgba(188, 208, 255, 0.35);
+      }
+      a.link:hover {
+        border-bottom-color: rgba(188, 208, 255, 0.75);
+      }
+    </style>
+  </head>
+  <body>
+    <main class="wrap">
+      <h1>Catch bad AI deploys before they ship</h1>
+      <p class="sub">Run evals, detect failures, and block broken AI before production</p>
+
+      <div class="card section" aria-label="Failure example">
+        <pre><code>FAIL — 3 failed, 21 passed (24 total)
+
+a3:
+Missing tool execution
+
+h2:
+Pricing hallucination</code></pre>
+      </div>
+
+      <div class="row">
+        <a class="btn primary" href="https://github.com/aireliability/ai-reliability#quick-start"
+          >Run your first eval</a
+        >
+      </div>
+      <p class="foot">Runs locally in under 30 seconds</p>
+
+      <section id="pricing" class="section" aria-label="Pricing">
+        <h2>Pricing</h2>
+        <div class="pricing">
+          <div class="tier"><strong>Starter</strong> — $299/month — 1,000 credits</div>
+          <div class="tier"><strong>Team</strong> — $999/month — 5,000 credits</div>
+          <div class="tier"><strong>Growth</strong> — $2,500/month — 15,000 credits</div>
+        </div>
+      </section>
+
+      <div id="run" class="row section">
+        <a class="btn primary" href="#pricing">Buy now</a>
+      </div>
+      <p class="foot">Instant access after payment</p>
+
+      <p id="buy" class="foot">
+        FAQ: <a class="link" href="../README.md">README</a>
+      </p>
+    </main>
+  </body>
+</html>
+

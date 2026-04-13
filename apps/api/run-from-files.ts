@@ -28,7 +28,7 @@ export async function runFromFiles(input: {
 }
 
 runFromFiles({
-  datasetPath: "datasets/demo-openai.json",
+  datasetPath: "datasets/high-risk-production.json",
   configPath: "configs/openai.json",
 }).catch((err) => {
   console.error("FILE RUN ERROR:", err);

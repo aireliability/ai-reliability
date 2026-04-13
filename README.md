@@ -55,6 +55,56 @@ It helps teams:
 
 The product is sold as a subscription with usage-based expansion, targeting product teams, engineering teams, and AI-enabled software businesses.
 
+## Pricing
+
+Starter — $299/month — 1,000 credits  
+For solo technical founders or small teams shipping one real AI workflow and needing a safety/control layer before production.
+
+Team — $999/month — 5,000 credits  
+For product teams running AI repeatedly in development and CI who need shared reliability coverage across multiple workflows.
+
+Growth — $2,500/month — 15,000 credits  
+For heavier production users with frequent eval runs, deeper usage, and stronger need for deployment control and operational reliability.
+
+1 credit = 1 sample evaluation.
+
+## Getting Access
+
+AI Reliability is available via paid plans.
+
+After purchase:
+- your account is provisioned
+- credits are allocated
+- you receive setup instructions for running evals locally and in CI
+
+## Support
+
+For access or billing inquiries:
+support@aireliability.com
+
+## FAQ
+
+### How do I use AI Reliability?
+Run evals locally or in CI before deploying AI changes.
+
+### What does a credit mean?
+Credits are consumed as evaluations run against dataset samples.
+
+### How do I pay?
+Purchase a plan through the payment link on the pricing page.
+
+### What happens after I pay?
+Your account is provisioned and credits are assigned.
+
+### Can this stop bad deployments?
+Yes. Failed evals return non-zero exit codes and block CI.
+
+### Does this control cost?
+AI Reliability is being built to enforce control over risky AI usage before production.
+
+### Do you store my data?
+Your data stays in your environment unless you explicitly use hosted capabilities later.
+
 ## Requirements
 
 - Node.js 20+
