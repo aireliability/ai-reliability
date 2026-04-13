@@ -8,6 +8,14 @@
       name="description"
       content="Run evals, detect failures, and block broken AI before production."
     />
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-XXXXXXX');
+    </script>
     <style>
       :root {
         --bg: #0b0d12;
@@ -146,6 +154,9 @@ Pricing hallucination</code></pre>
         >
       </div>
       <p class="foot">Runs locally in under 30 seconds</p>
+      <p class="foot">Run this locally to detect high-risk failures before deployment</p>
+      <pre><code>npm install
+npm run dev:file:openai</code></pre>
 
       <section id="pricing" class="section" aria-label="Pricing">
         <h2>Pricing</h2>
