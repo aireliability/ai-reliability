@@ -151,9 +151,10 @@ Pricing hallucination</code></pre>
         <a
           class="btn primary"
           href="https://github.com/aireliability/ai-reliability#quick-start"
-          onclick="gtag('event', 'run_eval_click')"
-          >Run your first eval</a
+          onclick="gtag('event', 'run_eval_click'); setTimeout(() => { window.location.href = this.href; }, 200); return false;"
         >
+          Run your first eval
+        </a>
       </div>
       <p class="foot">Runs locally in under 30 seconds</p>
       <p class="foot">Run this locally to detect high-risk failures before deployment</p>
@@ -170,7 +171,13 @@ npm run dev:file:openai</code></pre>
       </section>
 
       <div id="run" class="row section">
-        <a class="btn primary" href="#pricing" onclick="gtag('event', 'buy_now_click')">Buy now</a>
+        <a
+          class="btn primary"
+          href="#pricing"
+          onclick="gtag('event', 'buy_now_click'); setTimeout(() => { window.location.href = this.href; }, 200); return false;"
+        >
+          Buy now
+        </a>
       </div>
       <p class="foot">Instant access after payment</p>
 
