@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AI Reliability — Starter Pack Access</title>
+    <meta name="description" content="Starter pack access and setup steps." />
+    <style>
+      :root {
+        --bg: #0b0d12;
+        --card: #121725;
+        --text: #e9edf7;
+        --muted: #a9b4cf;
+        --line: rgba(255, 255, 255, 0.12);
+        --cta: #5b8cff;
+        --ctaText: #0b0d12;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial,
+          "Apple Color Emoji", "Segoe UI Emoji";
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.5;
+      }
+      .wrap {
+        max-width: 920px;
+        margin: 0 auto;
+        padding: 56px 20px 72px;
+      }
+      h1 {
+        font-size: 40px;
+        line-height: 1.1;
+        margin: 0 0 12px;
+        letter-spacing: -0.02em;
+      }
+      p {
+        margin: 0;
+      }
+      .sub {
+        color: var(--muted);
+        font-size: 18px;
+        max-width: 72ch;
+        margin-bottom: 22px;
+      }
+      .section {
+        margin-top: 22px;
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 18px;
+      }
+      h2 {
+        font-size: 18px;
+        margin: 0 0 12px;
+        color: #dbe4ff;
+        letter-spacing: -0.01em;
+      }
+      ul {
+        margin: 10px 0 0;
+        padding-left: 20px;
+        color: var(--text);
+      }
+      li {
+        margin: 6px 0;
+      }
+      pre {
+        margin: 10px 0 0;
+        padding: 14px;
+        border-radius: 12px;
+        background: rgba(0, 0, 0, 0.35);
+        border: 1px solid var(--line);
+        overflow: auto;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+          "Courier New", monospace;
+        font-size: 14px;
+        color: #f2f5ff;
+      }
+      .foot {
+        margin-top: 14px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .note {
+        margin-top: 16px;
+        padding: 12px 14px;
+        border-radius: 12px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.03);
+        color: var(--muted);
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="wrap">
+      <h1>AI Reliability — Starter Pack Access</h1>
+      <p class="sub">You now have access to the AI Reliability evaluation starter pack</p>
+
+      <section class="card section" aria-label="Included">
+        <h2>Starter pack contents</h2>
+        <p class="foot">The starter pack includes:</p>
+        <ul>
+          <li>local evaluation workflow</li>
+          <li>deterministic evaluation config</li>
+          <li>CI gating workflow reference</li>
+          <li>failure detection examples</li>
+        </ul>
+        <p class="foot">CI/CD gating workflows are included for integration after local evaluation is working.</p>
+        <p class="foot">Designed to catch hallucinations, tool failures, and regressions before production</p>
+      </section>
+
+      <section class="card section" aria-label="Instructions">
+        <h2>Instructions</h2>
+        <p><strong>Step 1:</strong> Clone repository</p>
+        <p class="foot"><strong>Step 2:</strong> Run:</p>
+        <pre><code>npm install
+npm run dev:file:openai</code></pre>
+        <p class="foot"><strong>Step 3:</strong> Review failures and fix before deployment</p>
+
+        <div class="note">This is a simulated access page for early release</div>
+      </section>
+    </main>
+  </body>
+</html>
+

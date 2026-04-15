@@ -114,8 +114,7 @@ Your data stays in your environment unless you explicitly use hosted capabilitie
 
 ```bash
 npm install
-npm run dev:api        # deterministic example
-npm run dev:api:openai # real model execution
+npm run dev:file:openai
 ```
 
 ## OpenAI Setup
@@ -131,7 +130,7 @@ Use your own OpenAI API key locally. Do not commit `.env`.
 Then run:
 
 ```bash
-npm run dev:api:openai
+npm run dev:file:openai
 ```
 
 ## Examples
