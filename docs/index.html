@@ -167,21 +167,36 @@ npm run dev:file:openai</code></pre>
           <div class="tier">
             <strong>Starter</strong> — $299/month — 1,000 credits
             <div style="margin-top: 10px">
-              <a class="btn primary" href="starter-pack.html?plan=starter">Buy Starter</a>
+              <a
+                class="btn primary"
+                href="starter-pack.html?plan=starter"
+                onclick="gtag('event', 'starter_plan_click'); setTimeout(() => { window.location.href = this.href; }, 200); return false;"
+                >Buy Starter</a
+              >
             </div>
             <div class="foot">Best for solo technical founders shipping one live AI workflow</div>
           </div>
           <div class="tier">
             <strong>Team</strong> — $999/month — 5,000 credits
             <div style="margin-top: 10px">
-              <a class="btn primary" href="starter-pack.html?plan=team">Buy Team</a>
+              <a
+                class="btn primary"
+                href="starter-pack.html?plan=team"
+                onclick="gtag('event', 'team_plan_click'); setTimeout(() => { window.location.href = this.href; }, 200); return false;"
+                >Buy Team</a
+              >
             </div>
             <div class="foot">Best for product teams running repeated evals in development and CI</div>
           </div>
           <div class="tier">
             <strong>Growth</strong> — $2,500/month — 15,000 credits
             <div style="margin-top: 10px">
-              <a class="btn primary" href="starter-pack.html?plan=growth">Buy Growth</a>
+              <a
+                class="btn primary"
+                href="starter-pack.html?plan=growth"
+                onclick="gtag('event', 'growth_plan_click'); setTimeout(() => { window.location.href = this.href; }, 200); return false;"
+                >Buy Growth</a
+              >
             </div>
             <div class="foot">Best for heavier production usage and stronger deployment control</div>
           </div>

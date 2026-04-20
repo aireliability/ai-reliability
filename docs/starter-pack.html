@@ -104,12 +104,15 @@
 
       <section class="card section" aria-label="Included">
         <h2>Starter pack contents</h2>
-        <p class="foot">The starter pack includes:</p>
+        <p class="foot">
+          Plan: <strong id="planName">Starter</strong> — <span id="planPrice">$299/month</span> — <span id="planCredits">1,000 credits</span>
+        </p>
+        <p class="foot">Included items:</p>
         <ul>
-          <li>local evaluation workflow</li>
-          <li>deterministic evaluation config</li>
-          <li>CI gating workflow reference</li>
-          <li>failure detection examples</li>
+          <li id="inc1">local evaluation workflow</li>
+          <li id="inc2">deterministic evaluation config</li>
+          <li id="inc3">CI gating workflow reference</li>
+          <li id="inc4">failure detection examples</li>
         </ul>
         <p class="foot">CI/CD gating workflows are included for integration after local evaluation is working.</p>
         <p class="foot">Designed to catch hallucinations, tool failures, and regressions before production</p>
@@ -126,6 +129,62 @@ npm run dev:file:openai</code></pre>
         <div class="note">This is a simulated access page for early release</div>
       </section>
     </main>
+    <script>
+      (function () {
+        const params = new URLSearchParams(window.location.search);
+        const plan = (params.get("plan") || "starter").toLowerCase();
+
+        const plans = {
+          starter: {
+            name: "Starter",
+            price: "$299/month",
+            credits: "1,000 credits",
+            included: [
+              "local evaluation workflow",
+              "deterministic evaluation config",
+              "CI gating workflow reference",
+              "failure detection examples",
+            ],
+          },
+          team: {
+            name: "Team",
+            price: "$999/month",
+            credits: "5,000 credits",
+            included: [
+              "local evaluation workflow",
+              "deterministic evaluation config",
+              "CI gating workflow reference",
+              "failure detection examples",
+            ],
+          },
+          growth: {
+            name: "Growth",
+            price: "$2,500/month",
+            credits: "15,000 credits",
+            included: [
+              "local evaluation workflow",
+              "deterministic evaluation config",
+              "CI gating workflow reference",
+              "failure detection examples",
+            ],
+          },
+        };
+
+        const selected = plans[plan] || plans.starter;
+
+        const planName = document.getElementById("planName");
+        const planPrice = document.getElementById("planPrice");
+        const planCredits = document.getElementById("planCredits");
+        if (planName) planName.textContent = selected.name;
+        if (planPrice) planPrice.textContent = selected.price;
+        if (planCredits) planCredits.textContent = selected.credits;
+
+        for (let i = 0; i < 4; i++) {
+          const el = document.getElementById(`inc${i + 1}`);
+          if (el) el.textContent = selected.included[i] || "";
+        }
+      })();
+    </script>
   </body>
 </html>
 
