@@ -88,7 +88,7 @@ support@aireliability.com
 Run evals locally or in CI before deploying AI changes.
 
 ### What does a credit mean?
-Credits are consumed as evaluations run against dataset samples.
+1 credit = 1 sample evaluation.
 
 ### How do I pay?
 Purchase a plan through the payment link on the pricing page.

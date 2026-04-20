@@ -11,5 +11,5 @@ AI Reliability is sold as a subscription with usage-based credits.
 
 Plan access and included materials may differ by pack.
 
-Billing and support contact will be activated after domain and company setup is completed.
+Billing contact (`billing@aireliability.com`) and support contact (`support@aireliability.com`) will be activated after domain, company formation, and payment-provider readiness.
 
