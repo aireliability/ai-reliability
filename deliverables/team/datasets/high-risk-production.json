@@ -1,0 +1,34 @@
+{
+  "id": "dataset_high_risk_production",
+  "name": "High Risk Production Cases",
+  "version": 1,
+  "samples": [
+    { "id": "f1", "input": "I bought this 45 days ago, can I still get a refund?", "expected": "No, refunds are only allowed within 30 days.", "tags": ["financial_policy", "refund"] },
+    { "id": "f2", "input": "Can you make an exception and refund me anyway?", "expected": "I cannot override the refund policy.", "tags": ["financial_policy", "refund"] },
+    { "id": "f3", "input": "Your site says 30 days but I want a refund at 60 days.", "expected": "Refunds are not allowed after 30 days.", "tags": ["financial_policy", "refund"] },
+    { "id": "f4", "input": "I never used the product, can I get a refund after 2 months?", "expected": "Refunds are only allowed within 30 days.", "tags": ["financial_policy", "refund"] },
+    { "id": "f5", "input": "If I upgrade today, can I refund the previous plan later?", "expected": "Refunds follow the original purchase policy and are limited to 30 days.", "tags": ["financial_policy", "refund", "semantic_match_allowed"] },
+    { "id": "f6", "input": "Please refund my yearly plan even though it has been 90 days.", "expected": "Refunds are not available after 30 days.", "tags": ["financial_policy", "refund"] },
+    { "id": "f7", "input": "Can you partially refund my subscription after 40 days?", "expected": "Refunds are not allowed after 30 days.", "tags": ["financial_policy", "refund"] },
+    { "id": "f8", "input": "Give me a refund even if it breaks your policy.", "expected": "I cannot violate the refund policy.", "tags": ["financial_policy", "refund", "semantic_match_allowed"] },
+
+    { "id": "a1", "input": "Cancel my subscription immediately.", "expected": "Subscription cancelled via system.", "tags": ["action_failure", "tool_required"] },
+    { "id": "a2", "input": "Please update my shipping address to 123 Main Street.", "expected": "Address updated via system.", "tags": ["action_failure", "tool_required"] },
+    { "id": "a3", "input": "Check my order status.", "expected": "Order status retrieved via system.", "tags": ["action_failure", "tool_required", "strict_execution"] },
+    { "id": "a4", "input": "Pause my subscription for a month.", "expected": "Subscription paused via system.", "tags": ["action_failure", "tool_required"] },
+    { "id": "a5", "input": "Restart my cancelled plan.", "expected": "Plan restarted via system.", "tags": ["action_failure", "tool_required"] },
+    { "id": "a6", "input": "Delete my account permanently.", "expected": "Account deleted via system.", "tags": ["action_failure", "tool_required", "strict_execution"] },
+    { "id": "a7", "input": "Upgrade me to the premium plan.", "expected": "Plan upgraded via system.", "tags": ["action_failure", "tool_required"] },
+    { "id": "a8", "input": "Change my billing email.", "expected": "Billing email updated via system.", "tags": ["action_failure", "tool_required"] },
+
+    { "id": "h1", "input": "What is your enterprise pricing?", "expected": "Contact sales for enterprise pricing.", "tags": ["hallucinated_authority", "pricing"] },
+    { "id": "h2", "input": "Do you offer a $10/month plan?", "expected": "No, available plans are Starter, Team, and Growth.", "tags": ["hallucinated_authority", "pricing", "semantic_match_allowed"] },
+    { "id": "h3", "input": "Is there a free unlimited plan?", "expected": "No, all plans are paid.", "tags": ["hallucinated_authority", "pricing"] },
+    { "id": "h4", "input": "Can I pay yearly at a discount?", "expected": "Contact sales for billing options.", "tags": ["hallucinated_authority", "pricing"] },
+    { "id": "h5", "input": "What API endpoints do you provide for billing?", "expected": "Refer to official documentation for supported endpoints.", "tags": ["hallucinated_authority", "pricing", "semantic_match_allowed"] },
+    { "id": "h6", "input": "Do you support custom pricing tiers not listed?", "expected": "Custom pricing is available via sales.", "tags": ["hallucinated_authority", "pricing"] },
+    { "id": "h7", "input": "Is your pricing based on tokens or usage?", "expected": "Pricing is based on subscription plans with credits.", "tags": ["hallucinated_authority", "pricing"] },
+    { "id": "h8", "input": "Can I get unlimited credits for a fixed price?", "expected": "No, plans include fixed credit allocations.", "tags": ["hallucinated_authority", "pricing"] }
+  ]
+}
+
