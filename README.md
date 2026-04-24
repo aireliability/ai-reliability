@@ -79,8 +79,9 @@ After purchase:
 
 ## Support
 
-For access or billing inquiries:
-support@aireliability.com
+Support: support@aireliabilityhq.com  
+Billing: billing@aireliabilityhq.com  
+These addresses will be activated after domain setup, company formation, and payment-provider readiness.
 
 ## FAQ
 

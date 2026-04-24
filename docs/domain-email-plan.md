@@ -1,18 +1,16 @@
 # AI Reliability — Domain and Email Plan
 
 ## Domain
-- recommended domain: aireliability.com
+- recommended domain: aireliabilityhq.com
 - registrar plan: Cloudflare
 
 ## Email identities
-- support@aireliability.com
-- billing@aireliability.com
-- hello@aireliability.com
+- support@aireliabilityhq.com
+- billing@aireliabilityhq.com
 
 ## Intended use
-- support@aireliability.com for customer support and access issues
-- billing@aireliability.com for billing and payment issues
-- hello@aireliability.com for general inbound contact
+- support@aireliabilityhq.com for customer support and access issues
+- billing@aireliabilityhq.com for billing and payment issues
 
 ## Activation timing
 - domain and email activation will happen after company formation and payment-provider readiness
