@@ -97,6 +97,18 @@
       a.link:hover {
         border-bottom-color: rgba(188, 208, 255, 0.75);
       }
+      .wm ul {
+        margin: 12px 0 0;
+        padding-left: 1.25rem;
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .wm li {
+        margin-top: 8px;
+      }
+      .wm li:first-child {
+        margin-top: 0;
+      }
     </style>
   </head>
   <body>
@@ -137,17 +149,24 @@
         </section>
       </div>
 
-      <section class="card section" aria-label="What this means">
+      <section class="card section wm" aria-label="What this means">
         <h2>What this means</h2>
-        <p class="foot">Without pre-deployment evaluation, these failures would reach production.</p>
+        <p class="foot" style="margin-top: 0">
+          Without pre-deployment evaluation, these failures would reach production.
+        </p>
+        <ul>
+          <li>Tool failures would silently break workflows</li>
+          <li>Pricing errors would impact revenue and trust</li>
+          <li>Policy violations could create compliance risk</li>
+        </ul>
         <p class="foot">
-          AI Reliability ensures these issues are detected before they impact users, revenue, or compliance.
+          AI Reliability ensures these issues are detected before they affect users or business outcomes.
         </p>
       </section>
 
       <div class="section" style="display: flex; gap: 12px; flex-wrap: wrap">
         <a class="btn primary" href="https://github.com/aireliability/ai-reliability#quick-start">Run your first eval</a>
-        <a class="btn" href="../index.html">Back to homepage</a>
+        <a class="btn" href="../index.html">Back to AI Reliability</a>
       </div>
     </main>
   </body>
