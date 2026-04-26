@@ -8,7 +8,8 @@
     "dev:file:openai": "node --env-file=.env --import tsx apps/api/run-from-files.ts",
     "dev:file:deterministic": "tsx apps/api/run-from-files-deterministic.ts",
     "ci:eval": "node --env-file=.env --import tsx apps/api/ci-eval.ts",
-    "ci:eval:deterministic": "tsx apps/api/ci-eval-deterministic.ts"
+    "ci:eval:deterministic": "tsx apps/api/ci-eval-deterministic.ts",
+    "demo:failures": "tsx apps/api/demo-failures.ts"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

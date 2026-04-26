@@ -13,3 +13,11 @@ npm run dev:file:openai
 - A failing summary means the model/regression is caught before deploy.
 - Track the failing sample IDs and fix the behavior before merging.
 
+## Run Failure Demo
+
+```bash
+npm run demo:failures
+```
+
+This demonstrates how AI Reliability catches failures before deployment.
+
