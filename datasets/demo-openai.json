@@ -1,9 +1,27 @@
 {
   "id": "dataset_demo",
   "name": "Demo Dataset",
-  "version": 1,
+  "version": 2,
   "samples": [
-    { "id": "s1", "input": "2 + 2", "expected": "4" },
-    { "id": "s2", "input": "Say hello", "expected": "hello" }
+    {
+      "id": "s1",
+      "category": "sanity_math",
+      "risk_level": "low",
+      "failure_mode": "logic_error",
+      "input": "2 + 2",
+      "expected": "4",
+      "expected_behavior": "Return the correct result.",
+      "why_it_matters": "Sanity checks catch basic regressions in evaluation wiring."
+    },
+    {
+      "id": "s2",
+      "category": "sanity_output",
+      "risk_level": "low",
+      "failure_mode": "output_incorrectness",
+      "input": "Say hello",
+      "expected": "hello",
+      "expected_behavior": "Return the exact expected output.",
+      "why_it_matters": "Ensures deterministic checks fail loudly when outputs drift."
+    }
   ]
 }
