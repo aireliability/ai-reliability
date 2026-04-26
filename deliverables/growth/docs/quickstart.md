@@ -1,6 +1,6 @@
 # Quick start (Growth)
 
-Run evals locally, then enforce gating and rollout discipline before production releases.
+Continuous production-grade AI reliability checks.
 
 ## Run locally
 

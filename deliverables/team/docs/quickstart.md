@@ -1,6 +1,6 @@
 # Quick start (Team)
 
-Run evals locally first, then use CI gating to block regressions.
+Run repeated checks across development and CI.
 
 ## Run locally
 

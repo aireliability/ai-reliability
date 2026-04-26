@@ -11,9 +11,13 @@ These reports show real examples of AI breakage detected before deployment.
 
 - `deliverables/team/reports/gpt4-pricing-failure.md` — Pricing hallucination caught during pre-deploy checks.
 - `deliverables/team/reports/tool-call-failure.md` — Required tool/action execution was skipped.
+- `deliverables/team/reports/refund-policy-failure.md` — Refund policy violation prevented before deployment.
 
 ## Growth plan reports
 
 - `deliverables/growth/reports/gpt4-pricing-failure.md` — Pricing hallucination caught during pre-deploy checks.
 - `deliverables/growth/reports/tool-call-failure.md` — Required tool/action execution was skipped.
+- `deliverables/growth/reports/escalation-failure.md` — Failed escalation in a billing dispute.
+- `deliverables/growth/reports/workflow-state-error.md` — Contradictory workflow state that would break billing integrity.
+- `deliverables/growth/reports/unsafe-action-refusal.md` — Unsafe request that must be refused before production.
 

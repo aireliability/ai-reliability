@@ -1,6 +1,6 @@
 # Quick start (Starter)
 
-Run an eval locally and review failures before you ship changes.
+Validate one AI workflow before shipping.
 
 ## Run
 
