@@ -6,7 +6,7 @@
     <title>AI Reliability Failure Reports</title>
     <meta
       name="description"
-      content="Examples of AI failures caught before deployment across tool execution, pricing logic, policy behavior, and regression risk."
+      content="Examples of real AI failures caught before deployment — including tool execution gaps, pricing errors, and policy violations."
     />
     <style>
       :root {
@@ -97,71 +97,58 @@
       a.link:hover {
         border-bottom-color: rgba(188, 208, 255, 0.75);
       }
-      ul {
-        margin: 10px 0 0;
-        padding-left: 20px;
-        color: var(--text);
-      }
-      li {
-        margin: 6px 0;
-      }
     </style>
   </head>
   <body>
     <main class="wrap">
       <h1>AI Reliability Failure Reports</h1>
       <p class="sub">
-        Examples of AI failures caught before deployment across tool execution, pricing logic, policy behavior, and
-        regression risk.
+        Examples of real AI failures caught before deployment — including tool execution gaps, pricing errors, and policy violations.
       </p>
-
-      <div class="row section" style="display: flex; gap: 12px; flex-wrap: wrap">
-        <a class="btn primary" href="../index.html">Back to AI Reliability</a>
-        <a class="btn" href="index.md">View report index (markdown)</a>
-      </div>
 
       <div class="grid">
         <section class="card" aria-label="Missing tool execution">
           <h2>Missing tool execution</h2>
-          <p class="foot"><strong>Failure type:</strong> tool failure</p>
-          <p class="foot"><strong>Why it matters:</strong> When tool execution is skipped, the system can report actions as done when nothing happened.</p>
-          <p class="foot"><strong>What AI Reliability catches:</strong> Required system/tool actions that were not executed before the model confirms completion.</p>
+          <p class="foot" style="margin-top: 0"><strong>Critical workflow failure</strong></p>
           <p class="foot">
-            Source report:
-            <a class="link" href="../../deliverables/starter/reports/tool-call-failure.md">tool-call-failure.md</a>
+            The model skipped a required tool call, causing silent execution failure. In production, this would result in
+            incomplete workflows and hidden errors.
           </p>
+          <p class="foot"><strong>Outcome:</strong> Caught before deployment. Execution integrity preserved.</p>
         </section>
 
         <section class="card" aria-label="Pricing hallucination">
           <h2>Pricing hallucination</h2>
-          <p class="foot"><strong>Failure type:</strong> hallucination</p>
-          <p class="foot"><strong>Why it matters:</strong> Incorrect pricing answers create immediate trust loss, refunds, and support load.</p>
-          <p class="foot"><strong>What AI Reliability catches:</strong> Invented plans, prices, or capabilities that do not match published offerings.</p>
+          <p class="foot" style="margin-top: 0"><strong>Revenue-impacting error</strong></p>
           <p class="foot">
-            Source report:
-            <a class="link" href="../../deliverables/starter/reports/gpt4-pricing-failure.md">gpt4-pricing-failure.md</a>
+            The model generated incorrect pricing logic, which would have led to undercharging or inconsistent billing.
           </p>
+          <p class="foot"><strong>Outcome:</strong> Caught before deployment. Revenue risk prevented.</p>
         </section>
 
         <section class="card" aria-label="Refund policy violation">
           <h2>Refund policy violation</h2>
-          <p class="foot"><strong>Failure type:</strong> policy violation</p>
-          <p class="foot"><strong>Why it matters:</strong> Refund policy mistakes create revenue loss and chargeback risk.</p>
-          <p class="foot"><strong>What AI Reliability catches:</strong> Policy answers that grant exceptions or outcomes outside the defined rules.</p>
+          <p class="foot" style="margin-top: 0"><strong>Compliance failure</strong></p>
           <p class="foot">
-            Source report:
-            <a class="link" href="../../deliverables/team/reports/refund-policy-failure.md">refund-policy-failure.md</a>
+            The model produced a response violating refund policy rules. In production, this could expose the business to
+            disputes or legal risk.
           </p>
+          <p class="foot"><strong>Outcome:</strong> Caught before deployment. Policy compliance enforced.</p>
         </section>
       </div>
 
-      <section class="card section" aria-label="More reports">
-        <h2>More reports</h2>
-        <p class="foot">Additional plan-specific reports are listed in the repository index:</p>
-        <ul>
-          <li><a class="link" href="index.md">docs/reports/index.md</a></li>
-        </ul>
+      <section class="card section" aria-label="What this means">
+        <h2>What this means</h2>
+        <p class="foot">Without pre-deployment evaluation, these failures would reach production.</p>
+        <p class="foot">
+          AI Reliability ensures these issues are detected before they impact users, revenue, or compliance.
+        </p>
       </section>
+
+      <div class="section" style="display: flex; gap: 12px; flex-wrap: wrap">
+        <a class="btn primary" href="https://github.com/aireliability/ai-reliability#quick-start">Run your first eval</a>
+        <a class="btn" href="../index.html">Back to homepage</a>
+      </div>
     </main>
   </body>
 </html>
