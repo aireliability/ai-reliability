@@ -130,12 +130,58 @@
       a.link:hover {
         border-bottom-color: rgba(188, 208, 255, 0.75);
       }
+      .hero-sub p {
+        margin: 0 0 12px;
+        color: var(--muted);
+        font-size: 18px;
+        max-width: 64ch;
+        line-height: 1.5;
+      }
+      .hero-sub p:last-child {
+        margin-bottom: 22px;
+      }
+      .conversion-list {
+        margin: 0;
+        padding-left: 1.25rem;
+        color: var(--muted);
+        font-size: 15px;
+      }
+      .conversion-list li {
+        margin-top: 8px;
+      }
+      .conversion-list li:first-child {
+        margin-top: 0;
+      }
     </style>
   </head>
   <body>
     <main class="wrap">
       <h1>Catch bad AI deploys before they ship</h1>
-      <p class="sub">Run evals, detect failures, and block broken AI before production</p>
+      <div class="hero-sub">
+        <p>Shipping AI without evaluation is shipping blind.</p>
+        <p>
+          Hallucinations, pricing errors, and silent tool failures don't show up in testing — they show up in production.
+        </p>
+      </div>
+
+      <section class="card section" aria-label="What happens without AI Reliability" style="margin-top: 0">
+        <h2>What happens without AI Reliability</h2>
+        <ul class="conversion-list">
+          <li>Incorrect pricing reaches customers</li>
+          <li>Required tool actions are skipped silently</li>
+          <li>Policy violations create legal or refund risk</li>
+          <li>Broken workflows go unnoticed</li>
+        </ul>
+      </section>
+
+      <section class="card section" aria-label="What happens with AI Reliability">
+        <h2>What happens with AI Reliability</h2>
+        <ul class="conversion-list">
+          <li>Failures are caught before deployment</li>
+          <li>Reports show exactly what breaks and why</li>
+          <li>Teams ship with confidence instead of guesswork</li>
+        </ul>
+      </section>
 
       <div class="card" aria-label="Trust overview">
         <p style="margin: 0; color: var(--muted); font-size: 15px">
@@ -162,7 +208,10 @@ Refund policy violation → incorrect response</code></pre>
         </p>
       </div>
 
-      <div class="row">
+      <p class="foot" style="margin-top: 0; margin-bottom: 12px; color: var(--text); font-size: 16px">
+        Run a real failure check in under 30 seconds.
+      </p>
+      <div class="row" style="margin-top: 0">
         <a
           class="btn primary"
           href="https://github.com/aireliability/ai-reliability#quick-start"
@@ -171,11 +220,9 @@ Refund policy violation → incorrect response</code></pre>
           Run your first eval
         </a>
       </div>
-      <p class="foot">No setup. Runs locally. Surfaces real failures in seconds.</p>
-      <p class="foot">Runs locally in under 30 seconds</p>
-      <p class="foot">Run this locally to detect high-risk failures before deployment</p>
       <pre><code>npm install
 npm run dev:file:openai</code></pre>
+      <p class="foot">Most teams discover these failures after users do.</p>
 
       <section class="section" aria-label="What it checks">
         <h2>What it checks</h2>
