@@ -145,13 +145,23 @@
       </div>
 
       <div class="card section" aria-label="Failure example">
-        <pre><code>FAIL — 3 failed, 21 passed (24 total)
+        <p class="foot" style="margin-top: 0">Example failures caught before deployment</p>
+        <pre><code>FAIL — 3 critical failures detected
 
 a3:
-Missing tool execution
+Missing tool execution → action skipped silently
 
 h2:
-Pricing hallucination</code></pre>
+Pricing hallucination → incorrect pricing shown
+
+p1:
+Refund policy violation → incorrect response</code></pre>
+        <p class="foot">These failures would have reached production without detection.</p>
+        <p class="foot">
+          <a class="link" href="./reports/index.md" target="_blank" rel="noopener noreferrer"
+            >View full failure report → /docs/reports/index.md</a
+          >
+        </p>
       </div>
 
       <div class="row">
@@ -163,6 +173,7 @@ Pricing hallucination</code></pre>
           Run your first eval
         </a>
       </div>
+      <p class="foot">No setup. Runs locally. Surfaces real failures in seconds.</p>
       <p class="foot">Runs locally in under 30 seconds</p>
       <p class="foot">Run this locally to detect high-risk failures before deployment</p>
       <pre><code>npm install
@@ -176,6 +187,7 @@ npm run dev:file:openai</code></pre>
           <div class="tier"><strong>Tool/action failures</strong></div>
           <div class="tier"><strong>Deployment regressions</strong></div>
         </div>
+        <p class="foot">Backed by real failure cases across pricing, policy, and tool execution.</p>
       </section>
 
       <section class="section" aria-label="Built for">
