@@ -81,7 +81,6 @@ After purchase:
 
 Support: support@aireliabilityhq.com  
 Billing: billing@aireliabilityhq.com  
-These addresses will be activated after domain setup, company formation, and payment-provider readiness.
 
 ## FAQ
 
@@ -101,7 +100,7 @@ Your account is provisioned and credits are assigned.
 Yes. Failed evals return non-zero exit codes and block CI.
 
 ### Does this control cost?
-AI Reliability is being built to enforce control over risky AI usage before production.
+AI Reliability helps teams enforce control over risky AI usage before production.
 
 ### Do you store my data?
 Your data stays in your environment unless you explicitly use hosted capabilities later.
@@ -148,7 +147,7 @@ npm run dev:file:openai
 - Enables pass/fail gating decisions before production
 - Returns a non-zero exit code on failure so CI can block bad deploys
 
-## Coming Next
+## Roadmap
 
 - Cost guardrails (prevent runaway API spend)
 - Hosted eval runs and team workflows

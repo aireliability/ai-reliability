@@ -1,23 +1,38 @@
-# Failure Reports
+# AI Reliability Failure Reports
 
-These reports show real examples of AI breakage detected before deployment.
+Examples of real AI failures caught before deployment — including tool execution gaps, pricing errors, and policy violations.
 
-## Starter plan reports
+## Missing tool execution
 
-- `deliverables/starter/reports/gpt4-pricing-failure.md` — Pricing hallucination caught during pre-deploy checks.
-- `deliverables/starter/reports/tool-call-failure.md` — Required tool/action execution was skipped.
+**Critical workflow failure**
 
-## Team plan reports
+The model skipped a required tool call, causing silent execution failure. In production, this would result in incomplete workflows and hidden errors.
 
-- `deliverables/team/reports/gpt4-pricing-failure.md` — Pricing hallucination caught during pre-deploy checks.
-- `deliverables/team/reports/tool-call-failure.md` — Required tool/action execution was skipped.
-- `deliverables/team/reports/refund-policy-failure.md` — Refund policy violation prevented before deployment.
+**Outcome:** Caught before deployment. Execution integrity preserved.
 
-## Growth plan reports
+## Pricing hallucination
 
-- `deliverables/growth/reports/gpt4-pricing-failure.md` — Pricing hallucination caught during pre-deploy checks.
-- `deliverables/growth/reports/tool-call-failure.md` — Required tool/action execution was skipped.
-- `deliverables/growth/reports/escalation-failure.md` — Failed escalation in a billing dispute.
-- `deliverables/growth/reports/workflow-state-error.md` — Contradictory workflow state that would break billing integrity.
-- `deliverables/growth/reports/unsafe-action-refusal.md` — Unsafe request that must be refused before production.
+**Revenue-impacting error**
+
+The model generated incorrect pricing logic, which would have led to undercharging or inconsistent billing.
+
+**Outcome:** Caught before deployment. Revenue risk prevented.
+
+## Refund policy violation
+
+**Compliance failure**
+
+The model produced a response violating refund policy rules. In production, this could expose the business to disputes or legal risk.
+
+**Outcome:** Caught before deployment. Policy compliance enforced.
+
+## What this means
+
+Without pre-deployment evaluation, these failures would reach production.
+
+- Tool failures would silently break workflows
+- Pricing errors would impact revenue and trust
+- Policy violations could create compliance risk
+
+AI Reliability ensures these issues are detected before they affect users or business outcomes.
 
