@@ -156,15 +156,24 @@
   </head>
   <body>
     <main class="wrap">
-      <h1>Catch hallucinations, pricing errors, and broken AI workflows before they hit production</h1>
+      <h1>Catch AI failures in support bots, checkout flows, and agent workflows before they hit production</h1>
       <div class="hero-sub">
         <p>Shipping AI without evaluation is shipping blind.</p>
         <p>
-          Hallucinations, pricing errors, and silent tool failures don't show up in testing — they show up in production.
+          Hallucinations, pricing errors, and silent tool failures don’t show up in testing — they show up in production.
         </p>
       </div>
 
-      <section class="card section" aria-label="What happens without AI Reliability" style="margin-top: 0">
+      <div class="card" aria-label="Built for real production systems">
+        <strong style="display: block; margin-bottom: 10px; color: var(--text)">Built for real production systems:</strong>
+        <ul class="conversion-list" style="margin-top: 0">
+          <li>Support bots handling customer tickets and refunds</li>
+          <li>Checkout flows with pricing, plans, and billing logic</li>
+          <li>AI agents calling APIs and executing actions</li>
+        </ul>
+      </div>
+
+      <section class="card section" aria-label="What happens without AI Reliability">
         <h2>What happens without AI Reliability</h2>
         <ul class="conversion-list">
           <li>Incorrect pricing reaches customers</li>
@@ -208,18 +217,16 @@ Refund policy violation → incorrect response</code></pre>
         </p>
       </div>
 
-      <p class="foot" style="margin-top: 0; margin-bottom: 12px; color: var(--text); font-size: 16px">
-        Run a real failure check in under 30 seconds.
-      </p>
       <div class="row" style="margin-top: 0">
         <a
           class="btn primary"
           href="https://github.com/aireliability/ai-reliability#quick-start"
           onclick="gtag('event', 'run_eval_click'); setTimeout(() => { window.location.href = this.href; }, 200); return false;"
         >
-          Run your first eval
+          Run a real failure check in 30 seconds
         </a>
       </div>
+      <p class="foot">No setup. Runs locally. Surfaces real failures in seconds.</p>
       <pre><code>npm install
 npm run dev:file:openai</code></pre>
       <p class="foot">Most teams discover these failures after users do.</p>
