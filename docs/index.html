@@ -164,8 +164,8 @@
         </p>
       </div>
 
-      <div class="card" aria-label="Built for real production systems">
-        <strong style="display: block; margin-bottom: 10px; color: var(--text)">Built for real production systems:</strong>
+      <div class="card" aria-label="Exposure systems">
+        <strong style="display: block; margin-bottom: 10px; color: var(--text)">If you run any of these systems, you are exposed without evaluation:</strong>
         <ul class="conversion-list" style="margin-top: 0">
           <li>Support bots handling customer tickets and refunds</li>
           <li>Checkout flows with pricing, plans, and billing logic</li>
@@ -211,13 +211,16 @@ Pricing hallucination → incorrect pricing shown
 
 p1:
 Refund policy violation → incorrect response</code></pre>
-        <p class="foot">These failures would have reached production without detection.</p>
+        <p class="foot">These failures reach production in most teams — unless they are explicitly tested.</p>
+        <p class="foot">
+          These examples are derived from real failure patterns across pricing logic, policy handling, and tool execution.
+        </p>
         <p class="foot">
           <a class="link" href="reports/index.html">View full failure report</a>
         </p>
       </div>
 
-      <div class="row" style="margin-top: 0">
+      <div class="row" style="margin-top: 12px">
         <a
           class="btn primary"
           href="https://github.com/aireliability/ai-reliability#quick-start"
@@ -229,7 +232,7 @@ Refund policy violation → incorrect response</code></pre>
       <p class="foot">No setup. Runs locally. Surfaces real failures in seconds.</p>
       <pre><code>npm install
 npm run dev:file:openai</code></pre>
-      <p class="foot">Most teams discover these failures after users do.</p>
+      <p class="foot">Most teams discover these failures only after users do.</p>
 
       <section class="section" aria-label="What it checks">
         <h2>What it checks</h2>
