@@ -1,3 +1,5 @@
+import type { BudgetState } from "./budget-gate";
+
 export type RunStatus =
   | "PENDING"
   | "RUNNING"
@@ -39,6 +41,8 @@ export interface ModelConfig {
   model: string;
   temperature?: number;
   maxOutputTokens?: number;
+  /** When set, enforces credits/USD limits before each model call. */
+  budget?: BudgetState;
 }
 
 export interface RuleResult {

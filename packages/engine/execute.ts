@@ -6,6 +6,7 @@ import type {
   SampleResult,
   Usage,
 } from "../shared/types";
+import type { BudgetState } from "../shared/budget-gate";
 import { generateModelOutput } from "./generate";
 import { buildSampleResult } from "./classify";
 import { completeRun } from "./run";
@@ -17,16 +18,22 @@ export async function executeRun(input: {
 }): Promise<{
   finalizedRun: EvalRun & { finalStatus: "PASS" | "FAIL"; finalized: true };
   results: SampleResult[];
+  budget?: BudgetState;
 }> {
   const results: SampleResult[] = [];
+  let budget: BudgetState | undefined = input.config.budget;
 
   for (const sample of input.dataset.samples) {
     const start = Date.now();
-    const output = await generateModelOutput({
+    const { output, budget: nextBudget } = await generateModelOutput({
       sampleInput: sample.input,
       expected: sample.expected,
       config: input.config,
+      budget,
     });
+    if (nextBudget !== undefined) {
+      budget = nextBudget;
+    }
     const latencyMs = Date.now() - start;
 
     const score = output.includes(sample.expected) ? 1 : 0;
@@ -70,5 +77,6 @@ export async function executeRun(input: {
   return {
     finalizedRun,
     results,
+    ...(budget !== undefined ? { budget } : {}),
   };
 }

@@ -1,3 +1,11 @@
+/** Per-call credit cost reserved when usage is not metered from the provider. */
+export const DEFAULT_MODEL_CALL_CREDITS_REQUIRED = 1;
+
+/**
+ * Conservative USD ceiling per provider call for gating when exact usage is unavailable.
+ */
+export const DEFAULT_MODEL_CALL_ESTIMATE_USD = 0.25;
+
 export interface BudgetState {
   planId: string;
   creditsRemaining: number;

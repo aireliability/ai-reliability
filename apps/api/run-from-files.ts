@@ -20,8 +20,12 @@ export async function runFromFiles(input: {
     creditsReserved: 10,
     creditsUsed: 2,
   };
-  const { finalizedRun, results } = await executeRun({ dataset, run, config });
-  const report = buildReport({ run: finalizedRun, results });
+  const { finalizedRun, results, budget } = await executeRun({
+    dataset,
+    run,
+    config,
+  });
+  const report = buildReport({ run: finalizedRun, results, budget });
   const human = formatReportHuman(report);
   console.log("FILE RUN SUMMARY:\n" + human);
   console.log("\nFILE RUN REPORT JSON:\n", JSON.stringify(report, null, 2));

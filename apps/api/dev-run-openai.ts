@@ -3,6 +3,7 @@ import type {
   ModelConfig,
   SampleResult,
 } from "../../packages/shared/types";
+import type { BudgetState } from "../../packages/shared/budget-gate";
 import { buildReport, formatReportHuman } from "../../packages/engine/report";
 import { createDataset, validateDataset } from "../../packages/shared/dataset";
 import { executeRun } from "../../packages/engine/execute";
@@ -10,6 +11,7 @@ import { executeRun } from "../../packages/engine/execute";
 export async function runDevOpenAIExample(): Promise<{
   finalizedRun: EvalRun & { finalStatus: "PASS" | "FAIL"; finalized: true };
   results: SampleResult[];
+  budget?: BudgetState;
 }> {
   const dataset = createDataset({
     id: "dataset_demo",
@@ -48,8 +50,8 @@ export async function runDevOpenAIExample(): Promise<{
 }
 
 runDevOpenAIExample()
-  .then(({ finalizedRun, results }) => {
-    const report = buildReport({ run: finalizedRun, results });
+  .then(({ finalizedRun, results, budget }) => {
+    const report = buildReport({ run: finalizedRun, results, budget });
     const human = formatReportHuman(report);
     console.log("OPENAI DEV RUN SUMMARY:\n" + human);
     console.log("\nOPENAI DEV RUN REPORT JSON:\n", JSON.stringify(report, null, 2));
