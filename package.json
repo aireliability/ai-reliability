@@ -9,7 +9,9 @@
     "dev:file:deterministic": "tsx apps/api/run-from-files-deterministic.ts",
     "ci:eval": "node --env-file=.env --import tsx apps/api/ci-eval.ts",
     "ci:eval:deterministic": "tsx apps/api/ci-eval-deterministic.ts",
-    "demo:failures": "tsx apps/api/demo-failures.ts"
+    "demo:failures": "tsx apps/api/demo-failures.ts",
+    "demo:budget-gate": "tsx apps/api/demo-budget-gate.ts",
+    "test:budget-gate": "tsx --test packages/shared/budget-gate.test.ts"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

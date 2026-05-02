@@ -117,6 +117,17 @@ npm install
 npm run dev:file:openai
 ```
 
+### Budget gate (no API key)
+
+Validate spend gate logic locally:
+
+```bash
+npm run demo:budget-gate
+npm run test:budget-gate
+```
+
+`configs/openai.json` includes an optional `budget` block (see `configs/openai.budget-blocked.example.json` for a fail-closed example).
+
 ## OpenAI Setup
 
 To run the real model-backed example, create a root `.env` file:

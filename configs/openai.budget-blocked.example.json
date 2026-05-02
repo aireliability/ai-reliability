@@ -3,10 +3,9 @@
   "model": "gpt-4.1-mini",
   "budget": {
     "planId": "starter",
-    "creditsRemaining": 1000,
-    "budgetRemainingUsd": 500,
+    "creditsRemaining": 0,
+    "budgetRemainingUsd": 0,
     "creditsUsed": 0,
     "budgetUsedUsd": 0
   }
 }
-
