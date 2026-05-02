@@ -13,7 +13,7 @@
     <title>AI Reliability</title>
     <meta
       name="description"
-      content="Run evals, detect failures, and block broken AI before production."
+      content="Pre-deployment AI evaluations with credit and budget limits; catch failures before production."
     />
     <style>
       :root {
@@ -156,11 +156,12 @@
   </head>
   <body>
     <main class="wrap">
-      <h1>Catch AI failures in support bots, checkout flows, and agent workflows before they hit production</h1>
+      <h1>Control AI evaluation spend and catch production failures before they ship</h1>
       <div class="hero-sub">
         <p>
-          AI systems often pass internal testing while still containing failure modes that only surface in production
-          environments. These include hallucinations, incorrect pricing logic, and failed tool or API execution.
+          AI Reliability helps teams run pre-deployment AI evaluations with configured credit and budget limits. Before
+          provider calls are made, the spend gate checks available credits and budget state, while reliability checks
+          detect failure modes such as hallucinations, incorrect pricing logic, and failed tool or API execution.
         </p>
       </div>
 
@@ -180,6 +181,7 @@
           <li>Required tool actions are skipped silently</li>
           <li>Policy violations create legal or refund risk</li>
           <li>Broken workflows go unnoticed</li>
+          <li>Evaluation runs can exceed configured credit or budget limits</li>
         </ul>
       </section>
 
@@ -189,6 +191,9 @@
           <li>Failures are caught before deployment</li>
           <li>Reports show exactly what breaks and why</li>
           <li>Teams ship with confidence instead of guesswork</li>
+          <li>
+            Spend gate checks block evaluation runs before provider calls when credits or budget are exhausted
+          </li>
         </ul>
       </section>
 
@@ -291,6 +296,7 @@ npm run dev:file:openai</code></pre>
         <p class="foot">Secure payment processing. Access is delivered after successful purchase.</p>
         <div class="card" style="margin-top: 14px">
           <h2>Trust</h2>
+          <p class="foot">AI spend gate checks run before provider calls for configured evaluation runs.</p>
           <p class="foot">All evaluations run locally, ensuring that your data remains within your environment at all times.</p>
           <p class="foot">Designed to catch hallucinations, tool failures, and regressions before deployment.</p>
           <p class="foot">Access is delivered after purchase confirmation.</p>

@@ -50,7 +50,7 @@ AI Reliability is a developer infrastructure product for teams shipping AI into 
 It helps teams:
 - catch faulty AI outputs before deploy
 - enforce policy and tool correctness
-- monitor and control AI-related API cost
+- enforce configured credit and budget limits for evaluation runs before provider calls are made
 - block regressions in CI workflows
 
 The product is sold as a subscription with usage-based expansion, targeting product teams, engineering teams, and AI-enabled software businesses.
@@ -100,7 +100,7 @@ Your account is provisioned and credits are assigned.
 Yes. Failed evals return non-zero exit codes and block CI.
 
 ### Does this control cost?
-AI Reliability helps teams enforce control over risky AI usage before production.
+For evaluation runs where you configure a spend gate, the product checks credits and budget before provider calls and blocks execution when those limits are exhausted. It is not a full cost-monitoring or billing automation product.
 
 ### Do you store my data?
 Your data stays in your environment unless you explicitly use hosted capabilities later.
@@ -110,23 +110,26 @@ Your data stays in your environment unless you explicitly use hosted capabilitie
 - Node.js 20+
 - npm
 
+## AI Spend Gate
+
+AI Reliability includes a fail-closed spend gate for configured evaluation runs. Before provider calls are made, the system checks available credits and configured budget state. If credits or budget are exhausted, execution is blocked before model/API spend occurs.
+
+This is evaluation-run spend control, not payment-level enforcement or hosted cost governance.
+
+Demo:
+
+```bash
+npm run demo:budget-gate
+```
+
+Optional `budget` configuration is documented in `configs/openai.json` (see `configs/openai.budget-blocked.example.json` for an exhausted-limit example). Automated checks: `npm run test:budget-gate`.
+
 ## Quick Start
 
 ```bash
 npm install
 npm run dev:file:openai
 ```
-
-### Budget gate (no API key)
-
-Validate spend gate logic locally:
-
-```bash
-npm run demo:budget-gate
-npm run test:budget-gate
-```
-
-`configs/openai.json` includes an optional `budget` block (see `configs/openai.budget-blocked.example.json` for a fail-closed example).
 
 ## OpenAI Setup
 
@@ -160,5 +163,4 @@ npm run dev:file:openai
 
 ## Roadmap
 
-- Cost guardrails (prevent runaway API spend)
 - Hosted eval runs and team workflows
