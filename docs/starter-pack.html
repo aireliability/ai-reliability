@@ -86,39 +86,30 @@
         color: var(--muted);
         font-size: 14px;
       }
-      .note {
-        margin-top: 16px;
-        padding: 12px 14px;
-        border-radius: 12px;
-        border: 1px solid var(--line);
-        background: rgba(255, 255, 255, 0.03);
-        color: var(--muted);
-        font-size: 14px;
-      }
     </style>
   </head>
   <body>
     <main class="wrap">
       <h1>AI Reliability — Starter Pack Access</h1>
-      <p class="sub">You now have access to the AI Reliability evaluation starter pack</p>
+      <p class="sub">AI Reliability Starter provides access to pre-deployment AI evaluation materials.</p>
       <p class="foot">
-        Live payment outcome handling will connect to the prepared success and payment-not-completed pages.
+        The starter package includes evaluation datasets, configuration examples, and CI/CD-compatible workflows.
       </p>
+      <p class="foot">Access is delivered after purchase confirmation.</p>
 
       <section class="card section" aria-label="Included">
-        <h2>Starter pack contents</h2>
+        <h2>Your plan</h2>
         <p class="foot">
-          Plan: <strong id="planName">Starter</strong> — <span id="planPrice">$299/month</span> — <span id="planCredits">1,000 credits</span>
+          Plan: <strong id="planName">Starter</strong> — <span id="planPrice">$299/month</span> —
+          <span id="planCredits">1,000 credits</span>
         </p>
-        <p class="foot">Included items:</p>
+        <p class="foot">Included:</p>
         <ul>
-          <li id="inc1">local evaluation workflow</li>
-          <li id="inc2">deterministic evaluation config</li>
-          <li id="inc3">CI gating workflow reference</li>
-          <li id="inc4">failure detection examples</li>
+          <li id="inc1">Evaluation datasets</li>
+          <li id="inc2">Configuration examples</li>
+          <li id="inc3">CI/CD-compatible workflows</li>
         </ul>
-        <p class="foot">CI/CD gating workflows are included for integration after local evaluation is working.</p>
-        <p class="foot">Designed to catch hallucinations, tool failures, and regressions before production</p>
+        <p class="foot">Designed to catch hallucinations, tool failures, and regressions before deployment.</p>
       </section>
 
       <section class="card section" aria-label="Instructions">
@@ -128,9 +119,10 @@
         <pre><code>npm install
 npm run dev:file:openai</code></pre>
         <p class="foot"><strong>Step 3:</strong> Review failures and fix before deployment</p>
-
-        <div class="note">This is a simulated access page for early release</div>
       </section>
+
+      <p class="foot">Support: support@aireliabilityhq.com</p>
+      <p class="foot">Billing: billing@aireliabilityhq.com</p>
     </main>
     <script>
       (function () {
@@ -142,34 +134,19 @@ npm run dev:file:openai</code></pre>
             name: "Starter",
             price: "$299/month",
             credits: "1,000 credits",
-            included: [
-              "local evaluation workflow",
-              "deterministic evaluation config",
-              "CI gating workflow reference",
-              "failure detection examples",
-            ],
+            included: ["Evaluation datasets", "Configuration examples", "CI/CD-compatible workflows"],
           },
           team: {
             name: "Team",
             price: "$999/month",
             credits: "5,000 credits",
-            included: [
-              "local evaluation workflow",
-              "deterministic evaluation config",
-              "CI gating workflow reference",
-              "failure detection examples",
-            ],
+            included: ["Evaluation datasets", "Configuration examples", "CI/CD-compatible workflows"],
           },
           growth: {
             name: "Growth",
             price: "$2,500/month",
             credits: "15,000 credits",
-            included: [
-              "local evaluation workflow",
-              "deterministic evaluation config",
-              "CI gating workflow reference",
-              "failure detection examples",
-            ],
+            included: ["Evaluation datasets", "Configuration examples", "CI/CD-compatible workflows"],
           },
         };
 
@@ -182,7 +159,7 @@ npm run dev:file:openai</code></pre>
         if (planPrice) planPrice.textContent = selected.price;
         if (planCredits) planCredits.textContent = selected.credits;
 
-        for (let i = 0; i < 4; i++) {
+        for (let i = 0; i < 3; i++) {
           const el = document.getElementById(`inc${i + 1}`);
           if (el) el.textContent = selected.included[i] || "";
         }
@@ -190,4 +167,3 @@ npm run dev:file:openai</code></pre>
     </script>
   </body>
 </html>
-
