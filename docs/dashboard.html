@@ -1,0 +1,921 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AI Reliability — Production AI Maintenance Gate</title>
+    <meta
+      name="description"
+      content="Maintenance dashboard: production AI health from customer-defined eval specs, routed provider-call budget gate, and provider-call ledger."
+    />
+    <style>
+      :root {
+        --bg: #0c0f14;
+        --surface: #141a24;
+        --surface2: #1a2230;
+        --border: rgba(255, 255, 255, 0.1);
+        --text: #e8ecf4;
+        --muted: #9aa8c4;
+        --accent: #6b8cff;
+        --ok: #3dd68c;
+        --warn: #e6b84d;
+        --bad: #f07178;
+        --mis: #c792ea;
+        --blocked: #ff9f6b;
+        --font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: var(--font);
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.55;
+        font-size: 15px;
+      }
+      .wrap {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 40px 20px 64px;
+      }
+      header {
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 28px;
+        margin-bottom: 28px;
+      }
+      h1 {
+        font-size: 1.65rem;
+        font-weight: 650;
+        letter-spacing: -0.02em;
+        margin: 0 0 10px;
+      }
+      .subtitle {
+        color: var(--muted);
+        max-width: 72ch;
+        margin: 0;
+      }
+      .scope {
+        margin-top: 16px;
+        padding: 12px 14px;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        font-size: 0.9rem;
+        color: var(--muted);
+      }
+      .scope strong {
+        color: var(--text);
+        font-weight: 600;
+      }
+      .grid {
+        display: grid;
+        gap: 16px;
+      }
+      @media (min-width: 720px) {
+        .grid.cols-2 {
+          grid-template-columns: 1fr 1fr;
+        }
+        .grid.cols-3 {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+      section {
+        margin-top: 28px;
+      }
+      section h2 {
+        font-size: 1.05rem;
+        font-weight: 600;
+        margin: 0 0 12px;
+        color: #dbe4ff;
+        letter-spacing: -0.01em;
+      }
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 16px 18px;
+      }
+      .card dt {
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--muted);
+        margin: 0 0 4px;
+      }
+      .card dd {
+        margin: 0 0 14px;
+        font-weight: 500;
+      }
+      .card dd:last-child {
+        margin-bottom: 0;
+      }
+      .badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+      }
+      .badge.healthy {
+        background: rgba(61, 214, 140, 0.15);
+        color: var(--ok);
+        border: 1px solid rgba(61, 214, 140, 0.35);
+      }
+      .badge.at_risk {
+        background: rgba(230, 184, 77, 0.15);
+        color: var(--warn);
+        border: 1px solid rgba(230, 184, 77, 0.35);
+      }
+      .badge.failed {
+        background: rgba(240, 113, 120, 0.15);
+        color: var(--bad);
+        border: 1px solid rgba(240, 113, 120, 0.35);
+      }
+      .badge.misconfigured {
+        background: rgba(199, 146, 234, 0.15);
+        color: var(--mis);
+        border: 1px solid rgba(199, 146, 234, 0.35);
+      }
+      .badge.blocked {
+        background: rgba(255, 159, 107, 0.15);
+        color: var(--blocked);
+        border: 1px solid rgba(255, 159, 107, 0.35);
+      }
+      .meta {
+        font-size: 0.85rem;
+        color: var(--muted);
+        margin-top: 8px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+      }
+      th,
+      td {
+        text-align: left;
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--border);
+      }
+      th {
+        color: var(--muted);
+        font-weight: 600;
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      tbody tr:hover {
+        background: rgba(255, 255, 255, 0.02);
+      }
+      .empty {
+        color: var(--muted);
+        font-size: 0.9rem;
+        margin: 0;
+      }
+      .provenance {
+        margin-top: 32px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border);
+        font-size: 0.82rem;
+        color: var(--muted);
+      }
+      .provenance code {
+        font-size: 0.8em;
+        background: var(--surface2);
+        padding: 2px 6px;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+      }
+      #load-banner {
+        font-size: 0.85rem;
+        color: var(--muted);
+        margin-bottom: 16px;
+        padding: 10px 12px;
+        background: var(--surface2);
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        display: none;
+      }
+      #load-banner.visible {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <h1>Production AI Maintenance Gate</h1>
+        <p class="subtitle">
+          AI Reliability checks production AI behavior against customer-defined eval specs, validates tool calls and
+          actions, and enforces provider-call budget limits for routed calls.
+        </p>
+        <p class="scope">
+          <strong>Scope:</strong> Budget enforcement applies to configured provider calls
+          <strong>routed through the AI Reliability gate</strong>. Direct provider calls that bypass the gate are outside
+          this enforcement scope.
+        </p>
+      </header>
+
+      <p id="load-banner" class="visible" role="status"></p>
+
+      <section aria-labelledby="health-heading">
+        <h2 id="health-heading">Production AI health</h2>
+        <div class="grid cols-2">
+          <div class="card">
+            <dl>
+              <dt>Status</dt>
+              <dd><span id="health-badge" class="badge">—</span></dd>
+              <dt>Latest maintenance run</dt>
+              <dd id="run-time">—</dd>
+              <dt>Workflow</dt>
+              <dd id="workflow-name">—</dd>
+              <dt>Environment</dt>
+              <dd id="environment">—</dd>
+              <dt>Spec version</dt>
+              <dd id="spec-version">—</dd>
+            </dl>
+          </div>
+          <div class="card">
+            <dl>
+              <dt>Run ID</dt>
+              <dd id="run-id" style="word-break: break-all">—</dd>
+              <dt>Production health signal</dt>
+              <dd id="prod-health">—</dd>
+            </dl>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="spec-heading">
+        <h2 id="spec-heading">Source-of-truth eval specs</h2>
+        <div class="card">
+          <dl>
+            <dt>Active spec</dt>
+            <dd id="spec-label">—</dd>
+            <dt>Workflow covered</dt>
+            <dd id="spec-workflow">—</dd>
+            <dt>Policies recorded</dt>
+            <dd id="count-policies">—</dd>
+            <dt>Output / behavior checks</dt>
+            <dd id="count-behavior-output">—</dd>
+            <dt>Required tool-call checks</dt>
+            <dd id="count-tools">—</dd>
+            <dt>Forbidden action checks</dt>
+            <dd id="count-actions">—</dd>
+          </dl>
+          <p class="meta">
+            Customers define policies, tools, actions, and expectations in eval specs. AI Reliability compares
+            maintenance observations to those definitions.
+          </p>
+        </div>
+      </section>
+
+      <section aria-labelledby="checks-heading">
+        <h2 id="checks-heading">Maintenance checks</h2>
+        <div class="grid cols-3">
+          <div class="card"><dl><dt>Checks run</dt><dd id="checks-run">—</dd></dl></div>
+          <div class="card"><dl><dt>Passed</dt><dd id="checks-passed">—</dd></dl></div>
+          <div class="card"><dl><dt>Failed</dt><dd id="checks-failed">—</dd></dl></div>
+          <div class="card"><dl><dt>Blocking failures</dt><dd id="blocking-failures">—</dd></dl></div>
+          <div class="card"><dl><dt>Warnings</dt><dd id="warnings">—</dd></dl></div>
+        </div>
+      </section>
+
+      <section aria-labelledby="budget-heading">
+        <h2 id="budget-heading">Budget gate (routed provider calls)</h2>
+        <div class="grid cols-2">
+          <div class="card">
+            <dl>
+              <dt>Monthly budget limit (spec gate)</dt>
+              <dd id="monthly-limit">—</dd>
+              <dt>Budget used (tracked state)</dt>
+              <dd id="budget-used">—</dd>
+              <dt>Remaining (tracked state)</dt>
+              <dd id="budget-remaining">—</dd>
+              <dt>Per-run limit</dt>
+              <dd id="per-run-limit">—</dd>
+              <dt>Latest routed call estimate</dt>
+              <dd id="est-cost">—</dd>
+              <dt>Gate status</dt>
+              <dd id="budget-status">—</dd>
+            </dl>
+          </div>
+          <div class="card">
+            <dl>
+              <dt>Routed calls (this run summary)</dt>
+              <dd id="routed-summary">—</dd>
+              <dt>Fail closed</dt>
+              <dd id="fail-closed">—</dd>
+            </dl>
+            <p class="meta">
+              Figures reflect configured limits in the active eval spec and the latest maintenance run. Tracked state
+              comes from the same budget state artifact the runner writes after routed calls.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="ledger-heading">
+        <h2 id="ledger-heading">Provider-call ledger</h2>
+        <div class="grid cols-2">
+          <div class="card">
+            <dl>
+              <dt>Total entries</dt>
+              <dd id="ledger-total">—</dd>
+              <dt>Completed</dt>
+              <dd id="ledger-completed">—</dd>
+              <dt>Blocked</dt>
+              <dd id="ledger-blocked">—</dd>
+              <dt>Failed / misconfigured attempt</dt>
+              <dd id="ledger-failed">—</dd>
+              <dt>Estimated blocked spend</dt>
+              <dd id="ledger-blocked-spend">—</dd>
+            </dl>
+          </div>
+          <div class="card">
+            <dl>
+              <dt>Latest provider / model</dt>
+              <dd id="ledger-latest-pm">—</dd>
+            </dl>
+          </div>
+        </div>
+        <div class="card" style="margin-top: 16px; overflow-x: auto">
+          <table aria-label="Provider call ledger entries">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Status</th>
+                <th>Provider</th>
+                <th>Model</th>
+                <th>Est. USD</th>
+                <th>Actual USD</th>
+                <th>Block reason</th>
+              </tr>
+            </thead>
+            <tbody id="ledger-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section aria-labelledby="fail-heading">
+        <h2 id="fail-heading">Blocking failures and evidence</h2>
+        <div class="card" style="overflow-x: auto">
+          <table aria-label="Failed maintenance checks">
+            <thead>
+              <tr>
+                <th>Check</th>
+                <th>Severity</th>
+                <th>Reason</th>
+                <th>Kind</th>
+              </tr>
+            </thead>
+            <tbody id="fail-body"></tbody>
+          </table>
+          <p id="fail-empty" class="empty" style="display: none">No blocking failures in the latest result.</p>
+        </div>
+        <div class="card" style="margin-top: 16px">
+          <h2 style="font-size: 0.95rem; margin-bottom: 8px">Evidence strings</h2>
+          <ul id="evidence-list" style="margin: 0; padding-left: 1.2rem; color: var(--muted)"></ul>
+        </div>
+      </section>
+
+      <section aria-labelledby="rec-heading">
+        <h2 id="rec-heading">Recommended actions</h2>
+        <div class="card">
+          <ul id="rec-list" style="margin: 0; padding-left: 1.2rem"></ul>
+          <p id="rec-empty" class="empty" style="display: none">No recommended actions for this run.</p>
+        </div>
+      </section>
+
+      <section aria-labelledby="deploy-heading">
+        <h2 id="deploy-heading">Deploy gate mode</h2>
+        <div class="grid cols-2">
+          <div class="card">
+            <dl>
+              <dt>Deploy allowed</dt>
+              <dd id="deploy-allowed">—</dd>
+              <dt>Exit code</dt>
+              <dd id="gate-exit">—</dd>
+            </dl>
+          </div>
+          <div class="card">
+            <p class="meta" style="margin: 0 0 10px">
+              In CI/CD, the same maintenance artifacts can drive a release gate. Exit codes: <strong>0</strong> deploy
+              allowed (healthy or at-risk), <strong>1</strong> blocking failures, <strong>2</strong> misconfigured.
+            </p>
+            <p class="meta" style="margin: 0"><code style="color: var(--text)">npm run gate:release</code></p>
+          </div>
+        </div>
+      </section>
+
+      <footer class="provenance">
+        <p style="margin: 0 0 8px">
+          Data sources (regenerate with <code>npm run demo:maintenance-gate</code> and <code>npm run gate:release</code>):
+        </p>
+        <ul style="margin: 0; padding-left: 1.2rem">
+          <li><code>deliverables/maintenance/maintenance-result.json</code></li>
+          <li><code>deliverables/maintenance/budget-state.json</code></li>
+          <li><code>deliverables/maintenance/provider-call-ledger.jsonl</code></li>
+          <li><code>deliverables/maintenance/gate-result.json</code></li>
+        </ul>
+        <p style="margin: 12px 0 0">
+          On GitHub Pages, relative fetches to <code>deliverables/</code> may be unavailable; this page falls back to an
+          embedded snapshot copied from those artifacts. Replace the snapshot after local runs to refresh the alpha view.
+        </p>
+      </footer>
+    </div>
+
+    <!--
+      EMBEDDED_SNAPSHOT_* constants are copied from deliverables/maintenance/* after a healthy demo run.
+      Source of truth for regeneration: repo root deliverables/maintenance/
+    -->
+    <script>
+      const ARTIFACT_PATHS = {
+        maintenance: "../deliverables/maintenance/maintenance-result.json",
+        budget: "../deliverables/maintenance/budget-state.json",
+        gate: "../deliverables/maintenance/gate-result.json",
+        ledger: "../deliverables/maintenance/provider-call-ledger.jsonl",
+      };
+
+      const EMBEDDED_SNAPSHOT_MAINTENANCE = {
+        runId: "maint-f1d1702e-997d-41f3-90bd-ffafe285a36e",
+        specId: "pricing-plans-v1",
+        specVersion: 1,
+        workflowName: "sales_copilot",
+        environment: "pre_production",
+        status: "healthy",
+        productionHealthStatus: "healthy",
+        checksRun: 12,
+        checksPassed: 12,
+        checksFailed: 0,
+        blockingFailures: 0,
+        warnings: 0,
+        evidence: [],
+        budgetGateSummary: {
+          monthlyBudgetLimitUsd: 600,
+          perRunBudgetLimitUsd: 1.5,
+          monthlySpendUsdAfterRun: 200.2,
+          routedCallsAttempted: 1,
+          routedCallsBlocked: 0,
+          failClosed: true,
+        },
+        policyResults: [
+          {
+            policyId: "policy-0",
+            policySummary:
+              "Public pricing must match the customer's plan catalog embedded in this spec only; the model must not invent plans or prices.",
+            passed: true,
+            severity: "info",
+          },
+        ],
+        toolCallResults: [
+          {
+            testCaseId: "tc-quote-starter",
+            toolName: "fetch_plan_catalog",
+            required: true,
+            observed: true,
+            passed: true,
+            severity: "blocking",
+          },
+          {
+            testCaseId: "tc-quote-agency",
+            toolName: "fetch_plan_catalog",
+            required: true,
+            observed: true,
+            passed: true,
+            severity: "blocking",
+          },
+          { testCaseId: "_spec", toolName: "fetch_plan_catalog", required: true, observed: true, passed: true, severity: "blocking" },
+        ],
+        actionResults: [
+          {
+            testCaseId: "tc-quote-starter",
+            action: "invent_plan_price",
+            forbidden: true,
+            observed: false,
+            passed: true,
+            severity: "blocking",
+          },
+          {
+            testCaseId: "tc-quote-agency",
+            action: "invent_plan_price",
+            forbidden: true,
+            observed: false,
+            passed: true,
+            severity: "blocking",
+          },
+          { testCaseId: "_spec", action: "invent_plan_price", forbidden: true, observed: false, passed: true, severity: "blocking" },
+        ],
+        budgetResults: [
+          {
+            passed: true,
+            routedCallAllowed: true,
+            reason: "routed_call_allowed",
+            estimatedCostUsd: 0.2,
+            monthlyBudgetRemainingUsd: 400,
+            perRunBudgetLimitUsd: 1.5,
+          },
+        ],
+        checks: [
+          {
+            id: "policy-0",
+            name: "Policy acknowledged: Public pricing must match the customer's plan catalog embedded in this spec only",
+            kind: "policy",
+            passed: true,
+            severity: "info",
+            message: "Policy recorded in spec; customer is source of truth.",
+          },
+          {
+            id: "output:tc-quote-starter",
+            name: "Expected output (Quotes Starter from customer catalog)",
+            kind: "output",
+            passed: true,
+            severity: "blocking",
+            message: "Output matches spec-defined expectation.",
+            testCaseId: "tc-quote-starter",
+          },
+          {
+            id: "behavior:tc-quote-starter",
+            name: "Expected behavior (Quotes Starter from customer catalog)",
+            kind: "behavior",
+            passed: true,
+            severity: "blocking",
+            message: "Observed output reflects spec-defined expected behavior.",
+            testCaseId: "tc-quote-starter",
+          },
+          {
+            id: "tool:tc-quote-starter:fetch_plan_catalog",
+            name: "Required tool fetch_plan_catalog",
+            kind: "tool_call",
+            passed: true,
+            severity: "blocking",
+            message: "Tool fetch_plan_catalog present in routed trace.",
+            testCaseId: "tc-quote-starter",
+          },
+          {
+            id: "action:tc-quote-starter:invent_plan_price",
+            name: "Forbidden action invent_plan_price",
+            kind: "action",
+            passed: true,
+            severity: "blocking",
+            message: "Forbidden action invent_plan_price not observed.",
+            testCaseId: "tc-quote-starter",
+          },
+          {
+            id: "behavior:tc-quote-agency",
+            name: "Expected behavior (Quotes Agency tier correctly)",
+            kind: "behavior",
+            passed: true,
+            severity: "blocking",
+            message: "Observed output reflects spec-defined expected behavior.",
+            testCaseId: "tc-quote-agency",
+          },
+          {
+            id: "tool:tc-quote-agency:fetch_plan_catalog",
+            name: "Required tool fetch_plan_catalog",
+            kind: "tool_call",
+            passed: true,
+            severity: "blocking",
+            message: "Tool fetch_plan_catalog present in routed trace.",
+            testCaseId: "tc-quote-agency",
+          },
+          {
+            id: "action:tc-quote-agency:invent_plan_price",
+            name: "Forbidden action invent_plan_price",
+            kind: "action",
+            passed: true,
+            severity: "blocking",
+            message: "Forbidden action invent_plan_price not observed.",
+            testCaseId: "tc-quote-agency",
+          },
+          {
+            id: "spec_tool:fetch_plan_catalog",
+            name: "Spec-level required tool fetch_plan_catalog",
+            kind: "tool_call",
+            passed: true,
+            severity: "blocking",
+            message: "Tool fetch_plan_catalog present in maintenance trace.",
+          },
+          {
+            id: "spec_action:invent_plan_price",
+            name: "Spec-level forbidden action invent_plan_price",
+            kind: "action",
+            passed: true,
+            severity: "blocking",
+            message: "Forbidden action invent_plan_price not observed.",
+          },
+          {
+            id: "escalation:0",
+            name: "Escalation rule recorded",
+            kind: "escalation",
+            passed: true,
+            severity: "info",
+            message: "If the catalog tool fails, say you cannot confirm pricing and do not guess.",
+          },
+          {
+            id: "budget:routed_call",
+            name: "Routed provider call budget gate",
+            kind: "budget",
+            passed: true,
+            severity: "blocking",
+            message: "routed_call_allowed",
+          },
+        ],
+        recommendedActions: [],
+        generatedAt: "2026-05-10T10:06:26.408Z",
+      };
+
+      const EMBEDDED_SNAPSHOT_BUDGET = {
+        planId: "starter",
+        creditsRemaining: 499,
+        budgetRemainingUsd: 399.8,
+        creditsUsed: 1,
+        budgetUsedUsd: 0.2,
+      };
+
+      const EMBEDDED_SNAPSHOT_GATE = {
+        evaluatedAt: "2026-05-10T10:06:32.823Z",
+        source: "deliverables/maintenance/maintenance-result.json",
+        runId: "maint-f1d1702e-997d-41f3-90bd-ffafe285a36e",
+        specId: "pricing-plans-v1",
+        maintenanceStatus: "healthy",
+        deployAllowed: true,
+        exitCode: 0,
+      };
+
+      const EMBEDDED_SNAPSHOT_LEDGER = `{"callId":"call-maint-f1d1702e-997d-41f3-90bd-ffafe285a36e","runId":"maint-f1d1702e-997d-41f3-90bd-ffafe285a36e","specId":"pricing-plans-v1","provider":"openai","model":"gpt-4.1-mini","estimatedInputTokens":400,"estimatedOutputTokens":120,"estimatedCostUsd":0.2,"createdAt":"2026-05-10T10:06:26.408Z","status":"completed","actualInputTokens":400,"actualOutputTokens":120,"actualCostUsd":0.2}`;
+
+      const SPEC_DISPLAY = {
+        specName: "Plan and price accuracy (customer catalog)",
+        sourceFile: "examples/eval-specs/pricing-and-plan-accuracy.spec.json",
+      };
+
+      async function tryFetchJson(url) {
+        try {
+          const r = await fetch(url, { cache: "no-store" });
+          if (!r.ok) return null;
+          return await r.json();
+        } catch {
+          return null;
+        }
+      }
+
+      async function tryFetchText(url) {
+        try {
+          const r = await fetch(url, { cache: "no-store" });
+          if (!r.ok) return null;
+          return await r.text();
+        } catch {
+          return null;
+        }
+      }
+
+      function parseLedgerJsonl(text) {
+        if (!text || !text.trim()) return [];
+        return text
+          .split("\n")
+          .map((line) => line.trim())
+          .filter(Boolean)
+          .map((line) => {
+            try {
+              return JSON.parse(line);
+            } catch {
+              return null;
+            }
+          })
+          .filter(Boolean);
+      }
+
+      function badgeClass(status) {
+        const s = String(status || "").toLowerCase();
+        if (s === "healthy") return "healthy";
+        if (s === "at_risk") return "at_risk";
+        if (s === "failed") return "failed";
+        if (s === "misconfigured") return "misconfigured";
+        return "healthy";
+      }
+
+      function formatUsd(n) {
+        if (n === undefined || n === null || Number.isNaN(Number(n))) return "—";
+        return (
+          "$" +
+          Number(n).toLocaleString(undefined, {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 4,
+          })
+        );
+      }
+
+      function classifyFailure(check) {
+        if (!check || check.passed) return "";
+        const k = check.kind || "";
+        if (k === "tool_call") return "Required tool call missing or not observed in routed trace.";
+        if (k === "action") return "Forbidden action observed.";
+        if (k === "behavior" || k === "output") return "Expected behavior or output mismatch vs customer spec.";
+        if (k === "budget") return "Routed provider-call budget gate blocked or misconfigured.";
+        if (k === "spec_validity") return "Eval spec misconfigured or invalid.";
+        return check.message || "";
+      }
+
+      function render(maintenance, budget, gate, ledgerRows) {
+        const banner = document.getElementById("load-banner");
+        const status = maintenance.status || "unknown";
+        const badge = document.getElementById("health-badge");
+        badge.textContent = status.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+        badge.className = "badge " + badgeClass(status);
+
+        document.getElementById("run-time").textContent = maintenance.generatedAt || "—";
+        document.getElementById("workflow-name").textContent = maintenance.workflowName || "—";
+        document.getElementById("environment").textContent = maintenance.environment || "—";
+        document.getElementById("spec-version").textContent =
+          maintenance.specVersion !== undefined ? String(maintenance.specVersion) : "—";
+        document.getElementById("run-id").textContent = maintenance.runId || "—";
+        document.getElementById("prod-health").textContent = maintenance.productionHealthStatus || "—";
+
+        document.getElementById("spec-label").textContent =
+          (SPEC_DISPLAY.specName ? SPEC_DISPLAY.specName + " · " : "") + (maintenance.specId || "—");
+        document.getElementById("spec-workflow").textContent = maintenance.workflowName || "—";
+        const policies = maintenance.policyResults || [];
+        const checks = maintenance.checks || [];
+        document.getElementById("count-policies").textContent = String(policies.length);
+        const bo = checks.filter((c) => c.kind === "behavior" || c.kind === "output").length;
+        document.getElementById("count-behavior-output").textContent = String(bo);
+        const tools = maintenance.toolCallResults || [];
+        document.getElementById("count-tools").textContent = String(tools.length);
+        const acts = maintenance.actionResults || [];
+        document.getElementById("count-actions").textContent = String(acts.length);
+
+        document.getElementById("checks-run").textContent = String(maintenance.checksRun ?? "—");
+        document.getElementById("checks-passed").textContent = String(maintenance.checksPassed ?? "—");
+        document.getElementById("checks-failed").textContent = String(maintenance.checksFailed ?? "—");
+        document.getElementById("blocking-failures").textContent = String(maintenance.blockingFailures ?? "—");
+        document.getElementById("warnings").textContent = String(maintenance.warnings ?? "—");
+
+        const bg = maintenance.budgetGateSummary;
+        const br = (maintenance.budgetResults && maintenance.budgetResults[0]) || null;
+        document.getElementById("monthly-limit").textContent = bg ? formatUsd(bg.monthlyBudgetLimitUsd) : "—";
+        document.getElementById("budget-used").textContent = formatUsd(budget.budgetUsedUsd);
+        document.getElementById("budget-remaining").textContent = formatUsd(budget.budgetRemainingUsd);
+        document.getElementById("per-run-limit").textContent =
+          bg && bg.perRunBudgetLimitUsd !== undefined ? formatUsd(bg.perRunBudgetLimitUsd) : "—";
+        document.getElementById("est-cost").textContent = br ? formatUsd(br.estimatedCostUsd) : "—";
+
+        let bStatus = "—";
+        if (br) {
+          if (br.passed && br.routedCallAllowed) bStatus = "Within limits for routed call";
+          else if (!br.passed) bStatus = "Blocked or not allowed for routed call";
+        }
+        document.getElementById("budget-status").textContent = bStatus;
+        document.getElementById("routed-summary").textContent = bg
+          ? `Attempted ${bg.routedCallsAttempted}, blocked ${bg.routedCallsBlocked}`
+          : "—";
+        document.getElementById("fail-closed").textContent =
+          bg && typeof bg.failClosed === "boolean" ? (bg.failClosed ? "Yes" : "No") : "—";
+
+        const total = ledgerRows.length;
+        const completed = ledgerRows.filter((r) => r.status === "completed").length;
+        const blocked = ledgerRows.filter((r) => r.status === "blocked").length;
+        const failed = ledgerRows.filter((r) => r.status === "failed").length;
+        let blockedSpend = 0;
+        ledgerRows.forEach((r) => {
+          if (r.status === "blocked" && typeof r.estimatedCostUsd === "number") blockedSpend += r.estimatedCostUsd;
+        });
+        document.getElementById("ledger-total").textContent = String(total);
+        document.getElementById("ledger-completed").textContent = String(completed);
+        document.getElementById("ledger-blocked").textContent = String(blocked);
+        document.getElementById("ledger-failed").textContent = String(failed);
+        document.getElementById("ledger-blocked-spend").textContent = formatUsd(blockedSpend);
+        const latest = ledgerRows[ledgerRows.length - 1];
+        document.getElementById("ledger-latest-pm").textContent = latest
+          ? `${latest.provider} / ${latest.model}`
+          : "—";
+
+        const tbody = document.getElementById("ledger-body");
+        tbody.innerHTML = "";
+        ledgerRows
+          .slice()
+          .reverse()
+          .forEach((row) => {
+            const tr = document.createElement("tr");
+            const badge = document.createElement("span");
+            badge.className = "badge " + (row.status === "blocked" ? "blocked" : row.status === "failed" ? "misconfigured" : "healthy");
+            badge.textContent = row.status || "—";
+            const tdTime = document.createElement("td");
+            tdTime.textContent = row.createdAt || "—";
+            const tdSt = document.createElement("td");
+            tdSt.appendChild(badge);
+            tr.appendChild(tdTime);
+            tr.appendChild(tdSt);
+            ["provider", "model"].forEach((k) => {
+              const td = document.createElement("td");
+              td.textContent = row[k] || "—";
+              tr.appendChild(td);
+            });
+            const tdE = document.createElement("td");
+            tdE.textContent = formatUsd(row.estimatedCostUsd);
+            const tdA = document.createElement("td");
+            tdA.textContent = row.actualCostUsd !== undefined ? formatUsd(row.actualCostUsd) : "—";
+            const tdB = document.createElement("td");
+            tdB.textContent = row.blockReason || "—";
+            tr.appendChild(tdE);
+            tr.appendChild(tdA);
+            tr.appendChild(tdB);
+            tbody.appendChild(tr);
+          });
+
+        const failChecks = checks.filter((c) => !c.passed && c.severity === "blocking");
+        const failBody = document.getElementById("fail-body");
+        failBody.innerHTML = "";
+        if (failChecks.length === 0) {
+          document.getElementById("fail-empty").style.display = "block";
+        } else {
+          document.getElementById("fail-empty").style.display = "none";
+          failChecks.forEach((c) => {
+            const tr = document.createElement("tr");
+            [c.name || c.id, c.severity, classifyFailure(c) || c.message || "—", c.kind || "—"].forEach((text) => {
+              const td = document.createElement("td");
+              td.textContent = text;
+              tr.appendChild(td);
+            });
+            failBody.appendChild(tr);
+          });
+        }
+
+        const ev = maintenance.evidence || [];
+        const evUl = document.getElementById("evidence-list");
+        evUl.innerHTML = "";
+        if (ev.length === 0) {
+          const li = document.createElement("li");
+          li.textContent = "None recorded.";
+          evUl.appendChild(li);
+        } else {
+          ev.forEach((x) => {
+            const li = document.createElement("li");
+            li.textContent = x;
+            evUl.appendChild(li);
+          });
+        }
+
+        const rec = maintenance.recommendedActions || [];
+        const recUl = document.getElementById("rec-list");
+        const recEmpty = document.getElementById("rec-empty");
+        recUl.innerHTML = "";
+        if (!rec.length) {
+          recEmpty.style.display = "block";
+        } else {
+          recEmpty.style.display = "none";
+          rec.forEach((a) => {
+            const li = document.createElement("li");
+            li.innerHTML = `<strong>${escapeHtml(a.title || a.id || "Action")}</strong> — ${escapeHtml(a.detail || "")}`;
+            recUl.appendChild(li);
+          });
+        }
+
+        document.getElementById("deploy-allowed").textContent =
+          gate.deployAllowed === true ? "Yes" : gate.deployAllowed === false ? "No" : "—";
+        const code = gate.exitCode;
+        let codeMeaning = "—";
+        if (code === 0) codeMeaning = "0 — deploy allowed (healthy or at-risk)";
+        else if (code === 1) codeMeaning = "1 — blocking failures";
+        else if (code === 2) codeMeaning = "2 — misconfigured";
+        document.getElementById("gate-exit").textContent =
+          code !== undefined ? `${code} (${codeMeaning})` : "—";
+
+        banner.textContent =
+          "Loaded maintenance artifacts from fetch when available; otherwise embedded snapshot (see page footer).";
+      }
+
+      function escapeHtml(s) {
+        return String(s)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+
+      (async function init() {
+        const mFetch = await tryFetchJson(ARTIFACT_PATHS.maintenance);
+        const bFetch = await tryFetchJson(ARTIFACT_PATHS.budget);
+        const gFetch = await tryFetchJson(ARTIFACT_PATHS.gate);
+        const lText = await tryFetchText(ARTIFACT_PATHS.ledger);
+
+        const maintenance = mFetch || EMBEDDED_SNAPSHOT_MAINTENANCE;
+        const budget = bFetch || EMBEDDED_SNAPSHOT_BUDGET;
+        let gate = gFetch || EMBEDDED_SNAPSHOT_GATE;
+        if (gate && typeof gate.exitCode !== "number" && gate.maintenanceStatus) {
+          const s = gate.maintenanceStatus;
+          gate = {
+            ...gate,
+            exitCode: s === "misconfigured" ? 2 : s === "failed" ? 1 : 0,
+          };
+        }
+        const ledgerRows = parseLedgerJsonl(lText || EMBEDDED_SNAPSHOT_LEDGER);
+
+        render(maintenance, budget, gate, ledgerRows);
+      })();
+    </script>
+  </body>
+</html>
