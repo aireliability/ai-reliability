@@ -1,0 +1,51 @@
+{
+  "specId": "agent-tools-v1",
+  "specName": "Agent tool and API execution",
+  "workflowName": "operations_agent",
+  "environment": "staging",
+  "version": 1,
+  "policies": [
+    "Inventory changes must go through the customer's approved inventory API; direct database writes from the agent are forbidden."
+  ],
+  "testCases": [
+    {
+      "id": "tc-reserve-stock",
+      "name": "Reservation calls inventory API",
+      "input": "Reserve 2 units of SKU-441 for order 998877.",
+      "expectedBehavior": "call the customer's inventory reservation endpoint before confirming",
+      "requiredToolCalls": ["inventory_api_reserve"],
+      "forbiddenActions": ["db_direct_write", "skip_inventory_check"],
+      "severity": "blocking",
+      "tags": ["tools", "inventory"]
+    },
+    {
+      "id": "tc-read-only",
+      "name": "Read-only lookup does not mutate",
+      "input": "What is the stock count for SKU-441?",
+      "expectedBehavior": "use read-only lookup without reservation",
+      "requiredToolCalls": ["inventory_api_get_stock"],
+      "forbiddenActions": ["inventory_api_reserve"],
+      "severity": "warning",
+      "tags": ["tools"]
+    }
+  ],
+  "requiredToolCalls": ["inventory_api_get_stock"],
+  "forbiddenActions": ["db_direct_write"],
+  "escalationRules": [
+    "If inventory_api_reserve returns a conflict, surface the error and do not fabricate success."
+  ],
+  "budgetGate": {
+    "monthlyBudgetLimitUsd": 1200,
+    "perRunBudgetLimitUsd": 5,
+    "allowedProviders": ["openai", "anthropic"],
+    "allowedModels": ["claude-3-5-sonnet-20241022", "gpt-4.1-mini"],
+    "failClosed": true
+  },
+  "severity": "blocking",
+  "metadata": {
+    "sourceOfTruth": "customer_defined_spec",
+    "notes": "Tool names and forbidden actions are customer-defined; maintenance checks compare routed traces to this spec."
+  },
+  "createdAt": "2026-05-02T00:00:00.000Z",
+  "updatedAt": "2026-05-09T00:00:00.000Z"
+}

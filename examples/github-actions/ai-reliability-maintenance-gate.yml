@@ -1,0 +1,48 @@
+# Example: run maintenance demo, then release gate on generated artifacts.
+# Adjust paths and triggers for your repository layout.
+
+name: AI Reliability maintenance gate
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "0 6 * * *"
+
+jobs:
+  maintenance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Maintenance demo (healthy scenario)
+        run: npm run demo:maintenance-gate -- healthy
+
+      - name: Budget gate regression tests
+        run: npm run test:budget-gate
+
+      - name: Maintenance gate tests
+        run: npm run test:maintenance-gate
+
+      - name: Release gate
+        run: npm run gate:release
+
+      - name: Upload maintenance artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: maintenance-artifacts
+          path: |
+            deliverables/maintenance/maintenance-result.json
+            deliverables/maintenance/budget-state.json
+            deliverables/maintenance/provider-call-ledger.jsonl
+            deliverables/maintenance/gate-result.json

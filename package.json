@@ -11,10 +11,15 @@
     "ci:eval:deterministic": "tsx apps/api/ci-eval-deterministic.ts",
     "demo:failures": "tsx apps/api/demo-failures.ts",
     "demo:budget-gate": "tsx apps/api/demo-budget-gate.ts",
-    "test:budget-gate": "tsx --test packages/shared/budget-gate.test.ts"
+    "demo:maintenance-gate": "tsx apps/api/demo-maintenance-gate.ts",
+    "gate:release": "tsx apps/api/gate-release.ts",
+    "test:budget-gate": "tsx --test packages/shared/budget-gate.test.ts",
+    "test:maintenance-gate": "tsx --test packages/shared/maintenance-gate.test.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
-    "tsx": "^4.21.0"
+    "tsx": "^4.21.0",
+    "typescript": "^5.8.3"
   }
 }

@@ -1,0 +1,201 @@
+{
+  "runId": "maint-f1d1702e-997d-41f3-90bd-ffafe285a36e",
+  "specId": "pricing-plans-v1",
+  "specVersion": 1,
+  "workflowName": "sales_copilot",
+  "environment": "pre_production",
+  "status": "healthy",
+  "productionHealthStatus": "healthy",
+  "checksRun": 12,
+  "checksPassed": 12,
+  "checksFailed": 0,
+  "blockingFailures": 0,
+  "warnings": 0,
+  "evidence": [],
+  "budgetGateSummary": {
+    "monthlyBudgetLimitUsd": 600,
+    "perRunBudgetLimitUsd": 1.5,
+    "monthlySpendUsdAfterRun": 200.2,
+    "routedCallsAttempted": 1,
+    "routedCallsBlocked": 0,
+    "failClosed": true
+  },
+  "policyResults": [
+    {
+      "policyId": "policy-0",
+      "policySummary": "Public pricing must match the customer's plan catalog embedded in this spec only; the model must not invent plans or prices.",
+      "passed": true,
+      "severity": "info"
+    }
+  ],
+  "toolCallResults": [
+    {
+      "testCaseId": "tc-quote-starter",
+      "toolName": "fetch_plan_catalog",
+      "required": true,
+      "observed": true,
+      "passed": true,
+      "severity": "blocking"
+    },
+    {
+      "testCaseId": "tc-quote-agency",
+      "toolName": "fetch_plan_catalog",
+      "required": true,
+      "observed": true,
+      "passed": true,
+      "severity": "blocking"
+    },
+    {
+      "testCaseId": "_spec",
+      "toolName": "fetch_plan_catalog",
+      "required": true,
+      "observed": true,
+      "passed": true,
+      "severity": "blocking"
+    }
+  ],
+  "actionResults": [
+    {
+      "testCaseId": "tc-quote-starter",
+      "action": "invent_plan_price",
+      "forbidden": true,
+      "observed": false,
+      "passed": true,
+      "severity": "blocking"
+    },
+    {
+      "testCaseId": "tc-quote-agency",
+      "action": "invent_plan_price",
+      "forbidden": true,
+      "observed": false,
+      "passed": true,
+      "severity": "blocking"
+    },
+    {
+      "testCaseId": "_spec",
+      "action": "invent_plan_price",
+      "forbidden": true,
+      "observed": false,
+      "passed": true,
+      "severity": "blocking"
+    }
+  ],
+  "budgetResults": [
+    {
+      "passed": true,
+      "routedCallAllowed": true,
+      "reason": "routed_call_allowed",
+      "estimatedCostUsd": 0.2,
+      "monthlyBudgetRemainingUsd": 400,
+      "perRunBudgetRemainingUsd": 1.5
+    }
+  ],
+  "driftOrRegression": [],
+  "checks": [
+    {
+      "id": "policy-0",
+      "name": "Policy acknowledged: Public pricing must match the customer's plan catalog embedded in this spec only",
+      "kind": "policy",
+      "passed": true,
+      "severity": "info",
+      "message": "Policy recorded in spec; customer is source of truth."
+    },
+    {
+      "id": "output:tc-quote-starter",
+      "name": "Expected output (Quotes Starter from customer catalog)",
+      "kind": "output",
+      "passed": true,
+      "severity": "blocking",
+      "message": "Output matches spec-defined expectation.",
+      "testCaseId": "tc-quote-starter"
+    },
+    {
+      "id": "behavior:tc-quote-starter",
+      "name": "Expected behavior (Quotes Starter from customer catalog)",
+      "kind": "behavior",
+      "passed": true,
+      "severity": "blocking",
+      "message": "Observed output reflects spec-defined expected behavior.",
+      "testCaseId": "tc-quote-starter"
+    },
+    {
+      "id": "tool:tc-quote-starter:fetch_plan_catalog",
+      "name": "Required tool fetch_plan_catalog",
+      "kind": "tool_call",
+      "passed": true,
+      "severity": "blocking",
+      "message": "Tool fetch_plan_catalog present in routed trace.",
+      "testCaseId": "tc-quote-starter"
+    },
+    {
+      "id": "action:tc-quote-starter:invent_plan_price",
+      "name": "Forbidden action invent_plan_price",
+      "kind": "action",
+      "passed": true,
+      "severity": "blocking",
+      "message": "Forbidden action invent_plan_price not observed.",
+      "testCaseId": "tc-quote-starter"
+    },
+    {
+      "id": "behavior:tc-quote-agency",
+      "name": "Expected behavior (Quotes Agency tier correctly)",
+      "kind": "behavior",
+      "passed": true,
+      "severity": "blocking",
+      "message": "Observed output reflects spec-defined expected behavior.",
+      "testCaseId": "tc-quote-agency"
+    },
+    {
+      "id": "tool:tc-quote-agency:fetch_plan_catalog",
+      "name": "Required tool fetch_plan_catalog",
+      "kind": "tool_call",
+      "passed": true,
+      "severity": "blocking",
+      "message": "Tool fetch_plan_catalog present in routed trace.",
+      "testCaseId": "tc-quote-agency"
+    },
+    {
+      "id": "action:tc-quote-agency:invent_plan_price",
+      "name": "Forbidden action invent_plan_price",
+      "kind": "action",
+      "passed": true,
+      "severity": "blocking",
+      "message": "Forbidden action invent_plan_price not observed.",
+      "testCaseId": "tc-quote-agency"
+    },
+    {
+      "id": "spec_tool:fetch_plan_catalog",
+      "name": "Spec-level required tool fetch_plan_catalog",
+      "kind": "tool_call",
+      "passed": true,
+      "severity": "blocking",
+      "message": "Tool fetch_plan_catalog present in maintenance trace."
+    },
+    {
+      "id": "spec_action:invent_plan_price",
+      "name": "Spec-level forbidden action invent_plan_price",
+      "kind": "action",
+      "passed": true,
+      "severity": "blocking",
+      "message": "Forbidden action invent_plan_price not observed."
+    },
+    {
+      "id": "escalation:0",
+      "name": "Escalation rule recorded",
+      "kind": "escalation",
+      "passed": true,
+      "severity": "info",
+      "message": "If the catalog tool fails, say you cannot confirm pricing and do not guess."
+    },
+    {
+      "id": "budget:routed_call",
+      "name": "Routed provider call budget gate",
+      "kind": "budget",
+      "passed": true,
+      "severity": "blocking",
+      "message": "routed_call_allowed"
+    }
+  ],
+  "recommendedActions": [],
+  "generatedAt": "2026-05-10T10:06:26.408Z"
+}

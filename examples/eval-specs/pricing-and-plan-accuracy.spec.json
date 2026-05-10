@@ -1,0 +1,60 @@
+{
+  "specId": "pricing-plans-v1",
+  "specName": "Plan and price accuracy (customer catalog)",
+  "workflowName": "sales_copilot",
+  "environment": "pre_production",
+  "version": 1,
+  "policies": [
+    "Public pricing must match the customer's plan catalog embedded in this spec only; the model must not invent plans or prices."
+  ],
+  "expectedOutputs": [
+    "Starter: $199/mo, Multi-store: $499/mo, Agency: $1799/mo (customer-defined labels)"
+  ],
+  "testCases": [
+    {
+      "id": "tc-quote-starter",
+      "name": "Quotes Starter from customer catalog",
+      "input": "What is the price for the Starter plan?",
+      "expectedBehavior": "state the Starter price as $199/mo per this spec",
+      "expectedOutput": "State the Starter price as $199/mo per this spec (from your defined catalog).",
+      "requiredToolCalls": ["fetch_plan_catalog"],
+      "forbiddenActions": ["invent_plan_price"],
+      "severity": "blocking",
+      "tags": ["pricing"]
+    },
+    {
+      "id": "tc-quote-agency",
+      "name": "Quotes Agency tier correctly",
+      "input": "How much is Agency?",
+      "expectedBehavior": "state Agency as $1799/mo per this spec",
+      "requiredToolCalls": ["fetch_plan_catalog"],
+      "forbiddenActions": ["invent_plan_price"],
+      "severity": "blocking",
+      "tags": ["pricing"]
+    }
+  ],
+  "requiredToolCalls": ["fetch_plan_catalog"],
+  "forbiddenActions": ["invent_plan_price"],
+  "escalationRules": [
+    "If the catalog tool fails, say you cannot confirm pricing and do not guess."
+  ],
+  "budgetGate": {
+    "monthlyBudgetLimitUsd": 600,
+    "perRunBudgetLimitUsd": 1.5,
+    "allowedProviders": ["openai"],
+    "allowedModels": ["gpt-4.1-mini"],
+    "failClosed": true
+  },
+  "severity": "blocking",
+  "metadata": {
+    "sourceOfTruth": "customer_defined_catalog_in_spec",
+    "customerCatalog": {
+      "starterUsd": 199,
+      "multi_storeUsd": 499,
+      "agencyUsd": 1799
+    },
+    "notes": "AI Reliability does not learn your pricing automatically; it compares assistant output and tool use to the catalog you declare here."
+  },
+  "createdAt": "2026-05-03T00:00:00.000Z",
+  "updatedAt": "2026-05-09T00:00:00.000Z"
+}

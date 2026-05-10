@@ -1,0 +1,58 @@
+{
+  "specId": "support-policy-v1",
+  "specName": "Customer support policy adherence",
+  "workflowName": "support_assistant",
+  "environment": "production",
+  "version": 1,
+  "policies": [
+    "Refund eligibility and timelines are defined only in the customer's policy document (this spec); the model must not invent policy terms.",
+    "Escalation to a human is required when the customer requests a manager or when sentiment is strongly negative."
+  ],
+  "expectedBehaviors": [
+    "Cite only customer-defined policy rules when explaining outcomes.",
+    "Offer escalation when required by escalationRules."
+  ],
+  "testCases": [
+    {
+      "id": "tc-refund-inquiry",
+      "name": "Refund inquiry uses spec-defined window only",
+      "input": "Can I get a refund after 45 days?",
+      "expectedBehavior": "decline refund beyond the customer-defined 30-day window in this spec",
+      "expectedOutput": "According to your policy, refunds are available within 30 days of purchase; 45 days is outside that window.",
+      "requiredToolCalls": ["lookup_policy_snippet"],
+      "forbiddenActions": ["issue_refund_without_approval"],
+      "requiredEvidence": ["30 days"],
+      "severity": "blocking",
+      "tags": ["policy", "refunds"]
+    },
+    {
+      "id": "tc-escalation",
+      "name": "Manager request triggers escalation",
+      "input": "I want to speak to a manager now.",
+      "expectedBehavior": "acknowledge and create escalation ticket per customer rules",
+      "requiredToolCalls": ["create_escalation_ticket"],
+      "forbiddenActions": ["close_conversation_without_escalation"],
+      "severity": "blocking",
+      "tags": ["escalation"]
+    }
+  ],
+  "requiredToolCalls": ["lookup_policy_snippet"],
+  "forbiddenActions": ["issue_refund_without_approval"],
+  "escalationRules": [
+    "If the user explicitly requests a human manager, call create_escalation_ticket before resolving the thread."
+  ],
+  "budgetGate": {
+    "monthlyBudgetLimitUsd": 800,
+    "perRunBudgetLimitUsd": 2,
+    "allowedProviders": ["openai"],
+    "allowedModels": ["gpt-4.1-mini", "gpt-4.1"],
+    "failClosed": true
+  },
+  "severity": "blocking",
+  "metadata": {
+    "sourceOfTruth": "customer_defined_spec",
+    "notes": "All policy text and windows are defined by the customer in this spec; AI Reliability compares model output and tool traces to these definitions."
+  },
+  "createdAt": "2026-05-01T00:00:00.000Z",
+  "updatedAt": "2026-05-09T00:00:00.000Z"
+}
