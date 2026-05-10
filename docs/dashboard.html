@@ -6,22 +6,22 @@
     <title>AI Reliability — Production AI Maintenance Gate</title>
     <meta
       name="description"
-      content="Maintenance dashboard: production AI health from customer-defined eval specs, routed provider-call budget gate, and provider-call ledger."
+      content="Production AI health, customer-defined eval specs, routed provider-call budget gate, and ledger — AI Reliability Maintenance Gate."
     />
     <style>
       :root {
-        --bg: #0c0f14;
-        --surface: #141a24;
-        --surface2: #1a2230;
-        --border: rgba(255, 255, 255, 0.1);
-        --text: #e8ecf4;
-        --muted: #9aa8c4;
-        --accent: #6b8cff;
-        --ok: #3dd68c;
-        --warn: #e6b84d;
-        --bad: #f07178;
-        --mis: #c792ea;
-        --blocked: #ff9f6b;
+        --bg: #0a0d12;
+        --surface: #121722;
+        --surface-elevated: #171d2b;
+        --border: rgba(255, 255, 255, 0.08);
+        --text: #e9edf5;
+        --muted: #8b9ab8;
+        --accent: #7c9eff;
+        --ok: #34d399;
+        --warn: #fbbf24;
+        --bad: #f87171;
+        --mis: #c4b5fd;
+        --blocked: #fb923c;
         --font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       }
       * {
@@ -36,38 +36,115 @@
         font-size: 15px;
       }
       .wrap {
-        max-width: 1120px;
+        max-width: 1140px;
         margin: 0 auto;
-        padding: 40px 20px 64px;
+        padding: 36px 22px 72px;
       }
-      header {
-        border-bottom: 1px solid var(--border);
-        padding-bottom: 28px;
+      .hero {
+        background: linear-gradient(180deg, var(--surface-elevated) 0%, var(--surface) 100%);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 28px 28px 24px;
         margin-bottom: 28px;
       }
-      h1 {
-        font-size: 1.65rem;
+      .hero h1 {
+        font-size: 1.75rem;
         font-weight: 650;
-        letter-spacing: -0.02em;
-        margin: 0 0 10px;
+        letter-spacing: -0.03em;
+        margin: 0 0 12px;
+        line-height: 1.2;
       }
-      .subtitle {
+      .hero .tagline {
+        font-size: 1.05rem;
+        color: var(--muted);
+        max-width: 68ch;
+        margin: 0 0 22px;
+        line-height: 1.5;
+      }
+      .scope-secondary {
+        font-size: 0.88rem;
         color: var(--muted);
         max-width: 72ch;
         margin: 0;
+        padding-top: 18px;
+        border-top: 1px solid var(--border);
+        line-height: 1.5;
       }
-      .scope {
-        margin-top: 16px;
-        padding: 12px 14px;
-        background: var(--surface2);
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        font-size: 0.9rem;
-        color: var(--muted);
-      }
-      .scope strong {
-        color: var(--text);
+      .scope-secondary strong {
+        color: #b8c5e0;
         font-weight: 600;
+      }
+      .exec-strip {
+        display: grid;
+        gap: 12px;
+      }
+      @media (min-width: 900px) {
+        .exec-strip {
+          grid-template-columns: repeat(5, 1fr);
+        }
+      }
+      .exec-tile {
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 14px 16px;
+        min-height: 92px;
+      }
+      .exec-tile dt {
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--muted);
+        margin: 0 0 8px;
+        font-weight: 600;
+      }
+      .exec-tile dd {
+        margin: 0;
+        font-size: 1.35rem;
+        font-weight: 650;
+        letter-spacing: -0.02em;
+        line-height: 1.25;
+      }
+      .exec-tile dd.small {
+        font-size: 1rem;
+        font-weight: 600;
+      }
+      .how-read {
+        margin-top: 24px;
+        padding: 16px 18px;
+        background: rgba(0, 0, 0, 0.15);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+      }
+      .how-read h2 {
+        font-size: 0.82rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #b8c5e0;
+        margin: 0 0 10px;
+        font-weight: 600;
+      }
+      .how-read ul {
+        margin: 0;
+        padding-left: 1.2rem;
+        color: var(--muted);
+        font-size: 0.92rem;
+      }
+      .how-read li {
+        margin-top: 6px;
+      }
+      .how-read li:first-child {
+        margin-top: 0;
+      }
+      section {
+        margin-top: 32px;
+      }
+      section > h2 {
+        font-size: 1.08rem;
+        font-weight: 600;
+        margin: 0 0 14px;
+        color: #dbe4ff;
+        letter-spacing: -0.02em;
       }
       .grid {
         display: grid;
@@ -81,24 +158,25 @@
           grid-template-columns: repeat(3, 1fr);
         }
       }
-      section {
-        margin-top: 28px;
-      }
-      section h2 {
-        font-size: 1.05rem;
-        font-weight: 600;
-        margin: 0 0 12px;
-        color: #dbe4ff;
-        letter-spacing: -0.01em;
-      }
       .card {
         background: var(--surface);
         border: 1px solid var(--border);
         border-radius: 10px;
-        padding: 16px 18px;
+        padding: 18px 20px;
+      }
+      .card h3 {
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--muted);
+        margin: 0 0 12px;
+        font-weight: 600;
+      }
+      .card dl {
+        margin: 0;
       }
       .card dt {
-        font-size: 0.78rem;
+        font-size: 0.72rem;
         text-transform: uppercase;
         letter-spacing: 0.04em;
         color: var(--muted);
@@ -113,41 +191,52 @@
       }
       .badge {
         display: inline-block;
-        padding: 4px 10px;
-        border-radius: 999px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        letter-spacing: 0.02em;
+        padding: 5px 12px;
+        border-radius: 6px;
+        font-size: 0.78rem;
+        font-weight: 650;
+        letter-spacing: 0.03em;
       }
       .badge.healthy {
-        background: rgba(61, 214, 140, 0.15);
+        background: rgba(52, 211, 153, 0.12);
         color: var(--ok);
-        border: 1px solid rgba(61, 214, 140, 0.35);
+        border: 1px solid rgba(52, 211, 153, 0.35);
       }
       .badge.at_risk {
-        background: rgba(230, 184, 77, 0.15);
+        background: rgba(251, 191, 36, 0.12);
         color: var(--warn);
-        border: 1px solid rgba(230, 184, 77, 0.35);
+        border: 1px solid rgba(251, 191, 36, 0.35);
       }
       .badge.failed {
-        background: rgba(240, 113, 120, 0.15);
+        background: rgba(248, 113, 113, 0.12);
         color: var(--bad);
-        border: 1px solid rgba(240, 113, 120, 0.35);
+        border: 1px solid rgba(248, 113, 113, 0.35);
       }
       .badge.misconfigured {
-        background: rgba(199, 146, 234, 0.15);
+        background: rgba(196, 181, 253, 0.12);
         color: var(--mis);
-        border: 1px solid rgba(199, 146, 234, 0.35);
+        border: 1px solid rgba(196, 181, 253, 0.35);
       }
       .badge.blocked {
-        background: rgba(255, 159, 107, 0.15);
+        background: rgba(251, 146, 60, 0.12);
         color: var(--blocked);
-        border: 1px solid rgba(255, 159, 107, 0.35);
+        border: 1px solid rgba(251, 146, 60, 0.35);
+      }
+      .badge.deploy-yes {
+        background: rgba(52, 211, 153, 0.12);
+        color: var(--ok);
+        border: 1px solid rgba(52, 211, 153, 0.35);
+      }
+      .badge.deploy-no {
+        background: rgba(248, 113, 113, 0.12);
+        color: var(--bad);
+        border: 1px solid rgba(248, 113, 113, 0.35);
       }
       .meta {
-        font-size: 0.85rem;
+        font-size: 0.88rem;
         color: var(--muted);
-        margin-top: 8px;
+        margin-top: 12px;
+        line-height: 1.5;
       }
       table {
         width: 100%;
@@ -157,15 +246,15 @@
       th,
       td {
         text-align: left;
-        padding: 10px 12px;
+        padding: 11px 14px;
         border-bottom: 1px solid var(--border);
       }
       th {
         color: var(--muted);
         font-weight: 600;
-        font-size: 0.78rem;
+        font-size: 0.72rem;
         text-transform: uppercase;
-        letter-spacing: 0.04em;
+        letter-spacing: 0.05em;
       }
       tbody tr:hover {
         background: rgba(255, 255, 255, 0.02);
@@ -175,59 +264,108 @@
         font-size: 0.9rem;
         margin: 0;
       }
-      .provenance {
-        margin-top: 32px;
-        padding-top: 20px;
+      .footer-legal {
+        margin-top: 48px;
+        padding-top: 24px;
         border-top: 1px solid var(--border);
-        font-size: 0.82rem;
+      }
+      details.provenance-details {
+        font-size: 0.8rem;
         color: var(--muted);
       }
-      .provenance code {
-        font-size: 0.8em;
-        background: var(--surface2);
+      details.provenance-details summary {
+        cursor: pointer;
+        color: #b8c5e0;
+        font-weight: 500;
+        margin-bottom: 10px;
+      }
+      details.provenance-details code {
+        font-size: 0.85em;
+        background: var(--surface-elevated);
         padding: 2px 6px;
         border-radius: 4px;
         border: 1px solid var(--border);
       }
-      #load-banner {
-        font-size: 0.85rem;
-        color: var(--muted);
-        margin-bottom: 16px;
-        padding: 10px 12px;
-        background: var(--surface2);
-        border-radius: 8px;
-        border: 1px solid var(--border);
-        display: none;
-      }
-      #load-banner.visible {
-        display: block;
+      details.provenance-details ul {
+        margin: 8px 0 0;
+        padding-left: 1.2rem;
       }
     </style>
   </head>
   <body>
     <div class="wrap">
-      <header>
+      <header class="hero">
         <h1>Production AI Maintenance Gate</h1>
-        <p class="subtitle">
-          AI Reliability checks production AI behavior against customer-defined eval specs, validates tool calls and
-          actions, and enforces provider-call budget limits for routed calls.
+        <p class="tagline">
+          Scheduled and triggered checks keep production AI aligned with customer-defined rules, workflows, and
+          routed-call budgets.
         </p>
-        <p class="scope">
-          <strong>Scope:</strong> Budget enforcement applies to configured provider calls
-          <strong>routed through the AI Reliability gate</strong>. Direct provider calls that bypass the gate are outside
-          this enforcement scope.
+
+        <div class="exec-strip" role="region" aria-label="Executive summary">
+          <div class="exec-tile">
+            <dl>
+              <dt>Production AI health</dt>
+              <dd id="exec-health"><span class="badge healthy">—</span></dd>
+            </dl>
+          </div>
+          <div class="exec-tile">
+            <dl>
+              <dt>Maintenance checks</dt>
+              <dd id="exec-checks" class="small">—</dd>
+            </dl>
+          </div>
+          <div class="exec-tile">
+            <dl>
+              <dt>Budget remaining</dt>
+              <dd id="exec-budget-rem">—</dd>
+            </dl>
+          </div>
+          <div class="exec-tile">
+            <dl>
+              <dt>Routed provider calls</dt>
+              <dd id="exec-routed" class="small">—</dd>
+            </dl>
+          </div>
+          <div class="exec-tile">
+            <dl>
+              <dt>Deploy gate mode</dt>
+              <dd id="exec-deploy"><span class="badge deploy-yes">—</span></dd>
+            </dl>
+          </div>
+        </div>
+
+        <p class="scope-secondary">
+          <strong>Budget enforcement</strong> applies to configured provider calls
+          <strong>routed through the AI Reliability gate</strong>. Direct provider calls outside the gate are not in
+          enforcement scope.
         </p>
+
+        <div class="how-read">
+          <h2>How to read this dashboard</h2>
+          <ul>
+            <li>
+              <strong>Healthy</strong> means the latest maintenance run matched the active eval spec for outputs, tool
+              calls, actions, and routed-call budget rules.
+            </li>
+            <li>
+              <strong>At risk</strong> or <strong>failed</strong> means one or more checks deviated from the
+              customer-defined source of truth, including budget blocks on routed calls.
+            </li>
+            <li>
+              <strong>Deploy gate mode</strong> can fail CI/CD when blocking failures or misconfiguration are present
+              (<code style="color: var(--text)">npm run gate:release</code>).
+            </li>
+          </ul>
+        </div>
       </header>
 
-      <p id="load-banner" class="visible" role="status"></p>
-
       <section aria-labelledby="health-heading">
-        <h2 id="health-heading">Production AI health</h2>
+        <h2 id="health-heading">Production AI Health</h2>
         <div class="grid cols-2">
           <div class="card">
             <dl>
               <dt>Status</dt>
-              <dd><span id="health-badge" class="badge">—</span></dd>
+              <dd><span id="health-badge" class="badge healthy">—</span></dd>
               <dt>Latest maintenance run</dt>
               <dd id="run-time">—</dd>
               <dt>Workflow</dt>
@@ -240,9 +378,9 @@
           </div>
           <div class="card">
             <dl>
-              <dt>Run ID</dt>
-              <dd id="run-id" style="word-break: break-all">—</dd>
-              <dt>Production health signal</dt>
+              <dt>Run reference</dt>
+              <dd id="run-id" style="word-break: break-all; font-size: 0.88rem">—</dd>
+              <dt>Health signal</dt>
               <dd id="prod-health">—</dd>
             </dl>
           </div>
@@ -250,8 +388,12 @@
       </section>
 
       <section aria-labelledby="spec-heading">
-        <h2 id="spec-heading">Source-of-truth eval specs</h2>
+        <h2 id="spec-heading">Source-of-Truth Eval Specs</h2>
         <div class="card">
+          <p class="meta" style="margin-top: 0">
+            Customers define policies, expected behavior, required tool calls, forbidden actions, and budget limits as
+            eval specs. AI Reliability compares maintenance observations against those definitions.
+          </p>
           <dl>
             <dt>Active spec</dt>
             <dd id="spec-label">—</dd>
@@ -259,22 +401,18 @@
             <dd id="spec-workflow">—</dd>
             <dt>Policies recorded</dt>
             <dd id="count-policies">—</dd>
-            <dt>Output / behavior checks</dt>
+            <dt>Output and behavior checks</dt>
             <dd id="count-behavior-output">—</dd>
             <dt>Required tool-call checks</dt>
             <dd id="count-tools">—</dd>
             <dt>Forbidden action checks</dt>
             <dd id="count-actions">—</dd>
           </dl>
-          <p class="meta">
-            Customers define policies, tools, actions, and expectations in eval specs. AI Reliability compares
-            maintenance observations to those definitions.
-          </p>
         </div>
       </section>
 
       <section aria-labelledby="checks-heading">
-        <h2 id="checks-heading">Maintenance checks</h2>
+        <h2 id="checks-heading">Maintenance Check Results</h2>
         <div class="grid cols-3">
           <div class="card"><dl><dt>Checks run</dt><dd id="checks-run">—</dd></dl></div>
           <div class="card"><dl><dt>Passed</dt><dd id="checks-passed">—</dd></dl></div>
@@ -285,41 +423,43 @@
       </section>
 
       <section aria-labelledby="budget-heading">
-        <h2 id="budget-heading">Budget gate (routed provider calls)</h2>
+        <h2 id="budget-heading">Provider-Call Budget Gate</h2>
         <div class="grid cols-2">
           <div class="card">
             <dl>
-              <dt>Monthly budget limit (spec gate)</dt>
+              <dt>Monthly routed-call budget</dt>
               <dd id="monthly-limit">—</dd>
-              <dt>Budget used (tracked state)</dt>
+              <dt>Tracked routed-call spend</dt>
               <dd id="budget-used">—</dd>
-              <dt>Remaining (tracked state)</dt>
+              <dt>Remaining routed-call budget</dt>
               <dd id="budget-remaining">—</dd>
               <dt>Per-run limit</dt>
               <dd id="per-run-limit">—</dd>
-              <dt>Latest routed call estimate</dt>
+              <dt>Latest routed-call estimate</dt>
               <dd id="est-cost">—</dd>
-              <dt>Gate status</dt>
+              <dt>Budget gate status</dt>
               <dd id="budget-status">—</dd>
+              <dt>Estimated blocked spend</dt>
+              <dd id="budget-estimated-blocked">—</dd>
             </dl>
           </div>
           <div class="card">
             <dl>
-              <dt>Routed calls (this run summary)</dt>
+              <dt>Routed calls (this run)</dt>
               <dd id="routed-summary">—</dd>
-              <dt>Fail closed</dt>
+              <dt>Fail closed on unknown pricing</dt>
               <dd id="fail-closed">—</dd>
             </dl>
             <p class="meta">
-              Figures reflect configured limits in the active eval spec and the latest maintenance run. Tracked state
-              comes from the same budget state artifact the runner writes after routed calls.
+              Spend shown here reflects calls routed through the AI Reliability gate and recorded in the provider-call
+              ledger. It does not represent your full provider account usage.
             </p>
           </div>
         </div>
       </section>
 
       <section aria-labelledby="ledger-heading">
-        <h2 id="ledger-heading">Provider-call ledger</h2>
+        <h2 id="ledger-heading">Routed Provider-Call Ledger</h2>
         <div class="grid cols-2">
           <div class="card">
             <dl>
@@ -329,7 +469,7 @@
               <dd id="ledger-completed">—</dd>
               <dt>Blocked</dt>
               <dd id="ledger-blocked">—</dd>
-              <dt>Failed / misconfigured attempt</dt>
+              <dt>Failed attempt</dt>
               <dd id="ledger-failed">—</dd>
               <dt>Estimated blocked spend</dt>
               <dd id="ledger-blocked-spend">—</dd>
@@ -337,13 +477,13 @@
           </div>
           <div class="card">
             <dl>
-              <dt>Latest provider / model</dt>
+              <dt>Latest provider and model</dt>
               <dd id="ledger-latest-pm">—</dd>
             </dl>
           </div>
         </div>
         <div class="card" style="margin-top: 16px; overflow-x: auto">
-          <table aria-label="Provider call ledger entries">
+          <table aria-label="Routed provider-call ledger">
             <thead>
               <tr>
                 <th>Time</th>
@@ -361,41 +501,43 @@
       </section>
 
       <section aria-labelledby="fail-heading">
-        <h2 id="fail-heading">Blocking failures and evidence</h2>
+        <h2 id="fail-heading">Failure Evidence</h2>
         <div class="card" style="overflow-x: auto">
-          <table aria-label="Failed maintenance checks">
+          <table aria-label="Blocking failures">
             <thead>
               <tr>
                 <th>Check</th>
                 <th>Severity</th>
                 <th>Reason</th>
-                <th>Kind</th>
+                <th>Type</th>
               </tr>
             </thead>
             <tbody id="fail-body"></tbody>
           </table>
-          <p id="fail-empty" class="empty" style="display: none">No blocking failures in the latest result.</p>
+          <p id="fail-empty" class="empty" style="display: none">
+            No blocking failures detected in the latest maintenance run.
+          </p>
         </div>
         <div class="card" style="margin-top: 16px">
-          <h2 style="font-size: 0.95rem; margin-bottom: 8px">Evidence strings</h2>
+          <h3>Evidence detail</h3>
           <ul id="evidence-list" style="margin: 0; padding-left: 1.2rem; color: var(--muted)"></ul>
         </div>
       </section>
 
       <section aria-labelledby="rec-heading">
-        <h2 id="rec-heading">Recommended actions</h2>
+        <h2 id="rec-heading">Recommended Actions</h2>
         <div class="card">
           <ul id="rec-list" style="margin: 0; padding-left: 1.2rem"></ul>
-          <p id="rec-empty" class="empty" style="display: none">No recommended actions for this run.</p>
+          <p id="rec-empty" class="empty" style="display: none">No action required for this maintenance run.</p>
         </div>
       </section>
 
       <section aria-labelledby="deploy-heading">
-        <h2 id="deploy-heading">Deploy gate mode</h2>
+        <h2 id="deploy-heading">Deploy Gate Mode</h2>
         <div class="grid cols-2">
           <div class="card">
             <dl>
-              <dt>Deploy allowed</dt>
+              <dt>Deploy</dt>
               <dd id="deploy-allowed">—</dd>
               <dt>Exit code</dt>
               <dd id="gate-exit">—</dd>
@@ -403,35 +545,39 @@
           </div>
           <div class="card">
             <p class="meta" style="margin: 0 0 10px">
-              In CI/CD, the same maintenance artifacts can drive a release gate. Exit codes: <strong>0</strong> deploy
-              allowed (healthy or at-risk), <strong>1</strong> blocking failures, <strong>2</strong> misconfigured.
+              In CI/CD, release gates use the same maintenance artifacts. Exit codes: <strong>0</strong> allowed
+              (healthy or at-risk), <strong>1</strong> blocking failures, <strong>2</strong> misconfigured.
             </p>
             <p class="meta" style="margin: 0"><code style="color: var(--text)">npm run gate:release</code></p>
           </div>
         </div>
       </section>
 
-      <footer class="provenance">
-        <p style="margin: 0 0 8px">
-          Data sources (regenerate with <code>npm run demo:maintenance-gate</code> and <code>npm run gate:release</code>):
-        </p>
-        <ul style="margin: 0; padding-left: 1.2rem">
-          <li><code>deliverables/maintenance/maintenance-result.json</code></li>
-          <li><code>deliverables/maintenance/budget-state.json</code></li>
-          <li><code>deliverables/maintenance/provider-call-ledger.jsonl</code></li>
-          <li><code>deliverables/maintenance/gate-result.json</code></li>
-        </ul>
-        <p style="margin: 12px 0 0">
-          On GitHub Pages, relative fetches to <code>deliverables/</code> may be unavailable; this page falls back to an
-          embedded snapshot copied from those artifacts. Replace the snapshot after local runs to refresh the alpha view.
-        </p>
+      <footer class="footer-legal">
+        <details class="provenance-details">
+          <summary>Data provenance and refresh</summary>
+          <p style="margin: 0 0 8px">
+            This page loads JSON artifacts when available, otherwise uses an embedded snapshot aligned with the same
+            maintenance outputs. Regenerate locally with:
+          </p>
+          <p style="margin: 0 0 8px">
+            <code>npm run demo:maintenance-gate</code> · <code>npm run gate:release</code>
+          </p>
+          <p style="margin: 0 0 8px">Artifact paths (repository layout):</p>
+          <ul>
+            <li><code>deliverables/maintenance/maintenance-result.json</code></li>
+            <li><code>deliverables/maintenance/budget-state.json</code></li>
+            <li><code>deliverables/maintenance/provider-call-ledger.jsonl</code></li>
+            <li><code>deliverables/maintenance/gate-result.json</code></li>
+          </ul>
+          <p style="margin: 12px 0 0">
+            On GitHub Pages, fetches to sibling folders may fail; update the embedded snapshot in
+            <code>docs/dashboard.html</code> after runs to refresh this proof view.
+          </p>
+        </details>
       </footer>
     </div>
 
-    <!--
-      EMBEDDED_SNAPSHOT_* constants are copied from deliverables/maintenance/* after a healthy demo run.
-      Source of truth for regeneration: repo root deliverables/maintenance/
-    -->
     <script>
       const ARTIFACT_PATHS = {
         maintenance: "../deliverables/maintenance/maintenance-result.json",
@@ -653,6 +799,79 @@
         sourceFile: "examples/eval-specs/pricing-and-plan-accuracy.spec.json",
       };
 
+      function formatEnvironment(env) {
+        if (!env) return "—";
+        const map = {
+          pre_production: "Pre-production",
+          development: "Development",
+          staging: "Staging",
+          production: "Production",
+        };
+        if (map[env]) return map[env];
+        return String(env)
+          .replace(/_/g, " ")
+          .replace(/\b\w/g, (c) => c.toUpperCase());
+      }
+
+      function formatWorkflow(name) {
+        if (!name) return "—";
+        return String(name)
+          .replace(/_/g, " ")
+          .replace(/\b\w/g, (c) => c.toUpperCase());
+      }
+
+      function formatMaintenanceStatus(status) {
+        const s = String(status || "").toLowerCase();
+        if (s === "healthy") return "Healthy";
+        if (s === "at_risk") return "At Risk";
+        if (s === "failed") return "Failed";
+        if (s === "misconfigured") return "Misconfigured";
+        return String(status || "—")
+          .replace(/_/g, " ")
+          .replace(/\b\w/g, (c) => c.toUpperCase());
+      }
+
+      function formatProductionHealthLabel(v) {
+        const s = String(v || "").toLowerCase();
+        if (s === "at_risk") return "At Risk";
+        if (s === "healthy") return "Healthy";
+        if (s === "degraded") return "Degraded";
+        if (s === "unknown") return "Unknown";
+        return formatWorkflow(v);
+      }
+
+      function formatCheckKind(kind) {
+        const k = String(kind || "");
+        const map = {
+          policy: "Policy",
+          output: "Output",
+          behavior: "Behavior",
+          tool_call: "Tool call",
+          action: "Action",
+          budget: "Budget gate",
+          spec_validity: "Spec validity",
+          escalation: "Escalation",
+        };
+        return map[k] || k.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) || "—";
+      }
+
+      function formatLedgerStatus(status) {
+        const s = String(status || "").toLowerCase();
+        if (s === "completed") return "Completed";
+        if (s === "blocked") return "Blocked";
+        if (s === "failed") return "Failed";
+        if (s === "allowed") return "Allowed";
+        return String(status || "—").replace(/\b\w/g, (c) => c.toUpperCase());
+      }
+
+      function formatSeverity(sev) {
+        const s = String(sev || "").toLowerCase();
+        if (s === "blocking") return "Blocking";
+        if (s === "warning") return "Warning";
+        if (s === "info") return "Info";
+        return String(sev || "—").replace(/\b\w/g, (c) => c.toUpperCase());
+      }
+
       async function tryFetchJson(url) {
         try {
           const r = await fetch(url, { cache: "no-store" });
@@ -712,32 +931,62 @@
       function classifyFailure(check) {
         if (!check || check.passed) return "";
         const k = check.kind || "";
-        if (k === "tool_call") return "Required tool call missing or not observed in routed trace.";
+        if (k === "tool_call") return "Required tool call missing or not observed in the routed trace.";
         if (k === "action") return "Forbidden action observed.";
-        if (k === "behavior" || k === "output") return "Expected behavior or output mismatch vs customer spec.";
+        if (k === "behavior" || k === "output") return "Expected behavior or output did not match the customer spec.";
         if (k === "budget") return "Routed provider-call budget gate blocked or misconfigured.";
         if (k === "spec_validity") return "Eval spec misconfigured or invalid.";
         return check.message || "";
       }
 
+      function setHealthBadge(el, status) {
+        const label = formatMaintenanceStatus(status);
+        el.textContent = label;
+        el.className = "badge " + badgeClass(status);
+      }
+
       function render(maintenance, budget, gate, ledgerRows) {
-        const banner = document.getElementById("load-banner");
         const status = maintenance.status || "unknown";
+        const healthLabel = formatMaintenanceStatus(status);
+
+        const execHealth = document.querySelector("#exec-health .badge");
+        setHealthBadge(execHealth, status);
+
+        const passed = maintenance.checksPassed ?? "—";
+        const total = maintenance.checksRun ?? "—";
+        document.getElementById("exec-checks").textContent =
+          passed !== "—" && total !== "—" ? `${passed} / ${total} passed` : "—";
+
+        document.getElementById("exec-budget-rem").textContent = formatUsd(budget.budgetRemainingUsd);
+
+        const bgSum = maintenance.budgetGateSummary;
+        const routedLine =
+          bgSum != null
+            ? `${bgSum.routedCallsAttempted - (bgSum.routedCallsBlocked || 0)} completed · ${bgSum.routedCallsBlocked || 0} blocked`
+            : "—";
+        document.getElementById("exec-routed").textContent = routedLine;
+
+        const deployEl = document.querySelector("#exec-deploy .badge");
+        const allowed = gate.deployAllowed === true;
+        deployEl.textContent = allowed ? "Allowed" : "Blocked";
+        deployEl.className = "badge " + (allowed ? "deploy-yes" : "deploy-no");
+
         const badge = document.getElementById("health-badge");
-        badge.textContent = status.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-        badge.className = "badge " + badgeClass(status);
+        setHealthBadge(badge, status);
 
         document.getElementById("run-time").textContent = maintenance.generatedAt || "—";
-        document.getElementById("workflow-name").textContent = maintenance.workflowName || "—";
-        document.getElementById("environment").textContent = maintenance.environment || "—";
+        document.getElementById("workflow-name").textContent = formatWorkflow(maintenance.workflowName);
+        document.getElementById("environment").textContent = formatEnvironment(maintenance.environment);
         document.getElementById("spec-version").textContent =
           maintenance.specVersion !== undefined ? String(maintenance.specVersion) : "—";
         document.getElementById("run-id").textContent = maintenance.runId || "—";
-        document.getElementById("prod-health").textContent = maintenance.productionHealthStatus || "—";
+        document.getElementById("prod-health").textContent = formatProductionHealthLabel(
+          maintenance.productionHealthStatus,
+        );
 
         document.getElementById("spec-label").textContent =
           (SPEC_DISPLAY.specName ? SPEC_DISPLAY.specName + " · " : "") + (maintenance.specId || "—");
-        document.getElementById("spec-workflow").textContent = maintenance.workflowName || "—";
+        document.getElementById("spec-workflow").textContent = formatWorkflow(maintenance.workflowName);
         const policies = maintenance.policyResults || [];
         const checks = maintenance.checks || [];
         document.getElementById("count-policies").textContent = String(policies.length);
@@ -765,24 +1014,26 @@
 
         let bStatus = "—";
         if (br) {
-          if (br.passed && br.routedCallAllowed) bStatus = "Within limits for routed call";
-          else if (!br.passed) bStatus = "Blocked or not allowed for routed call";
+          if (br.passed && br.routedCallAllowed) bStatus = "Within limits for this routed call";
+          else if (!br.passed) bStatus = "Blocked or not allowed for this routed call";
         }
         document.getElementById("budget-status").textContent = bStatus;
         document.getElementById("routed-summary").textContent = bg
-          ? `Attempted ${bg.routedCallsAttempted}, blocked ${bg.routedCallsBlocked}`
+          ? `${bg.routedCallsAttempted} attempted · ${bg.routedCallsBlocked || 0} blocked`
           : "—";
         document.getElementById("fail-closed").textContent =
           bg && typeof bg.failClosed === "boolean" ? (bg.failClosed ? "Yes" : "No") : "—";
+
+        let blockedSpend = 0;
+        ledgerRows.forEach((r) => {
+          if (r.status === "blocked" && typeof r.estimatedCostUsd === "number") blockedSpend += r.estimatedCostUsd;
+        });
+        document.getElementById("budget-estimated-blocked").textContent = formatUsd(blockedSpend);
 
         const total = ledgerRows.length;
         const completed = ledgerRows.filter((r) => r.status === "completed").length;
         const blocked = ledgerRows.filter((r) => r.status === "blocked").length;
         const failed = ledgerRows.filter((r) => r.status === "failed").length;
-        let blockedSpend = 0;
-        ledgerRows.forEach((r) => {
-          if (r.status === "blocked" && typeof r.estimatedCostUsd === "number") blockedSpend += r.estimatedCostUsd;
-        });
         document.getElementById("ledger-total").textContent = String(total);
         document.getElementById("ledger-completed").textContent = String(completed);
         document.getElementById("ledger-blocked").textContent = String(blocked);
@@ -800,13 +1051,16 @@
           .reverse()
           .forEach((row) => {
             const tr = document.createElement("tr");
-            const badge = document.createElement("span");
-            badge.className = "badge " + (row.status === "blocked" ? "blocked" : row.status === "failed" ? "misconfigured" : "healthy");
-            badge.textContent = row.status || "—";
+            const span = document.createElement("span");
+            const st = String(row.status || "").toLowerCase();
+            span.className =
+              "badge " +
+              (st === "blocked" ? "blocked" : st === "failed" ? "misconfigured" : "healthy");
+            span.textContent = formatLedgerStatus(row.status);
             const tdTime = document.createElement("td");
             tdTime.textContent = row.createdAt || "—";
             const tdSt = document.createElement("td");
-            tdSt.appendChild(badge);
+            tdSt.appendChild(span);
             tr.appendChild(tdTime);
             tr.appendChild(tdSt);
             ["provider", "model"].forEach((k) => {
@@ -819,7 +1073,7 @@
             const tdA = document.createElement("td");
             tdA.textContent = row.actualCostUsd !== undefined ? formatUsd(row.actualCostUsd) : "—";
             const tdB = document.createElement("td");
-            tdB.textContent = row.blockReason || "—";
+            tdB.textContent = row.blockReason ? String(row.blockReason).replace(/_/g, " ") : "—";
             tr.appendChild(tdE);
             tr.appendChild(tdA);
             tr.appendChild(tdB);
@@ -835,7 +1089,12 @@
           document.getElementById("fail-empty").style.display = "none";
           failChecks.forEach((c) => {
             const tr = document.createElement("tr");
-            [c.name || c.id, c.severity, classifyFailure(c) || c.message || "—", c.kind || "—"].forEach((text) => {
+            [
+              c.name || c.id,
+              formatSeverity(c.severity),
+              classifyFailure(c) || c.message || "—",
+              formatCheckKind(c.kind),
+            ].forEach((text) => {
               const td = document.createElement("td");
               td.textContent = text;
               tr.appendChild(td);
@@ -849,7 +1108,7 @@
         evUl.innerHTML = "";
         if (ev.length === 0) {
           const li = document.createElement("li");
-          li.textContent = "None recorded.";
+          li.textContent = "No failure evidence recorded for this run.";
           evUl.appendChild(li);
         } else {
           ev.forEach((x) => {
@@ -874,18 +1133,19 @@
           });
         }
 
-        document.getElementById("deploy-allowed").textContent =
-          gate.deployAllowed === true ? "Yes" : gate.deployAllowed === false ? "No" : "—";
-        const code = gate.exitCode;
-        let codeMeaning = "—";
-        if (code === 0) codeMeaning = "0 — deploy allowed (healthy or at-risk)";
-        else if (code === 1) codeMeaning = "1 — blocking failures";
-        else if (code === 2) codeMeaning = "2 — misconfigured";
-        document.getElementById("gate-exit").textContent =
-          code !== undefined ? `${code} (${codeMeaning})` : "—";
+        const deployDd = document.getElementById("deploy-allowed");
+        deployDd.innerHTML = "";
+        const dBadge = document.createElement("span");
+        dBadge.className = "badge " + (gate.deployAllowed === true ? "deploy-yes" : "deploy-no");
+        dBadge.textContent = gate.deployAllowed === true ? "Allowed" : "Blocked";
+        deployDd.appendChild(dBadge);
 
-        banner.textContent =
-          "Loaded maintenance artifacts from fetch when available; otherwise embedded snapshot (see page footer).";
+        const code = gate.exitCode;
+        let codeLine = "—";
+        if (code === 0) codeLine = "0 — release may proceed (healthy or at-risk)";
+        else if (code === 1) codeLine = "1 — blocking failures";
+        else if (code === 2) codeLine = "2 — misconfigured";
+        document.getElementById("gate-exit").textContent = code !== undefined ? codeLine : "—";
       }
 
       function escapeHtml(s) {
