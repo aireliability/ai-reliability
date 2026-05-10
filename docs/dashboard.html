@@ -3,10 +3,10 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>AI Reliability — Production AI Maintenance Gate</title>
+    <title>AI Reliability Control Center</title>
     <meta
       name="description"
-      content="Production AI health, customer-defined eval specs, routed provider-call budget gate, and ledger — AI Reliability Maintenance Gate."
+      content="AI Reliability Control Center — production health, customer-defined eval specs, maintenance gate, budget gate, deploy gate, and provider-call ledger."
     />
     <style>
       :root {
@@ -295,40 +295,39 @@
   <body>
     <div class="wrap">
       <header class="hero">
-        <h1>Production AI Maintenance Gate</h1>
+        <h1>AI Reliability Control Center</h1>
         <p class="tagline">
-          Scheduled and triggered checks keep production AI aligned with customer-defined rules, workflows, and
-          routed-call budgets.
+          Keep production AI aligned with customer-defined rules, workflows, and routed-call budgets.
         </p>
 
         <div class="exec-strip" role="region" aria-label="Executive summary">
           <div class="exec-tile">
             <dl>
-              <dt>Production AI health</dt>
+              <dt>Production Health</dt>
               <dd id="exec-health"><span class="badge healthy">—</span></dd>
             </dl>
           </div>
           <div class="exec-tile">
             <dl>
-              <dt>Maintenance checks</dt>
+              <dt>Maintenance Gate</dt>
               <dd id="exec-checks" class="small">—</dd>
             </dl>
           </div>
           <div class="exec-tile">
             <dl>
-              <dt>Budget remaining</dt>
+              <dt>Budget Gate</dt>
               <dd id="exec-budget-rem">—</dd>
             </dl>
           </div>
           <div class="exec-tile">
             <dl>
-              <dt>Routed provider calls</dt>
+              <dt>Routed Calls</dt>
               <dd id="exec-routed" class="small">—</dd>
             </dl>
           </div>
           <div class="exec-tile">
             <dl>
-              <dt>Deploy gate mode</dt>
+              <dt>Deploy Gate</dt>
               <dd id="exec-deploy"><span class="badge deploy-yes">—</span></dd>
             </dl>
           </div>
@@ -352,7 +351,7 @@
               customer-defined source of truth, including budget blocks on routed calls.
             </li>
             <li>
-              <strong>Deploy gate mode</strong> can fail CI/CD when blocking failures or misconfiguration are present
+              <strong>Deploy gate</strong> can fail CI/CD when blocking failures or misconfiguration are present
               (<code style="color: var(--text)">npm run gate:release</code>).
             </li>
           </ul>
@@ -360,7 +359,7 @@
       </header>
 
       <section aria-labelledby="health-heading">
-        <h2 id="health-heading">Production AI Health</h2>
+        <h2 id="health-heading">Production Health</h2>
         <div class="grid cols-2">
           <div class="card">
             <dl>
@@ -388,7 +387,7 @@
       </section>
 
       <section aria-labelledby="spec-heading">
-        <h2 id="spec-heading">Source-of-Truth Eval Specs</h2>
+        <h2 id="spec-heading">Source-of-Truth Specs</h2>
         <div class="card">
           <p class="meta" style="margin-top: 0">
             Customers define policies, expected behavior, required tool calls, forbidden actions, and budget limits as
@@ -412,7 +411,7 @@
       </section>
 
       <section aria-labelledby="checks-heading">
-        <h2 id="checks-heading">Maintenance Check Results</h2>
+        <h2 id="checks-heading">Maintenance Gate Results</h2>
         <div class="grid cols-3">
           <div class="card"><dl><dt>Checks run</dt><dd id="checks-run">—</dd></dl></div>
           <div class="card"><dl><dt>Passed</dt><dd id="checks-passed">—</dd></dl></div>
@@ -423,7 +422,7 @@
       </section>
 
       <section aria-labelledby="budget-heading">
-        <h2 id="budget-heading">Provider-Call Budget Gate</h2>
+        <h2 id="budget-heading">Budget Gate</h2>
         <div class="grid cols-2">
           <div class="card">
             <dl>
@@ -459,7 +458,7 @@
       </section>
 
       <section aria-labelledby="ledger-heading">
-        <h2 id="ledger-heading">Routed Provider-Call Ledger</h2>
+        <h2 id="ledger-heading">Provider-Call Ledger</h2>
         <div class="grid cols-2">
           <div class="card">
             <dl>
@@ -483,7 +482,7 @@
           </div>
         </div>
         <div class="card" style="margin-top: 16px; overflow-x: auto">
-          <table aria-label="Routed provider-call ledger">
+          <table aria-label="Provider-call ledger">
             <thead>
               <tr>
                 <th>Time</th>
@@ -501,7 +500,7 @@
       </section>
 
       <section aria-labelledby="fail-heading">
-        <h2 id="fail-heading">Failure Evidence</h2>
+        <h2 id="fail-heading">Evidence</h2>
         <div class="card" style="overflow-x: auto">
           <table aria-label="Blocking failures">
             <thead>
@@ -533,7 +532,7 @@
       </section>
 
       <section aria-labelledby="deploy-heading">
-        <h2 id="deploy-heading">Deploy Gate Mode</h2>
+        <h2 id="deploy-heading">Deploy Gate</h2>
         <div class="grid cols-2">
           <div class="card">
             <dl>
@@ -842,7 +841,7 @@
         if (k === "tool_call") return "Required tool call missing or not observed in the routed trace.";
         if (k === "action") return "Forbidden action observed.";
         if (k === "behavior" || k === "output") return "Expected behavior or output did not match the customer spec.";
-        if (k === "budget") return "Routed provider-call budget gate blocked or misconfigured.";
+        if (k === "budget") return "Budget gate blocked or misconfigured.";
         if (k === "spec_validity") return "Eval spec misconfigured or invalid.";
         return check.message || "";
       }
