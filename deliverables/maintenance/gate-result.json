@@ -1,9 +1,9 @@
 {
-  "evaluatedAt": "2026-05-10T10:32:32.572Z",
-  "source": "C:\\Users\\THINK\\AppData\\Local\\Temp\\gate-test-MTsyqM\\mis.json",
-  "runId": "m",
-  "specId": "s",
-  "maintenanceStatus": "misconfigured",
-  "deployAllowed": false,
-  "exitCode": 2
+  "evaluatedAt": "2026-05-10T16:41:51.773Z",
+  "source": "deliverables\\maintenance\\maintenance-result.json",
+  "runId": "maint-8b720c32-48db-4989-a2d6-9f6d4ba17a01",
+  "specId": "pricing-plans-v1",
+  "maintenanceStatus": "healthy",
+  "deployAllowed": true,
+  "exitCode": 0
 }

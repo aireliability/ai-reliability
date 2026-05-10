@@ -1,5 +1,5 @@
 {
-  "runId": "maint-f277c1e8-ad16-4904-81e3-54021bad607f",
+  "runId": "maint-8b720c32-48db-4989-a2d6-9f6d4ba17a01",
   "specId": "pricing-plans-v1",
   "specVersion": 1,
   "workflowName": "sales_copilot",
@@ -197,5 +197,5 @@
     }
   ],
   "recommendedActions": [],
-  "generatedAt": "2026-05-10T10:32:25.822Z"
+  "generatedAt": "2026-05-10T16:40:03.612Z"
 }

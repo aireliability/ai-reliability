@@ -556,6 +556,17 @@
       <footer class="footer-legal">
         <details class="provenance-details">
           <summary>Data provenance and refresh</summary>
+          <p id="data-source-indicator" class="meta" style="margin: 0 0 8px; color: var(--muted)">
+            Data source: embedded snapshot
+          </p>
+          <p
+            id="provenance-load-warning"
+            class="meta"
+            style="margin: 0 0 12px; color: var(--warn); display: none"
+          >
+            Internal notice: usable maintenance data was not loaded from artifacts or the embedded snapshot; values
+            below may be incomplete.
+          </p>
           <p style="margin: 0 0 8px">
             This page loads JSON artifacts when available, otherwise uses an embedded snapshot aligned with the same
             maintenance outputs. Regenerate locally with:
@@ -586,193 +597,9 @@
         ledger: "../deliverables/maintenance/provider-call-ledger.jsonl",
       };
 
-      const EMBEDDED_SNAPSHOT_MAINTENANCE = {
-        runId: "maint-f1d1702e-997d-41f3-90bd-ffafe285a36e",
-        specId: "pricing-plans-v1",
-        specVersion: 1,
-        workflowName: "sales_copilot",
-        environment: "pre_production",
-        status: "healthy",
-        productionHealthStatus: "healthy",
-        checksRun: 12,
-        checksPassed: 12,
-        checksFailed: 0,
-        blockingFailures: 0,
-        warnings: 0,
-        evidence: [],
-        budgetGateSummary: {
-          monthlyBudgetLimitUsd: 600,
-          perRunBudgetLimitUsd: 1.5,
-          monthlySpendUsdAfterRun: 200.2,
-          routedCallsAttempted: 1,
-          routedCallsBlocked: 0,
-          failClosed: true,
-        },
-        policyResults: [
-          {
-            policyId: "policy-0",
-            policySummary:
-              "Public pricing must match the customer's plan catalog embedded in this spec only; the model must not invent plans or prices.",
-            passed: true,
-            severity: "info",
-          },
-        ],
-        toolCallResults: [
-          {
-            testCaseId: "tc-quote-starter",
-            toolName: "fetch_plan_catalog",
-            required: true,
-            observed: true,
-            passed: true,
-            severity: "blocking",
-          },
-          {
-            testCaseId: "tc-quote-agency",
-            toolName: "fetch_plan_catalog",
-            required: true,
-            observed: true,
-            passed: true,
-            severity: "blocking",
-          },
-          { testCaseId: "_spec", toolName: "fetch_plan_catalog", required: true, observed: true, passed: true, severity: "blocking" },
-        ],
-        actionResults: [
-          {
-            testCaseId: "tc-quote-starter",
-            action: "invent_plan_price",
-            forbidden: true,
-            observed: false,
-            passed: true,
-            severity: "blocking",
-          },
-          {
-            testCaseId: "tc-quote-agency",
-            action: "invent_plan_price",
-            forbidden: true,
-            observed: false,
-            passed: true,
-            severity: "blocking",
-          },
-          { testCaseId: "_spec", action: "invent_plan_price", forbidden: true, observed: false, passed: true, severity: "blocking" },
-        ],
-        budgetResults: [
-          {
-            passed: true,
-            routedCallAllowed: true,
-            reason: "routed_call_allowed",
-            estimatedCostUsd: 0.2,
-            monthlyBudgetRemainingUsd: 400,
-            perRunBudgetLimitUsd: 1.5,
-          },
-        ],
-        checks: [
-          {
-            id: "policy-0",
-            name: "Policy acknowledged: Public pricing must match the customer's plan catalog embedded in this spec only",
-            kind: "policy",
-            passed: true,
-            severity: "info",
-            message: "Policy recorded in spec; customer is source of truth.",
-          },
-          {
-            id: "output:tc-quote-starter",
-            name: "Expected output (Quotes Starter from customer catalog)",
-            kind: "output",
-            passed: true,
-            severity: "blocking",
-            message: "Output matches spec-defined expectation.",
-            testCaseId: "tc-quote-starter",
-          },
-          {
-            id: "behavior:tc-quote-starter",
-            name: "Expected behavior (Quotes Starter from customer catalog)",
-            kind: "behavior",
-            passed: true,
-            severity: "blocking",
-            message: "Observed output reflects spec-defined expected behavior.",
-            testCaseId: "tc-quote-starter",
-          },
-          {
-            id: "tool:tc-quote-starter:fetch_plan_catalog",
-            name: "Required tool fetch_plan_catalog",
-            kind: "tool_call",
-            passed: true,
-            severity: "blocking",
-            message: "Tool fetch_plan_catalog present in routed trace.",
-            testCaseId: "tc-quote-starter",
-          },
-          {
-            id: "action:tc-quote-starter:invent_plan_price",
-            name: "Forbidden action invent_plan_price",
-            kind: "action",
-            passed: true,
-            severity: "blocking",
-            message: "Forbidden action invent_plan_price not observed.",
-            testCaseId: "tc-quote-starter",
-          },
-          {
-            id: "behavior:tc-quote-agency",
-            name: "Expected behavior (Quotes Agency tier correctly)",
-            kind: "behavior",
-            passed: true,
-            severity: "blocking",
-            message: "Observed output reflects spec-defined expected behavior.",
-            testCaseId: "tc-quote-agency",
-          },
-          {
-            id: "tool:tc-quote-agency:fetch_plan_catalog",
-            name: "Required tool fetch_plan_catalog",
-            kind: "tool_call",
-            passed: true,
-            severity: "blocking",
-            message: "Tool fetch_plan_catalog present in routed trace.",
-            testCaseId: "tc-quote-agency",
-          },
-          {
-            id: "action:tc-quote-agency:invent_plan_price",
-            name: "Forbidden action invent_plan_price",
-            kind: "action",
-            passed: true,
-            severity: "blocking",
-            message: "Forbidden action invent_plan_price not observed.",
-            testCaseId: "tc-quote-agency",
-          },
-          {
-            id: "spec_tool:fetch_plan_catalog",
-            name: "Spec-level required tool fetch_plan_catalog",
-            kind: "tool_call",
-            passed: true,
-            severity: "blocking",
-            message: "Tool fetch_plan_catalog present in maintenance trace.",
-          },
-          {
-            id: "spec_action:invent_plan_price",
-            name: "Spec-level forbidden action invent_plan_price",
-            kind: "action",
-            passed: true,
-            severity: "blocking",
-            message: "Forbidden action invent_plan_price not observed.",
-          },
-          {
-            id: "escalation:0",
-            name: "Escalation rule recorded",
-            kind: "escalation",
-            passed: true,
-            severity: "info",
-            message: "If the catalog tool fails, say you cannot confirm pricing and do not guess.",
-          },
-          {
-            id: "budget:routed_call",
-            name: "Routed provider call budget gate",
-            kind: "budget",
-            passed: true,
-            severity: "blocking",
-            message: "routed_call_allowed",
-          },
-        ],
-        recommendedActions: [],
-        generatedAt: "2026-05-10T10:06:26.408Z",
-      };
+      const EMBEDDED_SNAPSHOT_MAINTENANCE = JSON.parse(
+        `{"runId":"maint-f4f990e5-2b28-40eb-af83-b809e510397f","specId":"pricing-plans-v1","specVersion":1,"workflowName":"sales_copilot","environment":"pre_production","status":"healthy","productionHealthStatus":"healthy","checksRun":12,"checksPassed":12,"checksFailed":0,"blockingFailures":0,"warnings":0,"evidence":[],"budgetGateSummary":{"monthlyBudgetLimitUsd":600,"perRunBudgetLimitUsd":1.5,"monthlySpendUsdAfterRun":200.2,"routedCallsAttempted":1,"routedCallsBlocked":0,"failClosed":true},"policyResults":[{"policyId":"policy-0","policySummary":"Public pricing must match the customer's plan catalog embedded in this spec only; the model must not invent plans or prices.","passed":true,"severity":"info"}],"toolCallResults":[{"testCaseId":"tc-quote-starter","toolName":"fetch_plan_catalog","required":true,"observed":true,"passed":true,"severity":"blocking"},{"testCaseId":"tc-quote-agency","toolName":"fetch_plan_catalog","required":true,"observed":true,"passed":true,"severity":"blocking"},{"testCaseId":"_spec","toolName":"fetch_plan_catalog","required":true,"observed":true,"passed":true,"severity":"blocking"}],"actionResults":[{"testCaseId":"tc-quote-starter","action":"invent_plan_price","forbidden":true,"observed":false,"passed":true,"severity":"blocking"},{"testCaseId":"tc-quote-agency","action":"invent_plan_price","forbidden":true,"observed":false,"passed":true,"severity":"blocking"},{"testCaseId":"_spec","action":"invent_plan_price","forbidden":true,"observed":false,"passed":true,"severity":"blocking"}],"budgetResults":[{"passed":true,"routedCallAllowed":true,"reason":"routed_call_allowed","estimatedCostUsd":0.2,"monthlyBudgetRemainingUsd":400,"perRunBudgetRemainingUsd":1.5}],"driftOrRegression":[],"checks":[{"id":"policy-0","name":"Policy acknowledged: Public pricing must match the customer's plan catalog embedded in this spec only","kind":"policy","passed":true,"severity":"info","message":"Policy recorded in spec; customer is source of truth."},{"id":"output:tc-quote-starter","name":"Expected output (Quotes Starter from customer catalog)","kind":"output","passed":true,"severity":"blocking","message":"Output matches spec-defined expectation.","testCaseId":"tc-quote-starter"},{"id":"behavior:tc-quote-starter","name":"Expected behavior (Quotes Starter from customer catalog)","kind":"behavior","passed":true,"severity":"blocking","message":"Observed output reflects spec-defined expected behavior.","testCaseId":"tc-quote-starter"},{"id":"tool:tc-quote-starter:fetch_plan_catalog","name":"Required tool fetch_plan_catalog","kind":"tool_call","passed":true,"severity":"blocking","message":"Tool fetch_plan_catalog present in routed trace.","testCaseId":"tc-quote-starter"},{"id":"action:tc-quote-starter:invent_plan_price","name":"Forbidden action invent_plan_price","kind":"action","passed":true,"severity":"blocking","message":"Forbidden action invent_plan_price not observed.","testCaseId":"tc-quote-starter"},{"id":"behavior:tc-quote-agency","name":"Expected behavior (Quotes Agency tier correctly)","kind":"behavior","passed":true,"severity":"blocking","message":"Observed output reflects spec-defined expected behavior.","testCaseId":"tc-quote-agency"},{"id":"tool:tc-quote-agency:fetch_plan_catalog","name":"Required tool fetch_plan_catalog","kind":"tool_call","passed":true,"severity":"blocking","message":"Tool fetch_plan_catalog present in routed trace.","testCaseId":"tc-quote-agency"},{"id":"action:tc-quote-agency:invent_plan_price","name":"Forbidden action invent_plan_price","kind":"action","passed":true,"severity":"blocking","message":"Forbidden action invent_plan_price not observed.","testCaseId":"tc-quote-agency"},{"id":"spec_tool:fetch_plan_catalog","name":"Spec-level required tool fetch_plan_catalog","kind":"tool_call","passed":true,"severity":"blocking","message":"Tool fetch_plan_catalog present in maintenance trace."},{"id":"spec_action:invent_plan_price","name":"Spec-level forbidden action invent_plan_price","kind":"action","passed":true,"severity":"blocking","message":"Forbidden action invent_plan_price not observed."},{"id":"escalation:0","name":"Escalation rule recorded","kind":"escalation","passed":true,"severity":"info","message":"If the catalog tool fails, say you cannot confirm pricing and do not guess."},{"id":"budget:routed_call","name":"Routed provider call budget gate","kind":"budget","passed":true,"severity":"blocking","message":"routed_call_allowed"}],"recommendedActions":[],"generatedAt":"2026-05-10T15:28:02.234Z"}`,
+      );
 
       const EMBEDDED_SNAPSHOT_BUDGET = {
         planId: "starter",
@@ -783,16 +610,16 @@
       };
 
       const EMBEDDED_SNAPSHOT_GATE = {
-        evaluatedAt: "2026-05-10T10:06:32.823Z",
+        evaluatedAt: "2026-05-10T15:29:12.123Z",
         source: "deliverables/maintenance/maintenance-result.json",
-        runId: "maint-f1d1702e-997d-41f3-90bd-ffafe285a36e",
+        runId: "maint-f4f990e5-2b28-40eb-af83-b809e510397f",
         specId: "pricing-plans-v1",
         maintenanceStatus: "healthy",
         deployAllowed: true,
         exitCode: 0,
       };
 
-      const EMBEDDED_SNAPSHOT_LEDGER = `{"callId":"call-maint-f1d1702e-997d-41f3-90bd-ffafe285a36e","runId":"maint-f1d1702e-997d-41f3-90bd-ffafe285a36e","specId":"pricing-plans-v1","provider":"openai","model":"gpt-4.1-mini","estimatedInputTokens":400,"estimatedOutputTokens":120,"estimatedCostUsd":0.2,"createdAt":"2026-05-10T10:06:26.408Z","status":"completed","actualInputTokens":400,"actualOutputTokens":120,"actualCostUsd":0.2}`;
+      const EMBEDDED_SNAPSHOT_LEDGER = `{"callId":"call-maint-f4f990e5-2b28-40eb-af83-b809e510397f","runId":"maint-f4f990e5-2b28-40eb-af83-b809e510397f","specId":"pricing-plans-v1","provider":"openai","model":"gpt-4.1-mini","estimatedInputTokens":400,"estimatedOutputTokens":120,"estimatedCostUsd":0.2,"createdAt":"2026-05-10T15:28:02.234Z","status":"completed","actualInputTokens":400,"actualOutputTokens":120,"actualCostUsd":0.2}`;
 
       const SPEC_DISPLAY = {
         specName: "Plan and price accuracy (customer catalog)",
@@ -872,24 +699,105 @@
         return String(sev || "—").replace(/\b\w/g, (c) => c.toUpperCase());
       }
 
-      async function tryFetchJson(url) {
+      async function fetchJsonArtifact(url) {
         try {
           const r = await fetch(url, { cache: "no-store" });
-          if (!r.ok) return null;
-          return await r.json();
+          if (!r.ok) return { httpOk: false, json: null };
+          const text = await r.text();
+          const trimmed = text.trim();
+          if (!trimmed.startsWith("{") && !trimmed.startsWith("[")) return { httpOk: true, json: null };
+          try {
+            return { httpOk: true, json: JSON.parse(trimmed) };
+          } catch {
+            return { httpOk: true, json: null };
+          }
         } catch {
-          return null;
+          return { httpOk: false, json: null };
         }
       }
 
-      async function tryFetchText(url) {
+      async function fetchTextArtifact(url) {
         try {
           const r = await fetch(url, { cache: "no-store" });
-          if (!r.ok) return null;
-          return await r.text();
+          if (!r.ok) return { httpOk: false, text: null };
+          return { httpOk: true, text: await r.text() };
         } catch {
-          return null;
+          return { httpOk: false, text: null };
         }
+      }
+
+      function isPlainObject(x) {
+        return x !== null && typeof x === "object" && !Array.isArray(x);
+      }
+
+      function isUsableMaintenance(m) {
+        if (!isPlainObject(m)) return false;
+        if (typeof m.runId !== "string" || !m.runId.trim()) return false;
+        if (m.status == null && m.productionHealthStatus == null && typeof m.checksRun !== "number") return false;
+        return true;
+      }
+
+      function isUsableBudget(b) {
+        if (!isPlainObject(b)) return false;
+        return (
+          typeof b.budgetRemainingUsd === "number" ||
+          typeof b.budgetUsedUsd === "number" ||
+          typeof b.creditsRemaining === "number"
+        );
+      }
+
+      function isUsableGate(g) {
+        if (!isPlainObject(g)) return false;
+        return (
+          typeof g.deployAllowed === "boolean" ||
+          typeof g.exitCode === "number" ||
+          (typeof g.maintenanceStatus === "string" && g.maintenanceStatus.length > 0)
+        );
+      }
+
+      function normalizeGateRecord(g, maintenance) {
+        const out = { ...g };
+        if (typeof out.exitCode !== "number" && typeof out.maintenanceStatus === "string") {
+          const s = out.maintenanceStatus.toLowerCase();
+          out.exitCode = s === "misconfigured" ? 2 : s === "failed" ? 1 : 0;
+        }
+        if (typeof out.deployAllowed !== "boolean" && maintenance && typeof maintenance.status === "string") {
+          const s = maintenance.status.toLowerCase();
+          out.deployAllowed = s === "healthy" || s === "at_risk";
+        }
+        return out;
+      }
+
+      function pickGateForMaintenance(maintenance, gFetch, embeddedGate) {
+        if (!isUsableGate(gFetch)) return embeddedGate;
+        const mr = maintenance.runId;
+        const gr = gFetch.runId;
+        if (typeof mr === "string" && typeof gr === "string" && gr !== mr) return embeddedGate;
+        return normalizeGateRecord(gFetch, maintenance);
+      }
+
+      function normalizeBudgetView(maintenance, budget) {
+        const bg = maintenance.budgetGateSummary;
+        const out = { ...budget };
+        if (typeof out.budgetRemainingUsd !== "number" && bg) {
+          const lim = bg.monthlyBudgetLimitUsd;
+          const spent = bg.monthlySpendUsdAfterRun;
+          if (typeof lim === "number" && typeof spent === "number") out.budgetRemainingUsd = lim - spent;
+        }
+        if (typeof out.budgetUsedUsd !== "number" && bg && typeof bg.monthlySpendUsdAfterRun === "number") {
+          out.budgetUsedUsd = bg.monthlySpendUsdAfterRun;
+        }
+        return out;
+      }
+
+      function setText(id, text) {
+        const el = document.getElementById(id);
+        if (el) el.textContent = text;
+      }
+
+      function setHealthBadgeSafe(selector, status) {
+        const el = document.querySelector(selector);
+        if (el) setHealthBadge(el, status);
       }
 
       function parseLedgerJsonl(text) {
@@ -946,206 +854,272 @@
       }
 
       function render(maintenance, budget, gate, ledgerRows) {
-        const status = maintenance.status || "unknown";
-        const healthLabel = formatMaintenanceStatus(status);
+        const status = maintenance.status || maintenance.productionHealthStatus || "unknown";
+        setHealthBadgeSafe("#exec-health .badge", status);
 
-        const execHealth = document.querySelector("#exec-health .badge");
-        setHealthBadge(execHealth, status);
+        const policies = maintenance.policyResults || [];
+        const checks = maintenance.checks || [];
+        let checksPassed = maintenance.checksPassed;
+        if (
+          typeof checksPassed !== "number" &&
+          typeof maintenance.checksRun === "number" &&
+          typeof maintenance.checksFailed === "number"
+        ) {
+          checksPassed = maintenance.checksRun - maintenance.checksFailed;
+        }
+        const totalChecks = maintenance.checksRun;
+        if (typeof checksPassed === "number" && typeof totalChecks === "number") {
+          setText("exec-checks", `${checksPassed} / ${totalChecks} passed`);
+        } else {
+          setText("exec-checks", "—");
+        }
 
-        const passed = maintenance.checksPassed ?? "—";
-        const total = maintenance.checksRun ?? "—";
-        document.getElementById("exec-checks").textContent =
-          passed !== "—" && total !== "—" ? `${passed} / ${total} passed` : "—";
-
-        document.getElementById("exec-budget-rem").textContent = formatUsd(budget.budgetRemainingUsd);
+        setText("exec-budget-rem", formatUsd(budget.budgetRemainingUsd));
 
         const bgSum = maintenance.budgetGateSummary;
         const routedLine =
           bgSum != null
             ? `${bgSum.routedCallsAttempted - (bgSum.routedCallsBlocked || 0)} completed · ${bgSum.routedCallsBlocked || 0} blocked`
             : "—";
-        document.getElementById("exec-routed").textContent = routedLine;
+        setText("exec-routed", routedLine);
 
         const deployEl = document.querySelector("#exec-deploy .badge");
-        const allowed = gate.deployAllowed === true;
-        deployEl.textContent = allowed ? "Allowed" : "Blocked";
-        deployEl.className = "badge " + (allowed ? "deploy-yes" : "deploy-no");
+        const deployAllowed =
+          typeof gate.deployAllowed === "boolean"
+            ? gate.deployAllowed
+            : String(maintenance.status || "").toLowerCase() === "healthy" ||
+              String(maintenance.status || "").toLowerCase() === "at_risk";
+        if (deployEl) {
+          deployEl.textContent = deployAllowed ? "Allowed" : "Blocked";
+          deployEl.className = "badge " + (deployAllowed ? "deploy-yes" : "deploy-no");
+        }
 
-        const badge = document.getElementById("health-badge");
-        setHealthBadge(badge, status);
+        setHealthBadgeSafe("#health-badge", status);
 
-        document.getElementById("run-time").textContent = maintenance.generatedAt || "—";
-        document.getElementById("workflow-name").textContent = formatWorkflow(maintenance.workflowName);
-        document.getElementById("environment").textContent = formatEnvironment(maintenance.environment);
-        document.getElementById("spec-version").textContent =
-          maintenance.specVersion !== undefined ? String(maintenance.specVersion) : "—";
-        document.getElementById("run-id").textContent = maintenance.runId || "—";
-        document.getElementById("prod-health").textContent = formatProductionHealthLabel(
-          maintenance.productionHealthStatus,
+        setText("run-time", maintenance.generatedAt || "—");
+        setText("workflow-name", formatWorkflow(maintenance.workflowName));
+        setText("environment", formatEnvironment(maintenance.environment));
+        setText(
+          "spec-version",
+          maintenance.specVersion !== undefined && maintenance.specVersion !== null
+            ? String(maintenance.specVersion)
+            : "—",
+        );
+        setText("run-id", maintenance.runId || "—");
+        setText(
+          "prod-health",
+          formatProductionHealthLabel(maintenance.productionHealthStatus || maintenance.status),
         );
 
-        document.getElementById("spec-label").textContent =
-          (SPEC_DISPLAY.specName ? SPEC_DISPLAY.specName + " · " : "") + (maintenance.specId || "—");
-        document.getElementById("spec-workflow").textContent = formatWorkflow(maintenance.workflowName);
-        const policies = maintenance.policyResults || [];
-        const checks = maintenance.checks || [];
-        document.getElementById("count-policies").textContent = String(policies.length);
+        setText(
+          "spec-label",
+          (SPEC_DISPLAY.specName ? SPEC_DISPLAY.specName + " · " : "") + (maintenance.specId || "—"),
+        );
+        setText("spec-workflow", formatWorkflow(maintenance.workflowName));
+        setText("count-policies", String(policies.length));
         const bo = checks.filter((c) => c.kind === "behavior" || c.kind === "output").length;
-        document.getElementById("count-behavior-output").textContent = String(bo);
+        setText("count-behavior-output", String(bo));
         const tools = maintenance.toolCallResults || [];
-        document.getElementById("count-tools").textContent = String(tools.length);
+        setText("count-tools", String(tools.length));
         const acts = maintenance.actionResults || [];
-        document.getElementById("count-actions").textContent = String(acts.length);
+        setText("count-actions", String(acts.length));
 
-        document.getElementById("checks-run").textContent = String(maintenance.checksRun ?? "—");
-        document.getElementById("checks-passed").textContent = String(maintenance.checksPassed ?? "—");
-        document.getElementById("checks-failed").textContent = String(maintenance.checksFailed ?? "—");
-        document.getElementById("blocking-failures").textContent = String(maintenance.blockingFailures ?? "—");
-        document.getElementById("warnings").textContent = String(maintenance.warnings ?? "—");
+        setText("checks-run", String(maintenance.checksRun ?? "—"));
+        setText(
+          "checks-passed",
+          String((typeof checksPassed === "number" ? checksPassed : maintenance.checksPassed) ?? "—"),
+        );
+        setText("checks-failed", String(maintenance.checksFailed ?? "—"));
+
+        let blockingFailures = maintenance.blockingFailures;
+        if (typeof blockingFailures !== "number") {
+          blockingFailures = checks.filter((c) => !c.passed && c.severity === "blocking").length;
+        }
+        let warnings = maintenance.warnings;
+        if (typeof warnings !== "number") {
+          warnings = checks.filter((c) => String(c.severity || "").toLowerCase() === "warning").length;
+        }
+        setText("blocking-failures", String(blockingFailures));
+        setText("warnings", String(warnings));
 
         const bg = maintenance.budgetGateSummary;
         const br = (maintenance.budgetResults && maintenance.budgetResults[0]) || null;
-        document.getElementById("monthly-limit").textContent = bg ? formatUsd(bg.monthlyBudgetLimitUsd) : "—";
-        document.getElementById("budget-used").textContent = formatUsd(budget.budgetUsedUsd);
-        document.getElementById("budget-remaining").textContent = formatUsd(budget.budgetRemainingUsd);
-        document.getElementById("per-run-limit").textContent =
-          bg && bg.perRunBudgetLimitUsd !== undefined ? formatUsd(bg.perRunBudgetLimitUsd) : "—";
-        document.getElementById("est-cost").textContent = br ? formatUsd(br.estimatedCostUsd) : "—";
+        setText("monthly-limit", bg ? formatUsd(bg.monthlyBudgetLimitUsd) : "—");
+        setText("budget-used", formatUsd(budget.budgetUsedUsd));
+        setText("budget-remaining", formatUsd(budget.budgetRemainingUsd));
+
+        const perRun =
+          bg && bg.perRunBudgetLimitUsd !== undefined
+            ? bg.perRunBudgetLimitUsd
+            : br && br.perRunBudgetRemainingUsd !== undefined
+              ? br.perRunBudgetRemainingUsd
+              : undefined;
+        setText("per-run-limit", perRun !== undefined ? formatUsd(perRun) : "—");
+
+        const ledgerSorted = ledgerRows.slice().sort((a, b) => {
+          const ta = a.createdAt ? Date.parse(a.createdAt) : 0;
+          const tb = b.createdAt ? Date.parse(b.createdAt) : 0;
+          return ta - tb;
+        });
+        const latestLedger = ledgerSorted.length ? ledgerSorted[ledgerSorted.length - 1] : null;
+        let estCost = br && br.estimatedCostUsd !== undefined ? br.estimatedCostUsd : undefined;
+        if (estCost === undefined && latestLedger && latestLedger.estimatedCostUsd !== undefined) {
+          estCost = latestLedger.estimatedCostUsd;
+        }
+        setText("est-cost", estCost !== undefined ? formatUsd(estCost) : "—");
 
         let bStatus = "—";
         if (br) {
           if (br.passed && br.routedCallAllowed) bStatus = "Within limits for this routed call";
           else if (!br.passed) bStatus = "Blocked or not allowed for this routed call";
+        } else if (bg) {
+          const bc = checks.find((c) => c.kind === "budget");
+          if (bc && bc.passed) bStatus = "Within limits for this routed call";
+          else if (bc && !bc.passed) bStatus = "Blocked or not allowed for this routed call";
         }
-        document.getElementById("budget-status").textContent = bStatus;
-        document.getElementById("routed-summary").textContent = bg
-          ? `${bg.routedCallsAttempted} attempted · ${bg.routedCallsBlocked || 0} blocked`
-          : "—";
-        document.getElementById("fail-closed").textContent =
-          bg && typeof bg.failClosed === "boolean" ? (bg.failClosed ? "Yes" : "No") : "—";
+        setText("budget-status", bStatus);
+        setText(
+          "routed-summary",
+          bg ? `${bg.routedCallsAttempted} attempted · ${bg.routedCallsBlocked || 0} blocked` : "—",
+        );
+        setText(
+          "fail-closed",
+          bg && typeof bg.failClosed === "boolean" ? (bg.failClosed ? "Yes" : "No") : "—",
+        );
 
         let blockedSpend = 0;
         ledgerRows.forEach((r) => {
-          if (r.status === "blocked" && typeof r.estimatedCostUsd === "number") blockedSpend += r.estimatedCostUsd;
+          const st = String(r.status || "").toLowerCase();
+          if (st === "blocked" && typeof r.estimatedCostUsd === "number") blockedSpend += r.estimatedCostUsd;
         });
-        document.getElementById("budget-estimated-blocked").textContent = formatUsd(blockedSpend);
+        setText("budget-estimated-blocked", formatUsd(blockedSpend));
 
-        const total = ledgerRows.length;
-        const completed = ledgerRows.filter((r) => r.status === "completed").length;
-        const blocked = ledgerRows.filter((r) => r.status === "blocked").length;
-        const failed = ledgerRows.filter((r) => r.status === "failed").length;
-        document.getElementById("ledger-total").textContent = String(total);
-        document.getElementById("ledger-completed").textContent = String(completed);
-        document.getElementById("ledger-blocked").textContent = String(blocked);
-        document.getElementById("ledger-failed").textContent = String(failed);
-        document.getElementById("ledger-blocked-spend").textContent = formatUsd(blockedSpend);
-        const latest = ledgerRows[ledgerRows.length - 1];
-        document.getElementById("ledger-latest-pm").textContent = latest
-          ? `${latest.provider} / ${latest.model}`
-          : "—";
+        const ledgerTotal = ledgerRows.length;
+        const completed = ledgerRows.filter((r) => String(r.status || "").toLowerCase() === "completed").length;
+        const blocked = ledgerRows.filter((r) => String(r.status || "").toLowerCase() === "blocked").length;
+        const failed = ledgerRows.filter((r) => String(r.status || "").toLowerCase() === "failed").length;
+        setText("ledger-total", String(ledgerTotal));
+        setText("ledger-completed", String(completed));
+        setText("ledger-blocked", String(blocked));
+        setText("ledger-failed", String(failed));
+        setText("ledger-blocked-spend", formatUsd(blockedSpend));
+        const latest = latestLedger;
+        setText("ledger-latest-pm", latest && latest.provider && latest.model ? `${latest.provider} / ${latest.model}` : "—");
 
         const tbody = document.getElementById("ledger-body");
-        tbody.innerHTML = "";
-        ledgerRows
-          .slice()
-          .reverse()
-          .forEach((row) => {
-            const tr = document.createElement("tr");
-            const span = document.createElement("span");
-            const st = String(row.status || "").toLowerCase();
-            span.className =
-              "badge " +
-              (st === "blocked" ? "blocked" : st === "failed" ? "misconfigured" : "healthy");
-            span.textContent = formatLedgerStatus(row.status);
-            const tdTime = document.createElement("td");
-            tdTime.textContent = row.createdAt || "—";
-            const tdSt = document.createElement("td");
-            tdSt.appendChild(span);
-            tr.appendChild(tdTime);
-            tr.appendChild(tdSt);
-            ["provider", "model"].forEach((k) => {
-              const td = document.createElement("td");
-              td.textContent = row[k] || "—";
-              tr.appendChild(td);
+        if (tbody) {
+          tbody.innerHTML = "";
+          ledgerRows
+            .slice()
+            .reverse()
+            .forEach((row) => {
+              const tr = document.createElement("tr");
+              const span = document.createElement("span");
+              const st = String(row.status || "").toLowerCase();
+              span.className =
+                "badge " +
+                (st === "blocked" ? "blocked" : st === "failed" ? "misconfigured" : "healthy");
+              span.textContent = formatLedgerStatus(row.status);
+              const tdTime = document.createElement("td");
+              tdTime.textContent = row.createdAt || "—";
+              const tdSt = document.createElement("td");
+              tdSt.appendChild(span);
+              tr.appendChild(tdTime);
+              tr.appendChild(tdSt);
+              ["provider", "model"].forEach((k) => {
+                const td = document.createElement("td");
+                td.textContent = row[k] || "—";
+                tr.appendChild(td);
+              });
+              const tdE = document.createElement("td");
+              tdE.textContent = formatUsd(row.estimatedCostUsd);
+              const tdA = document.createElement("td");
+              tdA.textContent = row.actualCostUsd !== undefined ? formatUsd(row.actualCostUsd) : "—";
+              const tdB = document.createElement("td");
+              tdB.textContent = row.blockReason ? String(row.blockReason).replace(/_/g, " ") : "—";
+              tr.appendChild(tdE);
+              tr.appendChild(tdA);
+              tr.appendChild(tdB);
+              tbody.appendChild(tr);
             });
-            const tdE = document.createElement("td");
-            tdE.textContent = formatUsd(row.estimatedCostUsd);
-            const tdA = document.createElement("td");
-            tdA.textContent = row.actualCostUsd !== undefined ? formatUsd(row.actualCostUsd) : "—";
-            const tdB = document.createElement("td");
-            tdB.textContent = row.blockReason ? String(row.blockReason).replace(/_/g, " ") : "—";
-            tr.appendChild(tdE);
-            tr.appendChild(tdA);
-            tr.appendChild(tdB);
-            tbody.appendChild(tr);
-          });
+        }
 
         const failChecks = checks.filter((c) => !c.passed && c.severity === "blocking");
         const failBody = document.getElementById("fail-body");
-        failBody.innerHTML = "";
-        if (failChecks.length === 0) {
-          document.getElementById("fail-empty").style.display = "block";
-        } else {
-          document.getElementById("fail-empty").style.display = "none";
-          failChecks.forEach((c) => {
-            const tr = document.createElement("tr");
-            [
-              c.name || c.id,
-              formatSeverity(c.severity),
-              classifyFailure(c) || c.message || "—",
-              formatCheckKind(c.kind),
-            ].forEach((text) => {
-              const td = document.createElement("td");
-              td.textContent = text;
-              tr.appendChild(td);
+        if (failBody) {
+          failBody.innerHTML = "";
+          if (failChecks.length === 0) {
+            const fe = document.getElementById("fail-empty");
+            if (fe) fe.style.display = "block";
+          } else {
+            const fe = document.getElementById("fail-empty");
+            if (fe) fe.style.display = "none";
+            failChecks.forEach((c) => {
+              const tr = document.createElement("tr");
+              [
+                c.name || c.id,
+                formatSeverity(c.severity),
+                classifyFailure(c) || c.message || "—",
+                formatCheckKind(c.kind),
+              ].forEach((text) => {
+                const td = document.createElement("td");
+                td.textContent = text;
+                tr.appendChild(td);
+              });
+              failBody.appendChild(tr);
             });
-            failBody.appendChild(tr);
-          });
+          }
         }
 
         const ev = maintenance.evidence || [];
         const evUl = document.getElementById("evidence-list");
-        evUl.innerHTML = "";
-        if (ev.length === 0) {
-          const li = document.createElement("li");
-          li.textContent = "No failure evidence recorded for this run.";
-          evUl.appendChild(li);
-        } else {
-          ev.forEach((x) => {
+        if (evUl) {
+          evUl.innerHTML = "";
+          if (ev.length === 0) {
             const li = document.createElement("li");
-            li.textContent = x;
+            li.textContent = "No failure evidence recorded for this run.";
             evUl.appendChild(li);
-          });
+          } else {
+            ev.forEach((x) => {
+              const li = document.createElement("li");
+              li.textContent = x;
+              evUl.appendChild(li);
+            });
+          }
         }
 
         const rec = maintenance.recommendedActions || [];
         const recUl = document.getElementById("rec-list");
         const recEmpty = document.getElementById("rec-empty");
-        recUl.innerHTML = "";
-        if (!rec.length) {
-          recEmpty.style.display = "block";
-        } else {
-          recEmpty.style.display = "none";
-          rec.forEach((a) => {
-            const li = document.createElement("li");
-            li.innerHTML = `<strong>${escapeHtml(a.title || a.id || "Action")}</strong> — ${escapeHtml(a.detail || "")}`;
-            recUl.appendChild(li);
-          });
+        if (recUl) {
+          recUl.innerHTML = "";
+          if (!rec.length) {
+            if (recEmpty) recEmpty.style.display = "block";
+          } else {
+            if (recEmpty) recEmpty.style.display = "none";
+            rec.forEach((a) => {
+              const li = document.createElement("li");
+              li.innerHTML = `<strong>${escapeHtml(a.title || a.id || "Action")}</strong> — ${escapeHtml(a.detail || "")}`;
+              recUl.appendChild(li);
+            });
+          }
         }
 
         const deployDd = document.getElementById("deploy-allowed");
-        deployDd.innerHTML = "";
-        const dBadge = document.createElement("span");
-        dBadge.className = "badge " + (gate.deployAllowed === true ? "deploy-yes" : "deploy-no");
-        dBadge.textContent = gate.deployAllowed === true ? "Allowed" : "Blocked";
-        deployDd.appendChild(dBadge);
+        if (deployDd) {
+          deployDd.innerHTML = "";
+          const dBadge = document.createElement("span");
+          dBadge.className = "badge " + (deployAllowed ? "deploy-yes" : "deploy-no");
+          dBadge.textContent = deployAllowed ? "Allowed" : "Blocked";
+          deployDd.appendChild(dBadge);
+        }
 
         const code = gate.exitCode;
         let codeLine = "—";
         if (code === 0) codeLine = "0 — release may proceed (healthy or at-risk)";
         else if (code === 1) codeLine = "1 — blocking failures";
         else if (code === 2) codeLine = "2 — misconfigured";
-        document.getElementById("gate-exit").textContent = code !== undefined ? codeLine : "—";
+        setText("gate-exit", typeof code === "number" ? codeLine : "—");
       }
 
       function escapeHtml(s) {
@@ -1157,24 +1131,51 @@
       }
 
       (async function init() {
-        const mFetch = await tryFetchJson(ARTIFACT_PATHS.maintenance);
-        const bFetch = await tryFetchJson(ARTIFACT_PATHS.budget);
-        const gFetch = await tryFetchJson(ARTIFACT_PATHS.gate);
-        const lText = await tryFetchText(ARTIFACT_PATHS.ledger);
+        const indicator = document.getElementById("data-source-indicator");
+        const warnEl = document.getElementById("provenance-load-warning");
 
-        const maintenance = mFetch || EMBEDDED_SNAPSHOT_MAINTENANCE;
-        const budget = bFetch || EMBEDDED_SNAPSHOT_BUDGET;
-        let gate = gFetch || EMBEDDED_SNAPSHOT_GATE;
-        if (gate && typeof gate.exitCode !== "number" && gate.maintenanceStatus) {
-          const s = gate.maintenanceStatus;
-          gate = {
-            ...gate,
-            exitCode: s === "misconfigured" ? 2 : s === "failed" ? 1 : 0,
-          };
+        const mRes = await fetchJsonArtifact(ARTIFACT_PATHS.maintenance);
+        const bRes = await fetchJsonArtifact(ARTIFACT_PATHS.budget);
+        const gRes = await fetchJsonArtifact(ARTIFACT_PATHS.gate);
+        const lRes = await fetchTextArtifact(ARTIFACT_PATHS.ledger);
+
+        const mOk = isUsableMaintenance(mRes.json);
+        const maintenance = mOk ? mRes.json : EMBEDDED_SNAPSHOT_MAINTENANCE;
+
+        const bOk = isUsableBudget(bRes.json);
+        const budgetBase = bOk ? bRes.json : EMBEDDED_SNAPSHOT_BUDGET;
+        const budget = normalizeBudgetView(maintenance, budgetBase);
+
+        const gate = pickGateForMaintenance(maintenance, gRes.json, EMBEDDED_SNAPSHOT_GATE);
+
+        let ledgerRows = [];
+        if (lRes.httpOk && lRes.text != null) ledgerRows = parseLedgerJsonl(lRes.text);
+        if (!ledgerRows.length) ledgerRows = parseLedgerJsonl(EMBEDDED_SNAPSHOT_LEDGER);
+
+        const dataSourceLive =
+          mRes.httpOk && bRes.httpOk && gRes.httpOk && lRes.httpOk && mOk && bOk;
+        if (indicator) {
+          indicator.textContent = dataSourceLive
+            ? "Data source: live artifacts"
+            : "Data source: embedded snapshot";
         }
-        const ledgerRows = parseLedgerJsonl(lText || EMBEDDED_SNAPSHOT_LEDGER);
+        if (warnEl) {
+          warnEl.style.display = !isUsableMaintenance(maintenance) ? "block" : "none";
+        }
 
-        render(maintenance, budget, gate, ledgerRows);
+        try {
+          render(maintenance, budget, gate, ledgerRows);
+        } catch (err) {
+          console.error(err);
+          if (warnEl) warnEl.style.display = "block";
+          render(
+            EMBEDDED_SNAPSHOT_MAINTENANCE,
+            normalizeBudgetView(EMBEDDED_SNAPSHOT_MAINTENANCE, EMBEDDED_SNAPSHOT_BUDGET),
+            EMBEDDED_SNAPSHOT_GATE,
+            parseLedgerJsonl(EMBEDDED_SNAPSHOT_LEDGER),
+          );
+          if (indicator) indicator.textContent = "Data source: embedded snapshot";
+        }
       })();
     </script>
   </body>
