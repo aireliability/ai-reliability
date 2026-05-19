@@ -1,9 +1,12 @@
 {
-  "evaluatedAt": "2026-05-10T16:41:51.773Z",
+  "evaluatedAt": "2026-05-19T06:42:24.852Z",
   "source": "deliverables\\maintenance\\maintenance-result.json",
-  "runId": "maint-8b720c32-48db-4989-a2d6-9f6d4ba17a01",
+  "runId": "maint-53693f8f-9aa0-457a-91a6-06f684604095",
   "specId": "pricing-plans-v1",
   "maintenanceStatus": "healthy",
+  "agentQaGateDecision": "pass",
+  "enforcementMode": "enforce",
+  "requiresHumanReview": false,
   "deployAllowed": true,
   "exitCode": 0
 }

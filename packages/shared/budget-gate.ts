@@ -1,5 +1,14 @@
+import {
+  budgetReasonToRemediation,
+  REMEDIATION_BUDGET_STATE,
+  REMEDIATION_PRICING_CONFIG,
+} from "./agent-qa";
 import type { EvalSpecBudgetGate } from "./eval-spec";
 import { getPlanEntitlement } from "./entitlements";
+import type {
+  EnforcementOutcome,
+  GateDecision,
+} from "./maintenance-result";
 
 /** Per-call credit cost reserved when usage is not metered from the provider. */
 export const DEFAULT_MODEL_CALL_CREDITS_REQUIRED = 1;
@@ -75,6 +84,10 @@ export interface ProviderCallGateResult {
   decision: ProviderCallGateDecision;
   /** Stable machine-oriented reason; safe to surface in API responses. */
   reason: string;
+  reasonCode: string;
+  gateDecision: GateDecision;
+  enforcementOutcome: EnforcementOutcome;
+  remediation: string[];
 }
 
 export interface AssertProviderCallAllowedInput {
@@ -95,56 +108,125 @@ export interface AssertProviderCallAllowedInput {
    * When false and failClosed is true, pricing is treated as unknown → misconfigured.
    */
   pricingKnown?: boolean;
+  /**
+   * When false, budget state was not loaded for this routed call (fail closed).
+   */
+  budgetStatePresent?: boolean;
+}
+
+function gateResult(
+  decision: ProviderCallGateDecision,
+  reasonCode: string,
+): ProviderCallGateResult {
+  const remediation = budgetReasonToRemediation(reasonCode);
+  if (decision === "allowed") {
+    return {
+      decision,
+      reason: reasonCode,
+      reasonCode,
+      gateDecision: "pass",
+      enforcementOutcome: "passed",
+      remediation: [],
+    };
+  }
+  if (decision === "misconfigured") {
+    const gateDecision: GateDecision =
+      reasonCode === "missing_pricing" ||
+      reasonCode === "unknown_plan_entitlement"
+        ? "block"
+        : "block";
+    return {
+      decision,
+      reason: reasonCode,
+      reasonCode,
+      gateDecision,
+      enforcementOutcome: "blocked",
+      remediation,
+    };
+  }
+  return {
+    decision: "blocked",
+    reason: reasonCode,
+    reasonCode,
+    gateDecision: "block",
+    enforcementOutcome: "blocked",
+    remediation,
+  };
 }
 
 /**
  * Assert whether a routed provider/model call may proceed under spec budget gate rules.
- * Does not throw; returns structured allow / block / misconfigured.
+ * Does not throw; returns structured allow / block / misconfigured with Agent QA fields.
  */
 export function assertProviderCallAllowed(
   input: AssertProviderCallAllowedInput,
 ): ProviderCallGateResult {
   const { budgetGate } = input;
 
+  if (input.budgetStatePresent === false) {
+    return {
+      decision: "misconfigured",
+      reason: "missing_budget_state",
+      reasonCode: "missing_budget_state",
+      gateDecision: "block",
+      enforcementOutcome: "blocked",
+      remediation: [REMEDIATION_BUDGET_STATE],
+    };
+  }
+
   if (!Number.isFinite(input.creditsRemaining)) {
-    return { decision: "misconfigured", reason: "invalid_credits_state" };
+    return gateResult("misconfigured", "invalid_credits_state");
   }
   if (!Number.isFinite(input.monthlyBudgetRemainingUsd)) {
-    return { decision: "misconfigured", reason: "invalid_monthly_budget_state" };
+    return gateResult("misconfigured", "invalid_monthly_budget_state");
   }
   if (!Number.isFinite(input.currentRunSpendUsd)) {
-    return { decision: "misconfigured", reason: "invalid_run_spend_state" };
+    return gateResult("misconfigured", "invalid_run_spend_state");
   }
   if (!Number.isFinite(input.estimatedCreditsRequired)) {
-    return { decision: "misconfigured", reason: "invalid_credit_estimate" };
+    return gateResult("misconfigured", "invalid_credit_estimate");
   }
   if (!Number.isFinite(input.estimatedCostUsd)) {
     if (budgetGate.failClosed) {
-      return { decision: "misconfigured", reason: "missing_pricing" };
+      return {
+        decision: "misconfigured",
+        reason: "missing_pricing",
+        reasonCode: "missing_pricing",
+        gateDecision: "block",
+        enforcementOutcome: "blocked",
+        remediation: [REMEDIATION_PRICING_CONFIG],
+      };
     }
-    return { decision: "blocked", reason: "invalid_cost_estimate" };
+    return gateResult("blocked", "invalid_cost_estimate");
   }
 
   try {
     getPlanEntitlement(input.planId);
   } catch {
-    return { decision: "misconfigured", reason: "unknown_plan_entitlement" };
+    return gateResult("misconfigured", "unknown_plan_entitlement");
   }
 
   if (input.subscriptionActive === false) {
-    return { decision: "blocked", reason: "subscription_inactive" };
+    return gateResult("blocked", "subscription_inactive");
   }
 
   if (input.pricingKnown === false && budgetGate.failClosed) {
-    return { decision: "misconfigured", reason: "missing_pricing" };
+    return {
+      decision: "misconfigured",
+      reason: "missing_pricing",
+      reasonCode: "missing_pricing",
+      gateDecision: "block",
+      enforcementOutcome: "blocked",
+      remediation: [REMEDIATION_PRICING_CONFIG],
+    };
   }
 
   if (input.creditsRemaining < input.estimatedCreditsRequired) {
-    return { decision: "blocked", reason: "credits_exhausted" };
+    return gateResult("blocked", "credits_exhausted");
   }
 
   if (input.estimatedCostUsd > input.monthlyBudgetRemainingUsd) {
-    return { decision: "blocked", reason: "monthly_budget_exceeded" };
+    return gateResult("blocked", "monthly_budget_exceeded");
   }
 
   if (
@@ -152,7 +234,7 @@ export function assertProviderCallAllowed(
     input.currentRunSpendUsd + input.estimatedCostUsd >
       budgetGate.perRunBudgetLimitUsd
   ) {
-    return { decision: "blocked", reason: "per_run_budget_exceeded" };
+    return gateResult("blocked", "per_run_budget_exceeded");
   }
 
   const providers = budgetGate.allowedProviders;
@@ -161,7 +243,7 @@ export function assertProviderCallAllowed(
     providers.length > 0 &&
     !providers.includes(input.provider)
   ) {
-    return { decision: "blocked", reason: "provider_not_allowed" };
+    return gateResult("blocked", "provider_not_allowed");
   }
 
   const models = budgetGate.allowedModels;
@@ -170,8 +252,8 @@ export function assertProviderCallAllowed(
     models.length > 0 &&
     !models.includes(input.model)
   ) {
-    return { decision: "blocked", reason: "model_not_allowed" };
+    return gateResult("blocked", "model_not_allowed");
   }
 
-  return { decision: "allowed", reason: "routed_call_allowed" };
+  return gateResult("allowed", "routed_call_allowed");
 }

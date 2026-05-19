@@ -14,6 +14,7 @@ import {
   type EvalSpec,
   type EvalSpecBudgetGate,
 } from "./eval-spec";
+import { isPassingGateDecision } from "./agent-qa";
 import {
   runMaintenanceCheck,
   evaluateTestCase,
@@ -349,6 +350,267 @@ describe("applyBudgetUsage still works (V1.9.1)", () => {
     const n = applyBudgetUsage(s, { creditsUsed: 2, actualCostUsd: 1 });
     assert.equal(n.creditsRemaining, 8);
     assert.equal(s.creditsRemaining, 10);
+  });
+});
+
+describe("Agent QA Firewall", () => {
+  const toolSpec = minimalSpec({
+    testCases: [
+      {
+        id: "t1",
+        name: "Tool required",
+        input: "x",
+        expectedBehavior: "use tool",
+        requiredToolCalls: ["must_exist"],
+        severity: "blocking",
+      },
+    ],
+  });
+
+  it("missing required tool call creates block under enforce", () => {
+    const r = runMaintenanceCheck({
+      runId: "aq1",
+      spec: toolSpec,
+      observations: { t1: { output: "ok", toolCalls: [], actions: [] } },
+      enforcementMode: "enforce",
+      generatedAt: new Date().toISOString(),
+    });
+    assert.equal(r.agentQa?.gateDecision, "block");
+    assert.ok((r.agentQa?.remediation ?? []).some((m) => m.includes("tool trace")));
+  });
+
+  it("wrong tool observed creates block under enforce", () => {
+    const r = runMaintenanceCheck({
+      runId: "aq-wrong",
+      spec: toolSpec,
+      observations: {
+        t1: { output: "ok", toolCalls: ["wrong_tool"], actions: [] },
+      },
+      enforcementMode: "enforce",
+      generatedAt: new Date().toISOString(),
+    });
+    assert.equal(r.agentQa?.gateDecision, "block");
+    const wrong = r.checks.find((c) => c.id.startsWith("wrong_tool"));
+    assert.ok(wrong);
+  });
+
+  it("no tool trace captured does not pass when tools required", () => {
+    const r = runMaintenanceCheck({
+      runId: "aq-notrace",
+      spec: toolSpec,
+      observations: { t1: { output: "ok", actions: [] } },
+      enforcementMode: "enforce",
+      generatedAt: new Date().toISOString(),
+    });
+    assert.notEqual(r.agentQa?.gateDecision, "pass");
+    assert.ok(r.checks.some((c) => c.id.startsWith("tool_trace")));
+  });
+
+  it("forbidden action creates block in enforce mode", () => {
+    const s = minimalSpec({
+      testCases: [
+        {
+          id: "t1",
+          name: "No refund",
+          input: "x",
+          expectedBehavior: "safe",
+          forbiddenActions: ["issue_refund"],
+          severity: "blocking",
+        },
+      ],
+    });
+    const r = runMaintenanceCheck({
+      runId: "aq-forbidden",
+      spec: s,
+      observations: {
+        t1: { output: "ok", toolCalls: [], actions: ["issue_refund"] },
+      },
+      enforcementMode: "enforce",
+      generatedAt: new Date().toISOString(),
+    });
+    assert.equal(r.agentQa?.gateDecision, "block");
+  });
+
+  it("missing output evidence does not pass", () => {
+    const s = minimalSpec({
+      testCases: [
+        {
+          id: "t1",
+          name: "Out",
+          input: "x",
+          expectedBehavior: "greet",
+          expectedOutput: "hello",
+          severity: "blocking",
+        },
+      ],
+    });
+    const r = runMaintenanceCheck({
+      runId: "aq-out",
+      spec: s,
+      observations: { t1: { output: "", toolCalls: [], actions: [] } },
+      evidenceCompleteness: { outputCaptured: false },
+      enforcementMode: "enforce",
+      generatedAt: new Date().toISOString(),
+    });
+    assert.notEqual(r.agentQa?.gateDecision, "pass");
+  });
+
+  it("missing budget state blocks", () => {
+    const r = runMaintenanceCheck({
+      runId: "aq-budget",
+      spec: minimalSpec(),
+      observations: { t1: { output: "greet", toolCalls: [], actions: [] } },
+      routedCall: {
+        callId: "c1",
+        planId: "starter",
+        creditsRemaining: 10,
+        monthlyBudgetRemainingUsd: 50,
+        currentRunSpendUsd: 0,
+        estimatedCreditsRequired: 1,
+        estimatedCostUsd: 0.1,
+        provider: "openai",
+        model: "gpt-4.1-mini",
+        pricingKnown: true,
+        budgetStatePresent: false,
+        estimatedInputTokens: 1,
+        estimatedOutputTokens: 1,
+      },
+      enforcementMode: "enforce",
+      generatedAt: new Date().toISOString(),
+    });
+    assert.equal(r.agentQa?.gateDecision, "block");
+  });
+
+  it("missing pricing config blocks when failClosed", () => {
+    const r = runMaintenanceCheck({
+      runId: "aq-price",
+      spec: minimalSpec(),
+      observations: { t1: { output: "greet", toolCalls: [], actions: [] } },
+      routedCall: {
+        callId: "c1",
+        planId: "starter",
+        creditsRemaining: 10,
+        monthlyBudgetRemainingUsd: 50,
+        currentRunSpendUsd: 0,
+        estimatedCreditsRequired: 1,
+        estimatedCostUsd: 0.1,
+        provider: "openai",
+        model: "gpt-4.1-mini",
+        pricingKnown: false,
+        budgetStatePresent: true,
+        estimatedInputTokens: 1,
+        estimatedOutputTokens: 1,
+      },
+      enforcementMode: "enforce",
+      generatedAt: new Date().toISOString(),
+    });
+    assert.equal(r.status, "misconfigured");
+    assert.equal(r.agentQa?.gateDecision, "block");
+  });
+
+  it("unknown provider blocks when allowlist configured", () => {
+    const gate = assertProviderCallAllowed({
+      planId: "starter",
+      creditsRemaining: 10,
+      monthlyBudgetRemainingUsd: 50,
+      currentRunSpendUsd: 0,
+      estimatedCreditsRequired: 1,
+      estimatedCostUsd: 0.1,
+      provider: "unknown_vendor",
+      model: "gpt-4.1-mini",
+      budgetGate: baseBudgetGate,
+      pricingKnown: true,
+    });
+    assert.equal(gate.decision, "blocked");
+    assert.equal(gate.reasonCode, "provider_not_allowed");
+    assert.ok(gate.remediation.length > 0);
+  });
+
+  it("ledger write failure does not silently pass", () => {
+    const r = runMaintenanceCheck({
+      runId: "aq-ledger",
+      spec: minimalSpec(),
+      observations: { t1: { output: "greet", toolCalls: [], actions: [] } },
+      ledgerWriteSucceeded: false,
+      enforcementMode: "enforce",
+      generatedAt: new Date().toISOString(),
+    });
+    assert.equal(r.agentQa?.gateDecision, "block");
+    assert.ok(r.checks.some((c) => c.id === "ledger:write"));
+  });
+
+  it("observe mode records findings without hard gate block", () => {
+    const r = runMaintenanceCheck({
+      runId: "aq-observe",
+      spec: toolSpec,
+      observations: { t1: { output: "ok", toolCalls: [], actions: [] } },
+      enforcementMode: "observe",
+      generatedAt: new Date().toISOString(),
+    });
+    assert.notEqual(r.agentQa?.gateDecision, "block");
+    assert.ok((r.agentQa?.wouldBlockCount ?? 0) > 0);
+  });
+
+  it("enforce mode blocks on forbidden action", () => {
+    const s = minimalSpec({
+      testCases: [
+        {
+          id: "t1",
+          name: "No delete",
+          input: "x",
+          expectedBehavior: "safe",
+          forbiddenActions: ["delete_record"],
+          severity: "blocking",
+        },
+      ],
+    });
+    const r = runMaintenanceCheck({
+      runId: "aq-enforce",
+      spec: s,
+      observations: {
+        t1: { output: "ok", toolCalls: [], actions: ["delete_record"] },
+      },
+      enforcementMode: "enforce",
+      generatedAt: new Date().toISOString(),
+    });
+    assert.equal(r.agentQa?.gateDecision, "block");
+    assert.equal(r.status, "failed");
+  });
+
+  it("manual_review is not treated as pass", () => {
+    assert.equal(isPassingGateDecision("manual_review"), false);
+    const r = runMaintenanceCheck({
+      runId: "aq-review",
+      spec: minimalSpec({
+        testCases: [
+          {
+            id: "t1",
+            name: "Behavior",
+            input: "x",
+            expectedBehavior: "very specific phrase required",
+            severity: "warning",
+          },
+        ],
+      }),
+      observations: { t1: { output: "vague", toolCalls: [], actions: [] } },
+      enforcementMode: "warn",
+      generatedAt: new Date().toISOString(),
+    });
+    assert.equal(r.agentQa?.gateDecision, "manual_review");
+    assert.equal(isPassingGateDecision(r.agentQa!.gateDecision), false);
+  });
+
+  it("remediation messages exist for failed checks", () => {
+    const r = runMaintenanceCheck({
+      runId: "aq-rem",
+      spec: toolSpec,
+      observations: { t1: { output: "ok", toolCalls: [], actions: [] } },
+      enforcementMode: "enforce",
+      generatedAt: new Date().toISOString(),
+    });
+    const failed = (r.agentQaChecks ?? []).filter((c) => c.enforcementOutcome !== "passed");
+    assert.ok(failed.length > 0);
+    assert.ok(failed.every((c) => c.remediation.length > 0));
   });
 });
 

@@ -1,5 +1,5 @@
 {
-  "runId": "maint-8b720c32-48db-4989-a2d6-9f6d4ba17a01",
+  "runId": "maint-53693f8f-9aa0-457a-91a6-06f684604095",
   "specId": "pricing-plans-v1",
   "specVersion": 1,
   "workflowName": "sales_copilot",
@@ -12,14 +12,6 @@
   "blockingFailures": 0,
   "warnings": 0,
   "evidence": [],
-  "budgetGateSummary": {
-    "monthlyBudgetLimitUsd": 600,
-    "perRunBudgetLimitUsd": 1.5,
-    "monthlySpendUsdAfterRun": 200.2,
-    "routedCallsAttempted": 1,
-    "routedCallsBlocked": 0,
-    "failClosed": true
-  },
   "policyResults": [
     {
       "policyId": "policy-0",
@@ -35,7 +27,8 @@
       "required": true,
       "observed": true,
       "passed": true,
-      "severity": "blocking"
+      "severity": "blocking",
+      "outcome": "present"
     },
     {
       "testCaseId": "tc-quote-agency",
@@ -43,7 +36,8 @@
       "required": true,
       "observed": true,
       "passed": true,
-      "severity": "blocking"
+      "severity": "blocking",
+      "outcome": "present"
     },
     {
       "testCaseId": "_spec",
@@ -51,7 +45,8 @@
       "required": true,
       "observed": true,
       "passed": true,
-      "severity": "blocking"
+      "severity": "blocking",
+      "outcome": "present"
     }
   ],
   "actionResults": [
@@ -61,7 +56,8 @@
       "forbidden": true,
       "observed": false,
       "passed": true,
-      "severity": "blocking"
+      "severity": "blocking",
+      "source": "action_trace"
     },
     {
       "testCaseId": "tc-quote-agency",
@@ -69,7 +65,8 @@
       "forbidden": true,
       "observed": false,
       "passed": true,
-      "severity": "blocking"
+      "severity": "blocking",
+      "source": "action_trace"
     },
     {
       "testCaseId": "_spec",
@@ -85,6 +82,10 @@
       "passed": true,
       "routedCallAllowed": true,
       "reason": "routed_call_allowed",
+      "reasonCode": "routed_call_allowed",
+      "gateDecision": "pass",
+      "enforcementOutcome": "passed",
+      "remediation": [],
       "estimatedCostUsd": 0.2,
       "monthlyBudgetRemainingUsd": 400,
       "perRunBudgetRemainingUsd": 1.5
@@ -98,25 +99,10 @@
       "kind": "policy",
       "passed": true,
       "severity": "info",
-      "message": "Policy recorded in spec; customer is source of truth."
-    },
-    {
-      "id": "output:tc-quote-starter",
-      "name": "Expected output (Quotes Starter from customer catalog)",
-      "kind": "output",
-      "passed": true,
-      "severity": "blocking",
-      "message": "Output matches spec-defined expectation.",
-      "testCaseId": "tc-quote-starter"
-    },
-    {
-      "id": "behavior:tc-quote-starter",
-      "name": "Expected behavior (Quotes Starter from customer catalog)",
-      "kind": "behavior",
-      "passed": true,
-      "severity": "blocking",
-      "message": "Observed output reflects spec-defined expected behavior.",
-      "testCaseId": "tc-quote-starter"
+      "message": "Policy recorded in spec; customer is source of truth.",
+      "checkCategory": "setup",
+      "checkMethod": "deterministic",
+      "enforcementOutcome": "passed"
     },
     {
       "id": "tool:tc-quote-starter:fetch_plan_catalog",
@@ -125,7 +111,41 @@
       "passed": true,
       "severity": "blocking",
       "message": "Tool fetch_plan_catalog present in routed trace.",
-      "testCaseId": "tc-quote-starter"
+      "testCaseId": "tc-quote-starter",
+      "checkCategory": "tool_call",
+      "checkMethod": "deterministic",
+      "expected": "fetch_plan_catalog",
+      "observed": "fetch_plan_catalog",
+      "remediation": []
+    },
+    {
+      "id": "output:tc-quote-starter",
+      "name": "Expected output (Quotes Starter from customer catalog)",
+      "kind": "output",
+      "passed": true,
+      "severity": "blocking",
+      "message": "Output matches spec-defined expectation.",
+      "testCaseId": "tc-quote-starter",
+      "checkCategory": "answer",
+      "checkMethod": "deterministic",
+      "expected": "State the Starter price as $199/mo per this spec (from your defined catalog).",
+      "observed": "State the Starter price as $199/mo per this spec (from your defined catalog).",
+      "enforcementOutcome": "passed"
+    },
+    {
+      "id": "behavior:tc-quote-starter",
+      "name": "Expected behavior (Quotes Starter from customer catalog)",
+      "kind": "behavior",
+      "passed": true,
+      "severity": "blocking",
+      "message": "Observed output reflects spec-defined expected behavior.",
+      "testCaseId": "tc-quote-starter",
+      "checkCategory": "answer",
+      "checkMethod": "semantic",
+      "expected": "state the Starter price as $199/mo per this spec",
+      "observed": "State the Starter price as $199/mo per this spec (from your defined catalog).",
+      "enforcementOutcome": "passed",
+      "remediation": []
     },
     {
       "id": "action:tc-quote-starter:invent_plan_price",
@@ -134,16 +154,13 @@
       "passed": true,
       "severity": "blocking",
       "message": "Forbidden action invent_plan_price not observed.",
-      "testCaseId": "tc-quote-starter"
-    },
-    {
-      "id": "behavior:tc-quote-agency",
-      "name": "Expected behavior (Quotes Agency tier correctly)",
-      "kind": "behavior",
-      "passed": true,
-      "severity": "blocking",
-      "message": "Observed output reflects spec-defined expected behavior.",
-      "testCaseId": "tc-quote-agency"
+      "testCaseId": "tc-quote-starter",
+      "checkCategory": "action",
+      "checkMethod": "deterministic",
+      "expected": "not observed",
+      "observed": "not observed",
+      "enforcementOutcome": "passed",
+      "remediation": []
     },
     {
       "id": "tool:tc-quote-agency:fetch_plan_catalog",
@@ -152,7 +169,27 @@
       "passed": true,
       "severity": "blocking",
       "message": "Tool fetch_plan_catalog present in routed trace.",
-      "testCaseId": "tc-quote-agency"
+      "testCaseId": "tc-quote-agency",
+      "checkCategory": "tool_call",
+      "checkMethod": "deterministic",
+      "expected": "fetch_plan_catalog",
+      "observed": "fetch_plan_catalog",
+      "remediation": []
+    },
+    {
+      "id": "behavior:tc-quote-agency",
+      "name": "Expected behavior (Quotes Agency tier correctly)",
+      "kind": "behavior",
+      "passed": true,
+      "severity": "blocking",
+      "message": "Observed output reflects spec-defined expected behavior.",
+      "testCaseId": "tc-quote-agency",
+      "checkCategory": "answer",
+      "checkMethod": "semantic",
+      "expected": "state Agency as $1799/mo per this spec",
+      "observed": "State the Agency plan as $1799/mo per this spec (from your defined catalog).",
+      "enforcementOutcome": "passed",
+      "remediation": []
     },
     {
       "id": "action:tc-quote-agency:invent_plan_price",
@@ -161,7 +198,13 @@
       "passed": true,
       "severity": "blocking",
       "message": "Forbidden action invent_plan_price not observed.",
-      "testCaseId": "tc-quote-agency"
+      "testCaseId": "tc-quote-agency",
+      "checkCategory": "action",
+      "checkMethod": "deterministic",
+      "expected": "not observed",
+      "observed": "not observed",
+      "enforcementOutcome": "passed",
+      "remediation": []
     },
     {
       "id": "spec_tool:fetch_plan_catalog",
@@ -169,7 +212,10 @@
       "kind": "tool_call",
       "passed": true,
       "severity": "blocking",
-      "message": "Tool fetch_plan_catalog present in maintenance trace."
+      "message": "Tool fetch_plan_catalog present in maintenance trace.",
+      "checkCategory": "tool_call",
+      "checkMethod": "deterministic",
+      "remediation": []
     },
     {
       "id": "spec_action:invent_plan_price",
@@ -177,7 +223,11 @@
       "kind": "action",
       "passed": true,
       "severity": "blocking",
-      "message": "Forbidden action invent_plan_price not observed."
+      "message": "Forbidden action invent_plan_price not observed.",
+      "checkCategory": "action",
+      "checkMethod": "deterministic",
+      "enforcementOutcome": "passed",
+      "remediation": []
     },
     {
       "id": "escalation:0",
@@ -185,7 +235,9 @@
       "kind": "escalation",
       "passed": true,
       "severity": "info",
-      "message": "If the catalog tool fails, say you cannot confirm pricing and do not guess."
+      "message": "If the catalog tool fails, say you cannot confirm pricing and do not guess.",
+      "checkCategory": "setup",
+      "enforcementOutcome": "passed"
     },
     {
       "id": "budget:routed_call",
@@ -193,9 +245,223 @@
       "kind": "budget",
       "passed": true,
       "severity": "blocking",
-      "message": "routed_call_allowed"
+      "message": "routed_call_allowed",
+      "checkCategory": "budget",
+      "checkMethod": "budget",
+      "enforcementOutcome": "passed",
+      "expected": "routed_call_allowed",
+      "observed": "routed_call_allowed",
+      "remediation": []
     }
   ],
   "recommendedActions": [],
-  "generatedAt": "2026-05-10T16:40:03.612Z"
+  "agentQa": {
+    "gateDecision": "pass",
+    "enforcementMode": "enforce",
+    "decisionReason": "all_checks_passed",
+    "confidence": "high",
+    "requiresHumanReview": false,
+    "remediation": [],
+    "evidenceCompleteness": {
+      "outputCaptured": true,
+      "toolTraceCaptured": true,
+      "actionTraceCaptured": true,
+      "budgetStateLoaded": true,
+      "pricingConfigLoaded": true,
+      "ledgerWriteSucceeded": true
+    },
+    "wouldBlockCount": 0,
+    "checkCounts": {
+      "answer": {
+        "total": 3,
+        "passed": 3,
+        "failed": 0
+      },
+      "tool_call": {
+        "total": 3,
+        "passed": 3,
+        "failed": 0
+      },
+      "action": {
+        "total": 3,
+        "passed": 3,
+        "failed": 0
+      },
+      "budget": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0
+      }
+    }
+  },
+  "agentQaChecks": [
+    {
+      "id": "policy-0",
+      "name": "Policy acknowledged: Public pricing must match the customer's plan catalog embedded in this spec only",
+      "checkCategory": "setup",
+      "checkMethod": "deterministic",
+      "enforcementOutcome": "passed",
+      "confidence": "high",
+      "missingEvidence": [],
+      "remediation": [],
+      "severity": "info",
+      "wouldHaveBlocked": false
+    },
+    {
+      "id": "tool:tc-quote-starter:fetch_plan_catalog",
+      "name": "Required tool fetch_plan_catalog",
+      "checkCategory": "tool_call",
+      "checkMethod": "deterministic",
+      "enforcementOutcome": "passed",
+      "confidence": "high",
+      "expected": "fetch_plan_catalog",
+      "observed": "fetch_plan_catalog",
+      "missingEvidence": [],
+      "remediation": [],
+      "severity": "blocking",
+      "testCaseId": "tc-quote-starter",
+      "wouldHaveBlocked": false
+    },
+    {
+      "id": "output:tc-quote-starter",
+      "name": "Expected output (Quotes Starter from customer catalog)",
+      "checkCategory": "answer",
+      "checkMethod": "deterministic",
+      "enforcementOutcome": "passed",
+      "confidence": "high",
+      "expected": "State the Starter price as $199/mo per this spec (from your defined catalog).",
+      "observed": "State the Starter price as $199/mo per this spec (from your defined catalog).",
+      "missingEvidence": [],
+      "remediation": [],
+      "severity": "blocking",
+      "testCaseId": "tc-quote-starter",
+      "wouldHaveBlocked": false
+    },
+    {
+      "id": "behavior:tc-quote-starter",
+      "name": "Expected behavior (Quotes Starter from customer catalog)",
+      "checkCategory": "answer",
+      "checkMethod": "semantic",
+      "enforcementOutcome": "passed",
+      "confidence": "high",
+      "expected": "state the Starter price as $199/mo per this spec",
+      "observed": "State the Starter price as $199/mo per this spec (from your defined catalog).",
+      "missingEvidence": [],
+      "remediation": [],
+      "severity": "blocking",
+      "testCaseId": "tc-quote-starter",
+      "wouldHaveBlocked": false
+    },
+    {
+      "id": "action:tc-quote-starter:invent_plan_price",
+      "name": "Forbidden action invent_plan_price",
+      "checkCategory": "action",
+      "checkMethod": "deterministic",
+      "enforcementOutcome": "passed",
+      "confidence": "high",
+      "expected": "not observed",
+      "observed": "not observed",
+      "missingEvidence": [],
+      "remediation": [],
+      "severity": "blocking",
+      "testCaseId": "tc-quote-starter",
+      "wouldHaveBlocked": false
+    },
+    {
+      "id": "tool:tc-quote-agency:fetch_plan_catalog",
+      "name": "Required tool fetch_plan_catalog",
+      "checkCategory": "tool_call",
+      "checkMethod": "deterministic",
+      "enforcementOutcome": "passed",
+      "confidence": "high",
+      "expected": "fetch_plan_catalog",
+      "observed": "fetch_plan_catalog",
+      "missingEvidence": [],
+      "remediation": [],
+      "severity": "blocking",
+      "testCaseId": "tc-quote-agency",
+      "wouldHaveBlocked": false
+    },
+    {
+      "id": "behavior:tc-quote-agency",
+      "name": "Expected behavior (Quotes Agency tier correctly)",
+      "checkCategory": "answer",
+      "checkMethod": "semantic",
+      "enforcementOutcome": "passed",
+      "confidence": "high",
+      "expected": "state Agency as $1799/mo per this spec",
+      "observed": "State the Agency plan as $1799/mo per this spec (from your defined catalog).",
+      "missingEvidence": [],
+      "remediation": [],
+      "severity": "blocking",
+      "testCaseId": "tc-quote-agency",
+      "wouldHaveBlocked": false
+    },
+    {
+      "id": "action:tc-quote-agency:invent_plan_price",
+      "name": "Forbidden action invent_plan_price",
+      "checkCategory": "action",
+      "checkMethod": "deterministic",
+      "enforcementOutcome": "passed",
+      "confidence": "high",
+      "expected": "not observed",
+      "observed": "not observed",
+      "missingEvidence": [],
+      "remediation": [],
+      "severity": "blocking",
+      "testCaseId": "tc-quote-agency",
+      "wouldHaveBlocked": false
+    },
+    {
+      "id": "spec_tool:fetch_plan_catalog",
+      "name": "Spec-level required tool fetch_plan_catalog",
+      "checkCategory": "tool_call",
+      "checkMethod": "deterministic",
+      "enforcementOutcome": "passed",
+      "confidence": "high",
+      "missingEvidence": [],
+      "remediation": [],
+      "severity": "blocking",
+      "wouldHaveBlocked": false
+    },
+    {
+      "id": "spec_action:invent_plan_price",
+      "name": "Spec-level forbidden action invent_plan_price",
+      "checkCategory": "action",
+      "checkMethod": "deterministic",
+      "enforcementOutcome": "passed",
+      "confidence": "high",
+      "missingEvidence": [],
+      "remediation": [],
+      "severity": "blocking",
+      "wouldHaveBlocked": false
+    },
+    {
+      "id": "escalation:0",
+      "name": "Escalation rule recorded",
+      "checkCategory": "setup",
+      "checkMethod": "deterministic",
+      "enforcementOutcome": "passed",
+      "confidence": "high",
+      "missingEvidence": [],
+      "remediation": [],
+      "severity": "info",
+      "wouldHaveBlocked": false
+    },
+    {
+      "id": "budget:routed_call",
+      "name": "Routed provider call budget gate",
+      "checkCategory": "budget",
+      "checkMethod": "budget",
+      "enforcementOutcome": "passed",
+      "confidence": "high",
+      "expected": "routed_call_allowed",
+      "observed": "routed_call_allowed",
+      "missingEvidence": [],
+      "remediation": [],
+      "severity": "blocking",
+      "wouldHaveBlocked": false
+    }
+  ],
+  "generatedAt": "2026-05-19T06:42:24.379Z"
 }

@@ -386,6 +386,61 @@
         </div>
       </section>
 
+      <section id="agent-qa-section" aria-labelledby="agent-qa-heading" style="display: none">
+        <h2 id="agent-qa-heading">Agent QA Firewall</h2>
+        <div class="grid cols-3">
+          <div class="card">
+            <dl>
+              <dt>Agent QA status</dt>
+              <dd id="agent-qa-status"><span class="badge healthy">—</span></dd>
+              <dt>Gate decision</dt>
+              <dd id="agent-qa-gate-decision">—</dd>
+              <dt>Enforcement mode</dt>
+              <dd id="agent-qa-enforcement-mode">—</dd>
+            </dl>
+          </div>
+          <div class="card">
+            <dl>
+              <dt>Manual review required</dt>
+              <dd id="agent-qa-human-review">—</dd>
+              <dt>Confidence</dt>
+              <dd id="agent-qa-confidence">—</dd>
+              <dt>Would-block (observe)</dt>
+              <dd id="agent-qa-would-block">—</dd>
+            </dl>
+          </div>
+          <div class="card">
+            <dl>
+              <dt>Answer checks</dt>
+              <dd id="agent-qa-answer-counts">—</dd>
+              <dt>Tool checks</dt>
+              <dd id="agent-qa-tool-counts">—</dd>
+              <dt>Action checks</dt>
+              <dd id="agent-qa-action-counts">—</dd>
+              <dt>Budget checks</dt>
+              <dd id="agent-qa-budget-counts">—</dd>
+            </dl>
+          </div>
+        </div>
+        <div class="card" style="margin-top: 16px">
+          <h3>Evidence completeness</h3>
+          <dl>
+            <dt>Output captured</dt>
+            <dd id="ev-output">—</dd>
+            <dt>Tool trace captured</dt>
+            <dd id="ev-tool-trace">—</dd>
+            <dt>Action trace captured</dt>
+            <dd id="ev-action-trace">—</dd>
+            <dt>Budget state loaded</dt>
+            <dd id="ev-budget-state">—</dd>
+            <dt>Pricing config loaded</dt>
+            <dd id="ev-pricing">—</dd>
+            <dt>Ledger write succeeded</dt>
+            <dd id="ev-ledger">—</dd>
+          </dl>
+        </div>
+      </section>
+
       <section aria-labelledby="spec-heading">
         <h2 id="spec-heading">Source-of-Truth Specs</h2>
         <div class="card">
@@ -576,6 +631,7 @@
           <p style="margin: 0 0 8px">Artifact paths (repository layout):</p>
           <ul>
             <li><code>deliverables/maintenance/maintenance-result.json</code></li>
+            <li><code>deliverables/maintenance/agent-quality-result.json</code></li>
             <li><code>deliverables/maintenance/budget-state.json</code></li>
             <li><code>deliverables/maintenance/provider-call-ledger.jsonl</code></li>
             <li><code>deliverables/maintenance/gate-result.json</code></li>
@@ -894,6 +950,35 @@
         }
 
         setHealthBadgeSafe("#health-badge", status);
+
+        const agentQa = maintenance.agentQa;
+        const agentQaSection = document.getElementById("agent-qa-section");
+        if (agentQaSection) {
+          agentQaSection.style.display = agentQa ? "block" : "none";
+        }
+        if (agentQa) {
+          const gateDecision = agentQa.gateDecision || "—";
+          setHealthBadgeSafe("#agent-qa-status .badge", gateDecision === "pass" ? "healthy" : gateDecision === "block" ? "failed" : "at_risk");
+          setText("agent-qa-gate-decision", gateDecision);
+          setText("agent-qa-enforcement-mode", agentQa.enforcementMode || "—");
+          setText("agent-qa-human-review", agentQa.requiresHumanReview ? "Yes" : "No");
+          setText("agent-qa-confidence", agentQa.confidence || "—");
+          setText("agent-qa-would-block", String(agentQa.wouldBlockCount ?? "—"));
+          const fmtCounts = (c) =>
+            c && typeof c.passed === "number" ? `${c.passed} / ${c.total} passed` : "—";
+          setText("agent-qa-answer-counts", fmtCounts(agentQa.checkCounts && agentQa.checkCounts.answer));
+          setText("agent-qa-tool-counts", fmtCounts(agentQa.checkCounts && agentQa.checkCounts.tool_call));
+          setText("agent-qa-action-counts", fmtCounts(agentQa.checkCounts && agentQa.checkCounts.action));
+          setText("agent-qa-budget-counts", fmtCounts(agentQa.checkCounts && agentQa.checkCounts.budget));
+          const ev = agentQa.evidenceCompleteness || {};
+          const yn = (v) => (v === true ? "Yes" : v === false ? "No" : "—");
+          setText("ev-output", yn(ev.outputCaptured));
+          setText("ev-tool-trace", yn(ev.toolTraceCaptured));
+          setText("ev-action-trace", yn(ev.actionTraceCaptured));
+          setText("ev-budget-state", yn(ev.budgetStateLoaded));
+          setText("ev-pricing", yn(ev.pricingConfigLoaded));
+          setText("ev-ledger", yn(ev.ledgerWriteSucceeded));
+        }
 
         setText("run-time", maintenance.generatedAt || "—");
         setText("workflow-name", formatWorkflow(maintenance.workflowName));

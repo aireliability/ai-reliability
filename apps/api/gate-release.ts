@@ -1,5 +1,6 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { gateDecisionAllowsDeploy, isPassingGateDecision } from "../../packages/shared/agent-qa";
 import type { MaintenanceRunResult } from "../../packages/shared/maintenance-result";
 
 const DEFAULT_RESULT = path.join(
@@ -14,15 +15,48 @@ async function main(): Promise<void> {
   const raw = await readFile(inputPath, "utf-8");
   const result = JSON.parse(raw) as MaintenanceRunResult;
 
+  const agentQa = result.agentQa;
+  const enforcementMode = agentQa?.enforcementMode ?? "enforce";
+  const gateDecision = agentQa?.gateDecision;
+
+  let deployAllowed: boolean;
+  if (gateDecision) {
+    deployAllowed =
+      isPassingGateDecision(gateDecision) &&
+      gateDecisionAllowsDeploy(gateDecision, enforcementMode) &&
+      (result.status === "healthy" || result.status === "at_risk");
+    if (gateDecision === "manual_review") {
+      deployAllowed = false;
+    }
+  } else {
+    deployAllowed =
+      result.status === "healthy" || result.status === "at_risk";
+  }
+
+  let exitCode: number;
+  if (result.status === "misconfigured") {
+    exitCode = 2;
+  } else if (
+    result.status === "failed" ||
+    gateDecision === "block" ||
+    (gateDecision === "manual_review" && enforcementMode !== "observe")
+  ) {
+    exitCode = 1;
+  } else {
+    exitCode = 0;
+  }
+
   const gatePayload = {
     evaluatedAt: new Date().toISOString(),
     source: inputPath,
     runId: result.runId,
     specId: result.specId,
     maintenanceStatus: result.status,
-    deployAllowed: result.status === "healthy" || result.status === "at_risk",
-    exitCode:
-      result.status === "misconfigured" ? 2 : result.status === "failed" ? 1 : 0,
+    agentQaGateDecision: gateDecision ?? null,
+    enforcementMode: enforcementMode,
+    requiresHumanReview: agentQa?.requiresHumanReview ?? false,
+    deployAllowed,
+    exitCode,
   };
 
   await mkdir(path.dirname(GATE_RESULT), { recursive: true });
@@ -30,11 +64,10 @@ async function main(): Promise<void> {
 
   console.log("Gate result written:", GATE_RESULT);
   console.log("Maintenance status:", result.status);
+  console.log("Agent QA gate decision:", gateDecision ?? "(legacy)");
   console.log("Deploy allowed:", gatePayload.deployAllowed);
 
-  if (result.status === "misconfigured") process.exit(2);
-  if (result.status === "failed") process.exit(1);
-  process.exit(0);
+  process.exit(exitCode);
 }
 
 main().catch((err) => {

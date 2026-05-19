@@ -1,0 +1,44 @@
+{
+  "runId": "maint-53693f8f-9aa0-457a-91a6-06f684604095",
+  "specId": "pricing-plans-v1",
+  "scenario": "healthy",
+  "enforcementMode": "enforce",
+  "gateDecision": "pass",
+  "decisionReason": "all_checks_passed",
+  "confidence": "high",
+  "requiresHumanReview": false,
+  "remediation": [],
+  "evidenceCompleteness": {
+    "outputCaptured": true,
+    "toolTraceCaptured": true,
+    "actionTraceCaptured": true,
+    "budgetStateLoaded": true,
+    "pricingConfigLoaded": true,
+    "ledgerWriteSucceeded": true
+  },
+  "wouldBlockCount": 0,
+  "checkCounts": {
+    "answer": {
+      "total": 3,
+      "passed": 3,
+      "failed": 0
+    },
+    "tool_call": {
+      "total": 3,
+      "passed": 3,
+      "failed": 0
+    },
+    "action": {
+      "total": 3,
+      "passed": 3,
+      "failed": 0
+    },
+    "budget": {
+      "total": 1,
+      "passed": 1,
+      "failed": 0
+    }
+  },
+  "maintenanceStatus": "healthy",
+  "generatedAt": "2026-05-19T06:42:24.379Z"
+}
