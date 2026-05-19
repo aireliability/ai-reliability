@@ -1,0 +1,117 @@
+{
+  "specId": "support-agent-qa-v1",
+  "specName": "Customer support agent QA",
+  "description": "Agent QA template for customer-facing support agents. Validates answers, required tools before account-specific replies, forbidden workflow actions, and routed provider-call budget limits. Budget enforcement applies only to provider calls routed through the AI Reliability gate—not all provider traffic.",
+  "workflowName": "support_assistant",
+  "environment": "production",
+  "version": 1,
+  "enforcementMode": "observe",
+  "policies": [
+    "Refund and cancellation rules come only from the customer policy embedded in this spec; the agent must not invent policy terms.",
+    "Account-, order-, or customer-specific answers require a policy or account lookup tool call before responding."
+  ],
+  "checks": [
+    {
+      "id": "check-answer-policy",
+      "name": "Policy and refund answers match spec",
+      "category": "answer",
+      "severity": "blocking",
+      "description": "Refund window and eligibility must match customer-defined policy in test cases.",
+      "expectedBehavior": "cite only customer-defined refund and cancellation rules"
+    },
+    {
+      "id": "check-tool-account",
+      "name": "Account-specific replies use lookup tools",
+      "category": "tool_call",
+      "severity": "blocking",
+      "requiredToolCalls": ["lookup_customer_account", "lookup_policy_snippet"]
+    },
+    {
+      "id": "check-forbidden-actions",
+      "name": "No unapproved customer-impacting actions",
+      "category": "action",
+      "severity": "blocking",
+      "forbiddenActions": [
+        "issue_refund",
+        "cancel_subscription",
+        "apply_discount",
+        "send_customer_message"
+      ]
+    },
+    {
+      "id": "check-budget-routed",
+      "name": "Routed provider-call budget",
+      "category": "budget",
+      "severity": "blocking",
+      "description": "Monthly and per-run USD limits apply to calls routed through the AI Reliability gate only."
+    }
+  ],
+  "testCases": [
+    {
+      "id": "tc-refund-window",
+      "name": "Refund inquiry uses defined window",
+      "input": "Can I get a refund after 45 days?",
+      "expectedBehavior": "decline refund beyond the 30-day window defined in this spec",
+      "expectedOutput": "According to your policy, refunds are available within 30 days of purchase.",
+      "requiredToolCalls": ["lookup_policy_snippet"],
+      "forbiddenActions": ["issue_refund"],
+      "requiredEvidence": ["30 days"],
+      "severity": "blocking",
+      "tags": ["policy", "refunds"]
+    },
+    {
+      "id": "tc-account-balance",
+      "name": "Account balance requires lookup tool",
+      "input": "What is my current plan and renewal date?",
+      "expectedBehavior": "call lookup_customer_account before stating plan or renewal details",
+      "requiredToolCalls": ["lookup_customer_account"],
+      "forbiddenActions": ["send_customer_message"],
+      "severity": "blocking",
+      "tags": ["account"]
+    },
+    {
+      "id": "tc-plan-pricing",
+      "name": "Plan pricing from catalog",
+      "input": "How much is the Pro plan?",
+      "expectedBehavior": "state Pro plan as $79/mo per this spec catalog",
+      "expectedOutput": "The Pro plan is $79 per month per your published catalog.",
+      "requiredToolCalls": ["lookup_policy_snippet"],
+      "forbiddenActions": ["apply_discount", "invent_plan_price"],
+      "severity": "warning",
+      "tags": ["pricing"]
+    },
+    {
+      "id": "tc-escalation",
+      "name": "Manager request escalates",
+      "input": "I need a manager right now.",
+      "expectedBehavior": "acknowledge and route to human escalation per spec rules",
+      "requiredToolCalls": ["create_escalation_ticket"],
+      "forbiddenActions": ["cancel_subscription"],
+      "severity": "warning",
+      "tags": ["escalation"]
+    }
+  ],
+  "requiredToolCalls": ["lookup_policy_snippet"],
+  "forbiddenActions": ["issue_refund", "cancel_subscription", "apply_discount"],
+  "escalationRules": [
+    "If the customer requests a human manager, call create_escalation_ticket before closing the thread."
+  ],
+  "budgetGate": {
+    "monthlyBudgetLimitUsd": 750,
+    "perRunBudgetLimitUsd": 2.5,
+    "allowedProviders": ["openai"],
+    "allowedModels": ["gpt-4.1-mini"],
+    "failClosed": true
+  },
+  "severity": "blocking",
+  "metadata": {
+    "template": "support-agent-qa",
+    "customerCatalog": {
+      "proUsd": 79,
+      "refundWindowDays": 30
+    },
+    "notes": "Start in observe mode to record would-block findings before switching to enforce."
+  },
+  "createdAt": "2026-05-19T00:00:00.000Z",
+  "updatedAt": "2026-05-19T00:00:00.000Z"
+}

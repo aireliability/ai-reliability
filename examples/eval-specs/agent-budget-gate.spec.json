@@ -1,0 +1,72 @@
+{
+  "specId": "agent-budget-gate-v1",
+  "specName": "Routed provider-call budget gate",
+  "description": "Agent QA template for budget control on provider/model calls routed through the AI Reliability gate. Does not monitor all production traffic or control external provider billing. Unknown model, missing pricing, or missing budget state fail closed when failClosed is true.",
+  "workflowName": "llm_router_agent",
+  "environment": "production",
+  "version": 1,
+  "enforcementMode": "enforce",
+  "checks": [
+    {
+      "id": "check-budget-monthly",
+      "name": "Monthly routed-call budget",
+      "category": "budget",
+      "severity": "blocking",
+      "description": "monthlyBudgetLimitUsd caps estimated USD for routed calls in the billing period."
+    },
+    {
+      "id": "check-budget-per-run",
+      "name": "Per-run routed-call budget",
+      "category": "budget",
+      "severity": "blocking",
+      "description": "perRunBudgetLimitUsd caps spend accumulated within a single maintenance or agent run."
+    },
+    {
+      "id": "check-provider-allowlist",
+      "name": "Allowed providers for routed calls",
+      "category": "budget",
+      "severity": "blocking",
+      "description": "Calls to providers outside allowedProviders are blocked at the gate."
+    },
+    {
+      "id": "check-model-allowlist",
+      "name": "Allowed models for routed calls",
+      "category": "budget",
+      "severity": "blocking",
+      "description": "Calls to models outside allowedModels are blocked at the gate."
+    }
+  ],
+  "testCases": [
+    {
+      "id": "tc-within-budget",
+      "name": "Routed call within budget",
+      "input": "Summarize ticket #4421.",
+      "expectedBehavior": "complete routed model call within configured limits",
+      "severity": "info",
+      "tags": ["budget", "happy"]
+    },
+    {
+      "id": "tc-allowlist-provider",
+      "name": "Provider must be allowlisted",
+      "input": "Draft reply using production model.",
+      "expectedBehavior": "use only allowedProviders from budgetGate",
+      "severity": "blocking",
+      "tags": ["budget", "provider"]
+    }
+  ],
+  "budgetGate": {
+    "monthlyBudgetLimitUsd": 600,
+    "perRunBudgetLimitUsd": 1.5,
+    "allowedProviders": ["openai"],
+    "allowedModels": ["gpt-4.1-mini"],
+    "failClosed": true
+  },
+  "severity": "blocking",
+  "metadata": {
+    "template": "agent-budget-gate",
+    "budgetScope": "routed_calls_through_ai_reliability_gate_only",
+    "notes": "Direct provider calls that bypass the gate are outside enforcement scope."
+  },
+  "createdAt": "2026-05-19T00:00:00.000Z",
+  "updatedAt": "2026-05-19T00:00:00.000Z"
+}

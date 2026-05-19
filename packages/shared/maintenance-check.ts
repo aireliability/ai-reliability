@@ -191,9 +191,12 @@ function toAgentQaCheck(
 export function runMaintenanceCheck(
   input: RunMaintenanceCheckInput,
 ): MaintenanceRunResult {
-  const enforcementMode = input.enforcementMode ?? "enforce";
-  const evidenceCompleteness = inferEvidenceCompleteness(input);
   const spec = input.spec;
+  const specEnforcement = (spec as { enforcementMode?: EnforcementMode })
+    .enforcementMode;
+  const enforcementMode =
+    input.enforcementMode ?? specEnforcement ?? "enforce";
+  const evidenceCompleteness = inferEvidenceCompleteness(input);
   const checks: MaintenanceCheckResult[] = [];
   const agentQaChecks: AgentQaCheckResult[] = [];
   const policyResults: PolicyCheckResult[] = [];

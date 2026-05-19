@@ -1,0 +1,76 @@
+{
+  "specId": "tool-call-required-v1",
+  "specName": "Required tool calls before answer or action",
+  "description": "Agent QA template for agents that must call specific tools before answering or acting. Missing tool traces, wrong tools, and absent requiredToolCalls fail validation at runtime. Route agent steps through the AI Reliability wrapper or provide a tool trace artifact for maintenance checks.",
+  "workflowName": "operations_agent",
+  "environment": "staging",
+  "version": 1,
+  "enforcementMode": "enforce",
+  "checks": [
+    {
+      "id": "check-inventory-tool",
+      "name": "Inventory mutations use API tool",
+      "category": "tool_call",
+      "severity": "blocking",
+      "requiredToolCalls": ["inventory_api_reserve", "inventory_api_get_stock"],
+      "description": "Wrong tool observed (e.g. legacy_db_lookup) should block under enforce mode."
+    },
+    {
+      "id": "check-read-behavior",
+      "name": "Read-only stock lookup behavior",
+      "category": "answer",
+      "severity": "warning",
+      "expectedBehavior": "use read-only inventory lookup without reservation"
+    }
+  ],
+  "testCases": [
+    {
+      "id": "tc-reserve-stock",
+      "name": "Reservation calls inventory API",
+      "input": "Reserve 2 units of SKU-441 for order 998877.",
+      "expectedBehavior": "call inventory_api_reserve before confirming reservation",
+      "requiredToolCalls": ["inventory_api_reserve"],
+      "forbiddenActions": ["db_direct_write"],
+      "severity": "blocking",
+      "tags": ["tools", "inventory"]
+    },
+    {
+      "id": "tc-read-stock",
+      "name": "Read-only lookup",
+      "input": "What is stock for SKU-441?",
+      "expectedBehavior": "call inventory_api_get_stock without mutating inventory",
+      "requiredToolCalls": ["inventory_api_get_stock"],
+      "forbiddenActions": ["inventory_api_reserve"],
+      "severity": "warning",
+      "tags": ["tools", "read"]
+    },
+    {
+      "id": "tc-wrong-tool-scenario",
+      "name": "Wrong tool compatibility check",
+      "input": "Reserve SKU-441.",
+      "expectedBehavior": "must not satisfy reservation with lookup_legacy_inventory only",
+      "requiredToolCalls": ["inventory_api_reserve"],
+      "severity": "blocking",
+      "tags": ["tools", "negative"]
+    }
+  ],
+  "requiredToolCalls": ["inventory_api_get_stock"],
+  "forbiddenActions": ["db_direct_write", "skip_inventory_check"],
+  "escalationRules": [
+    "If inventory_api_reserve returns a conflict, report the error—do not fabricate success."
+  ],
+  "budgetGate": {
+    "monthlyBudgetLimitUsd": 1200,
+    "perRunBudgetLimitUsd": 5,
+    "allowedProviders": ["openai", "anthropic"],
+    "allowedModels": ["gpt-4.1-mini", "claude-3-5-sonnet-20241022"],
+    "failClosed": true
+  },
+  "severity": "blocking",
+  "metadata": {
+    "template": "tool-call-required",
+    "remediation": "Provide a tool trace artifact or route the agent step through the AI Reliability wrapper when required tools are missing."
+  },
+  "createdAt": "2026-05-19T00:00:00.000Z",
+  "updatedAt": "2026-05-19T00:00:00.000Z"
+}

@@ -14,7 +14,8 @@
     "demo:maintenance-gate": "tsx apps/api/demo-maintenance-gate.ts",
     "gate:release": "tsx apps/api/gate-release.ts",
     "test:budget-gate": "tsx --test packages/shared/budget-gate.test.ts",
-    "test:maintenance-gate": "tsx --test packages/shared/maintenance-gate.test.ts",
+    "test:maintenance-gate": "tsx --test packages/shared/maintenance-gate.test.ts packages/shared/agent-qa-spec-validator.test.ts",
+    "validate:spec": "tsx apps/api/validate-spec.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {

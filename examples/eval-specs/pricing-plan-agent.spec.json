@@ -1,0 +1,93 @@
+{
+  "specId": "pricing-plan-agent-v1",
+  "specName": "Plan and pricing answer accuracy",
+  "description": "Agent QA template for agents answering plan, pricing, and product-limit questions. Requires catalog or account tool calls when answering from customer context. Invented discounts or prices are forbidden actions.",
+  "workflowName": "sales_copilot",
+  "environment": "pre_production",
+  "version": 1,
+  "enforcementMode": "warn",
+  "checks": [
+    {
+      "id": "check-pricing-answers",
+      "name": "Pricing answers match customer catalog",
+      "category": "answer",
+      "severity": "blocking",
+      "expectedBehavior": "state prices only from the customer catalog defined in this spec",
+      "expectedOutput": "prices must match Starter $199/mo, Multi-store $499/mo, Agency $1799/mo"
+    },
+    {
+      "id": "check-catalog-tool",
+      "name": "Catalog tool before pricing quotes",
+      "category": "tool_call",
+      "severity": "blocking",
+      "requiredToolCalls": ["fetch_plan_catalog"]
+    },
+    {
+      "id": "check-no-invented-pricing",
+      "name": "No invented prices or discounts",
+      "category": "action",
+      "severity": "blocking",
+      "forbiddenActions": ["invent_plan_price", "apply_discount"]
+    }
+  ],
+  "expectedOutputs": [
+    "Starter: $199/mo, Multi-store: $499/mo, Agency: $1799/mo (customer-defined)"
+  ],
+  "testCases": [
+    {
+      "id": "tc-starter-price",
+      "name": "Starter price from catalog",
+      "input": "What is the Starter plan price?",
+      "expectedBehavior": "state Starter as $199/mo per this spec",
+      "expectedOutput": "The Starter plan is $199 per month per your catalog.",
+      "requiredToolCalls": ["fetch_plan_catalog"],
+      "forbiddenActions": ["invent_plan_price"],
+      "severity": "blocking",
+      "tags": ["pricing"]
+    },
+    {
+      "id": "tc-agency-price",
+      "name": "Agency price from catalog",
+      "input": "How much is Agency?",
+      "expectedBehavior": "state Agency as $1799/mo per this spec",
+      "requiredToolCalls": ["fetch_plan_catalog"],
+      "forbiddenActions": ["invent_plan_price", "apply_discount"],
+      "severity": "blocking",
+      "tags": ["pricing"]
+    },
+    {
+      "id": "tc-limits-warning",
+      "name": "Product limits without guessing",
+      "input": "How many seats on Starter?",
+      "expectedBehavior": "state seat limit as 3 per this spec or decline if unknown",
+      "expectedOutput": "Starter includes up to 3 seats per your plan definition.",
+      "requiredToolCalls": ["fetch_plan_catalog"],
+      "severity": "warning",
+      "tags": ["limits"]
+    }
+  ],
+  "requiredToolCalls": ["fetch_plan_catalog"],
+  "forbiddenActions": ["invent_plan_price", "apply_discount"],
+  "escalationRules": [
+    "If fetch_plan_catalog fails, say pricing cannot be confirmed and do not guess."
+  ],
+  "budgetGate": {
+    "monthlyBudgetLimitUsd": 600,
+    "perRunBudgetLimitUsd": 1.5,
+    "allowedProviders": ["openai"],
+    "allowedModels": ["gpt-4.1-mini"],
+    "failClosed": true
+  },
+  "severity": "blocking",
+  "metadata": {
+    "template": "pricing-plan-agent",
+    "customerCatalog": {
+      "starterUsd": 199,
+      "multiStoreUsd": 499,
+      "agencyUsd": 1799,
+      "starterSeats": 3
+    }
+  },
+  "createdAt": "2026-05-19T00:00:00.000Z",
+  "updatedAt": "2026-05-19T00:00:00.000Z"
+}
