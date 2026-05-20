@@ -1,7 +1,7 @@
 {
   "specId": "pricing-plan-agent-v1",
   "specName": "Plan and pricing answer accuracy",
-  "description": "Agent QA template for agents answering plan, pricing, and product-limit questions. Requires catalog or account tool calls when answering from customer context. Invented discounts or prices are forbidden actions.",
+  "description": "Agent QA template for agents answering plan, pricing, and product-limit questions. Requires catalog or account tool calls when answering from customer context. Invented discounts or prices are forbidden actions. Budget limits apply to provider calls routed through the AI Reliability gate only.",
   "workflowName": "sales_copilot",
   "environment": "pre_production",
   "version": 1,

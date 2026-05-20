@@ -1,7 +1,7 @@
 {
   "specId": "forbidden-action-v1",
   "specName": "Forbidden workflow actions",
-  "description": "Agent QA template for agents that must never attempt specific workflow actions (refunds, cancellations, discounts, record deletion, outbound messages, approvals). Forbidden actions observed in action or tool traces block under enforce mode.",
+  "description": "Agent QA template for agents that must never attempt specific workflow actions (refunds, cancellations, discounts, record deletion, outbound messages, approvals). Forbidden actions observed in action or tool traces block under enforce mode. Budget limits apply to provider calls routed through the AI Reliability gate only.",
   "workflowName": "workflow_automation_agent",
   "environment": "production",
   "version": 1,

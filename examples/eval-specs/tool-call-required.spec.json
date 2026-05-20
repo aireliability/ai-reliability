@@ -1,7 +1,7 @@
 {
   "specId": "tool-call-required-v1",
   "specName": "Required tool calls before answer or action",
-  "description": "Agent QA template for agents that must call specific tools before answering or acting. Missing tool traces, wrong tools, and absent requiredToolCalls fail validation at runtime. Route agent steps through the AI Reliability wrapper or provide a tool trace artifact for maintenance checks.",
+  "description": "Agent QA template for agents that must call specific tools before answering or acting. Missing tool traces, wrong tools, and absent requiredToolCalls fail validation at runtime. Route agent steps through the AI Reliability wrapper or provide a tool trace artifact for maintenance checks. Budget limits apply to provider calls routed through the AI Reliability gate only.",
   "workflowName": "operations_agent",
   "environment": "staging",
   "version": 1,

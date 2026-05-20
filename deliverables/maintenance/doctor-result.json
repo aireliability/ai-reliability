@@ -1,0 +1,653 @@
+{
+  "status": "ready",
+  "checks": [
+    {
+      "id": "environment:script:test:maintenance-gate",
+      "category": "environment",
+      "status": "pass",
+      "title": "npm script test:maintenance-gate",
+      "message": "package.json defines \"test:maintenance-gate\".",
+      "path": "package.json",
+      "remediation": []
+    },
+    {
+      "id": "environment:script:test:budget-gate",
+      "category": "environment",
+      "status": "pass",
+      "title": "npm script test:budget-gate",
+      "message": "package.json defines \"test:budget-gate\".",
+      "path": "package.json",
+      "remediation": []
+    },
+    {
+      "id": "environment:script:demo:maintenance-gate",
+      "category": "environment",
+      "status": "pass",
+      "title": "npm script demo:maintenance-gate",
+      "message": "package.json defines \"demo:maintenance-gate\".",
+      "path": "package.json",
+      "remediation": []
+    },
+    {
+      "id": "environment:script:gate:release",
+      "category": "environment",
+      "status": "pass",
+      "title": "npm script gate:release",
+      "message": "package.json defines \"gate:release\".",
+      "path": "package.json",
+      "remediation": []
+    },
+    {
+      "id": "environment:script:validate:spec",
+      "category": "environment",
+      "status": "pass",
+      "title": "npm script validate:spec",
+      "message": "package.json defines \"validate:spec\".",
+      "path": "package.json",
+      "remediation": []
+    },
+    {
+      "id": "environment:script:doctor",
+      "category": "environment",
+      "status": "pass",
+      "title": "npm script doctor",
+      "message": "package.json defines \"doctor\".",
+      "path": "package.json",
+      "remediation": []
+    },
+    {
+      "id": "spec:json:examples\\eval-specs\\support-agent-qa.spec.json",
+      "category": "spec",
+      "status": "pass",
+      "title": "Spec parses as JSON (examples\\eval-specs\\support-agent-qa.spec.json)",
+      "message": "Spec file is valid JSON.",
+      "path": "examples\\eval-specs\\support-agent-qa.spec.json",
+      "remediation": []
+    },
+    {
+      "id": "spec:agent-qa:examples\\eval-specs\\support-agent-qa.spec.json",
+      "category": "spec",
+      "status": "pass",
+      "title": "Agent QA spec validation (examples\\eval-specs\\support-agent-qa.spec.json)",
+      "message": "validateAgentQaSpec passed.",
+      "path": "examples\\eval-specs\\support-agent-qa.spec.json",
+      "remediation": []
+    },
+    {
+      "id": "spec:enforcement:examples\\eval-specs\\support-agent-qa.spec.json",
+      "category": "spec",
+      "status": "pass",
+      "title": "enforcementMode (examples\\eval-specs\\support-agent-qa.spec.json)",
+      "message": "enforcementMode is \"observe\".",
+      "path": "examples\\eval-specs\\support-agent-qa.spec.json",
+      "remediation": []
+    },
+    {
+      "id": "spec:checks:examples\\eval-specs\\support-agent-qa.spec.json",
+      "category": "spec",
+      "status": "pass",
+      "title": "Checks or test cases (examples\\eval-specs\\support-agent-qa.spec.json)",
+      "message": "At least one check or test case is defined.",
+      "path": "examples\\eval-specs\\support-agent-qa.spec.json",
+      "remediation": []
+    },
+    {
+      "id": "spec:source-of-truth:examples\\eval-specs\\support-agent-qa.spec.json",
+      "category": "spec",
+      "status": "pass",
+      "title": "Source-of-truth fields (examples\\eval-specs\\support-agent-qa.spec.json)",
+      "message": "Spec includes policies, description, or metadata.sourceOfTruth.",
+      "path": "examples\\eval-specs\\support-agent-qa.spec.json",
+      "remediation": []
+    },
+    {
+      "id": "budget:monthly:examples\\eval-specs\\support-agent-qa.spec.json",
+      "category": "budget",
+      "status": "pass",
+      "title": "Monthly routed-call budget (examples\\eval-specs\\support-agent-qa.spec.json)",
+      "message": "monthlyBudgetLimitUsd is 750.",
+      "path": "examples\\eval-specs\\support-agent-qa.spec.json → budgetGate.monthlyBudgetLimitUsd",
+      "remediation": []
+    },
+    {
+      "id": "budget:per-run:examples\\eval-specs\\support-agent-qa.spec.json",
+      "category": "budget",
+      "status": "pass",
+      "title": "Per-run routed-call budget (examples\\eval-specs\\support-agent-qa.spec.json)",
+      "message": "perRunBudgetLimitUsd is 2.5.",
+      "path": "examples\\eval-specs\\support-agent-qa.spec.json → budgetGate.perRunBudgetLimitUsd",
+      "remediation": []
+    },
+    {
+      "id": "budget:providers:examples\\eval-specs\\support-agent-qa.spec.json",
+      "category": "budget",
+      "status": "pass",
+      "title": "allowedProviders (examples\\eval-specs\\support-agent-qa.spec.json)",
+      "message": "allowedProviders is a non-empty string array.",
+      "path": "examples\\eval-specs\\support-agent-qa.spec.json → budgetGate.allowedProviders",
+      "remediation": [
+        "Set budgetGate.allowedProviders to provider ids used for routed calls."
+      ]
+    },
+    {
+      "id": "budget:models:examples\\eval-specs\\support-agent-qa.spec.json",
+      "category": "budget",
+      "status": "pass",
+      "title": "allowedModels (examples\\eval-specs\\support-agent-qa.spec.json)",
+      "message": "allowedModels is a non-empty string array.",
+      "path": "examples\\eval-specs\\support-agent-qa.spec.json → budgetGate.allowedModels",
+      "remediation": [
+        "Set budgetGate.allowedModels to model ids used for routed calls."
+      ]
+    },
+    {
+      "id": "budget:scope:examples\\eval-specs\\support-agent-qa.spec.json",
+      "category": "budget",
+      "status": "pass",
+      "title": "Routed-call scope wording (examples\\eval-specs\\support-agent-qa.spec.json)",
+      "message": "Description or metadata mentions routed-call scope.",
+      "path": "examples\\eval-specs\\support-agent-qa.spec.json",
+      "remediation": []
+    },
+    {
+      "id": "spec:json:examples\\eval-specs\\tool-call-required.spec.json",
+      "category": "spec",
+      "status": "pass",
+      "title": "Spec parses as JSON (examples\\eval-specs\\tool-call-required.spec.json)",
+      "message": "Spec file is valid JSON.",
+      "path": "examples\\eval-specs\\tool-call-required.spec.json",
+      "remediation": []
+    },
+    {
+      "id": "spec:agent-qa:examples\\eval-specs\\tool-call-required.spec.json",
+      "category": "spec",
+      "status": "pass",
+      "title": "Agent QA spec validation (examples\\eval-specs\\tool-call-required.spec.json)",
+      "message": "validateAgentQaSpec passed.",
+      "path": "examples\\eval-specs\\tool-call-required.spec.json",
+      "remediation": []
+    },
+    {
+      "id": "spec:enforcement:examples\\eval-specs\\tool-call-required.spec.json",
+      "category": "spec",
+      "status": "pass",
+      "title": "enforcementMode (examples\\eval-specs\\tool-call-required.spec.json)",
+      "message": "enforcementMode is \"enforce\".",
+      "path": "examples\\eval-specs\\tool-call-required.spec.json",
+      "remediation": []
+    },
+    {
+      "id": "spec:checks:examples\\eval-specs\\tool-call-required.spec.json",
+      "category": "spec",
+      "status": "pass",
+      "title": "Checks or test cases (examples\\eval-specs\\tool-call-required.spec.json)",
+      "message": "At least one check or test case is defined.",
+      "path": "examples\\eval-specs\\tool-call-required.spec.json",
+      "remediation": []
+    },
+    {
+      "id": "spec:source-of-truth:examples\\eval-specs\\tool-call-required.spec.json",
+      "category": "spec",
+      "status": "pass",
+      "title": "Source-of-truth fields (examples\\eval-specs\\tool-call-required.spec.json)",
+      "message": "Spec includes policies, description, or metadata.sourceOfTruth.",
+      "path": "examples\\eval-specs\\tool-call-required.spec.json",
+      "remediation": []
+    },
+    {
+      "id": "budget:monthly:examples\\eval-specs\\tool-call-required.spec.json",
+      "category": "budget",
+      "status": "pass",
+      "title": "Monthly routed-call budget (examples\\eval-specs\\tool-call-required.spec.json)",
+      "message": "monthlyBudgetLimitUsd is 1200.",
+      "path": "examples\\eval-specs\\tool-call-required.spec.json → budgetGate.monthlyBudgetLimitUsd",
+      "remediation": []
+    },
+    {
+      "id": "budget:per-run:examples\\eval-specs\\tool-call-required.spec.json",
+      "category": "budget",
+      "status": "pass",
+      "title": "Per-run routed-call budget (examples\\eval-specs\\tool-call-required.spec.json)",
+      "message": "perRunBudgetLimitUsd is 5.",
+      "path": "examples\\eval-specs\\tool-call-required.spec.json → budgetGate.perRunBudgetLimitUsd",
+      "remediation": []
+    },
+    {
+      "id": "budget:providers:examples\\eval-specs\\tool-call-required.spec.json",
+      "category": "budget",
+      "status": "pass",
+      "title": "allowedProviders (examples\\eval-specs\\tool-call-required.spec.json)",
+      "message": "allowedProviders is a non-empty string array.",
+      "path": "examples\\eval-specs\\tool-call-required.spec.json → budgetGate.allowedProviders",
+      "remediation": [
+        "Set budgetGate.allowedProviders to provider ids used for routed calls."
+      ]
+    },
+    {
+      "id": "budget:models:examples\\eval-specs\\tool-call-required.spec.json",
+      "category": "budget",
+      "status": "pass",
+      "title": "allowedModels (examples\\eval-specs\\tool-call-required.spec.json)",
+      "message": "allowedModels is a non-empty string array.",
+      "path": "examples\\eval-specs\\tool-call-required.spec.json → budgetGate.allowedModels",
+      "remediation": [
+        "Set budgetGate.allowedModels to model ids used for routed calls."
+      ]
+    },
+    {
+      "id": "budget:scope:examples\\eval-specs\\tool-call-required.spec.json",
+      "category": "budget",
+      "status": "pass",
+      "title": "Routed-call scope wording (examples\\eval-specs\\tool-call-required.spec.json)",
+      "message": "Description or metadata mentions routed-call scope.",
+      "path": "examples\\eval-specs\\tool-call-required.spec.json",
+      "remediation": []
+    },
+    {
+      "id": "spec:json:examples\\eval-specs\\forbidden-action.spec.json",
+      "category": "spec",
+      "status": "pass",
+      "title": "Spec parses as JSON (examples\\eval-specs\\forbidden-action.spec.json)",
+      "message": "Spec file is valid JSON.",
+      "path": "examples\\eval-specs\\forbidden-action.spec.json",
+      "remediation": []
+    },
+    {
+      "id": "spec:agent-qa:examples\\eval-specs\\forbidden-action.spec.json",
+      "category": "spec",
+      "status": "pass",
+      "title": "Agent QA spec validation (examples\\eval-specs\\forbidden-action.spec.json)",
+      "message": "validateAgentQaSpec passed.",
+      "path": "examples\\eval-specs\\forbidden-action.spec.json",
+      "remediation": []
+    },
+    {
+      "id": "spec:enforcement:examples\\eval-specs\\forbidden-action.spec.json",
+      "category": "spec",
+      "status": "pass",
+      "title": "enforcementMode (examples\\eval-specs\\forbidden-action.spec.json)",
+      "message": "enforcementMode is \"enforce\".",
+      "path": "examples\\eval-specs\\forbidden-action.spec.json",
+      "remediation": []
+    },
+    {
+      "id": "spec:checks:examples\\eval-specs\\forbidden-action.spec.json",
+      "category": "spec",
+      "status": "pass",
+      "title": "Checks or test cases (examples\\eval-specs\\forbidden-action.spec.json)",
+      "message": "At least one check or test case is defined.",
+      "path": "examples\\eval-specs\\forbidden-action.spec.json",
+      "remediation": []
+    },
+    {
+      "id": "spec:source-of-truth:examples\\eval-specs\\forbidden-action.spec.json",
+      "category": "spec",
+      "status": "pass",
+      "title": "Source-of-truth fields (examples\\eval-specs\\forbidden-action.spec.json)",
+      "message": "Spec includes policies, description, or metadata.sourceOfTruth.",
+      "path": "examples\\eval-specs\\forbidden-action.spec.json",
+      "remediation": []
+    },
+    {
+      "id": "budget:monthly:examples\\eval-specs\\forbidden-action.spec.json",
+      "category": "budget",
+      "status": "pass",
+      "title": "Monthly routed-call budget (examples\\eval-specs\\forbidden-action.spec.json)",
+      "message": "monthlyBudgetLimitUsd is 500.",
+      "path": "examples\\eval-specs\\forbidden-action.spec.json → budgetGate.monthlyBudgetLimitUsd",
+      "remediation": []
+    },
+    {
+      "id": "budget:per-run:examples\\eval-specs\\forbidden-action.spec.json",
+      "category": "budget",
+      "status": "pass",
+      "title": "Per-run routed-call budget (examples\\eval-specs\\forbidden-action.spec.json)",
+      "message": "perRunBudgetLimitUsd is 1.5.",
+      "path": "examples\\eval-specs\\forbidden-action.spec.json → budgetGate.perRunBudgetLimitUsd",
+      "remediation": []
+    },
+    {
+      "id": "budget:providers:examples\\eval-specs\\forbidden-action.spec.json",
+      "category": "budget",
+      "status": "pass",
+      "title": "allowedProviders (examples\\eval-specs\\forbidden-action.spec.json)",
+      "message": "allowedProviders is a non-empty string array.",
+      "path": "examples\\eval-specs\\forbidden-action.spec.json → budgetGate.allowedProviders",
+      "remediation": [
+        "Set budgetGate.allowedProviders to provider ids used for routed calls."
+      ]
+    },
+    {
+      "id": "budget:models:examples\\eval-specs\\forbidden-action.spec.json",
+      "category": "budget",
+      "status": "pass",
+      "title": "allowedModels (examples\\eval-specs\\forbidden-action.spec.json)",
+      "message": "allowedModels is a non-empty string array.",
+      "path": "examples\\eval-specs\\forbidden-action.spec.json → budgetGate.allowedModels",
+      "remediation": [
+        "Set budgetGate.allowedModels to model ids used for routed calls."
+      ]
+    },
+    {
+      "id": "budget:scope:examples\\eval-specs\\forbidden-action.spec.json",
+      "category": "budget",
+      "status": "pass",
+      "title": "Routed-call scope wording (examples\\eval-specs\\forbidden-action.spec.json)",
+      "message": "Description or metadata mentions routed-call scope.",
+      "path": "examples\\eval-specs\\forbidden-action.spec.json",
+      "remediation": []
+    },
+    {
+      "id": "spec:json:examples\\eval-specs\\agent-budget-gate.spec.json",
+      "category": "spec",
+      "status": "pass",
+      "title": "Spec parses as JSON (examples\\eval-specs\\agent-budget-gate.spec.json)",
+      "message": "Spec file is valid JSON.",
+      "path": "examples\\eval-specs\\agent-budget-gate.spec.json",
+      "remediation": []
+    },
+    {
+      "id": "spec:agent-qa:examples\\eval-specs\\agent-budget-gate.spec.json",
+      "category": "spec",
+      "status": "pass",
+      "title": "Agent QA spec validation (examples\\eval-specs\\agent-budget-gate.spec.json)",
+      "message": "validateAgentQaSpec passed.",
+      "path": "examples\\eval-specs\\agent-budget-gate.spec.json",
+      "remediation": []
+    },
+    {
+      "id": "spec:enforcement:examples\\eval-specs\\agent-budget-gate.spec.json",
+      "category": "spec",
+      "status": "pass",
+      "title": "enforcementMode (examples\\eval-specs\\agent-budget-gate.spec.json)",
+      "message": "enforcementMode is \"enforce\".",
+      "path": "examples\\eval-specs\\agent-budget-gate.spec.json",
+      "remediation": []
+    },
+    {
+      "id": "spec:checks:examples\\eval-specs\\agent-budget-gate.spec.json",
+      "category": "spec",
+      "status": "pass",
+      "title": "Checks or test cases (examples\\eval-specs\\agent-budget-gate.spec.json)",
+      "message": "At least one check or test case is defined.",
+      "path": "examples\\eval-specs\\agent-budget-gate.spec.json",
+      "remediation": []
+    },
+    {
+      "id": "spec:source-of-truth:examples\\eval-specs\\agent-budget-gate.spec.json",
+      "category": "spec",
+      "status": "pass",
+      "title": "Source-of-truth fields (examples\\eval-specs\\agent-budget-gate.spec.json)",
+      "message": "Spec includes policies, description, or metadata.sourceOfTruth.",
+      "path": "examples\\eval-specs\\agent-budget-gate.spec.json",
+      "remediation": []
+    },
+    {
+      "id": "budget:monthly:examples\\eval-specs\\agent-budget-gate.spec.json",
+      "category": "budget",
+      "status": "pass",
+      "title": "Monthly routed-call budget (examples\\eval-specs\\agent-budget-gate.spec.json)",
+      "message": "monthlyBudgetLimitUsd is 600.",
+      "path": "examples\\eval-specs\\agent-budget-gate.spec.json → budgetGate.monthlyBudgetLimitUsd",
+      "remediation": []
+    },
+    {
+      "id": "budget:per-run:examples\\eval-specs\\agent-budget-gate.spec.json",
+      "category": "budget",
+      "status": "pass",
+      "title": "Per-run routed-call budget (examples\\eval-specs\\agent-budget-gate.spec.json)",
+      "message": "perRunBudgetLimitUsd is 1.5.",
+      "path": "examples\\eval-specs\\agent-budget-gate.spec.json → budgetGate.perRunBudgetLimitUsd",
+      "remediation": []
+    },
+    {
+      "id": "budget:providers:examples\\eval-specs\\agent-budget-gate.spec.json",
+      "category": "budget",
+      "status": "pass",
+      "title": "allowedProviders (examples\\eval-specs\\agent-budget-gate.spec.json)",
+      "message": "allowedProviders is a non-empty string array.",
+      "path": "examples\\eval-specs\\agent-budget-gate.spec.json → budgetGate.allowedProviders",
+      "remediation": [
+        "Set budgetGate.allowedProviders to provider ids used for routed calls."
+      ]
+    },
+    {
+      "id": "budget:models:examples\\eval-specs\\agent-budget-gate.spec.json",
+      "category": "budget",
+      "status": "pass",
+      "title": "allowedModels (examples\\eval-specs\\agent-budget-gate.spec.json)",
+      "message": "allowedModels is a non-empty string array.",
+      "path": "examples\\eval-specs\\agent-budget-gate.spec.json → budgetGate.allowedModels",
+      "remediation": [
+        "Set budgetGate.allowedModels to model ids used for routed calls."
+      ]
+    },
+    {
+      "id": "budget:scope:examples\\eval-specs\\agent-budget-gate.spec.json",
+      "category": "budget",
+      "status": "pass",
+      "title": "Routed-call scope wording (examples\\eval-specs\\agent-budget-gate.spec.json)",
+      "message": "Description or metadata mentions routed-call scope.",
+      "path": "examples\\eval-specs\\agent-budget-gate.spec.json",
+      "remediation": []
+    },
+    {
+      "id": "spec:json:examples\\eval-specs\\pricing-plan-agent.spec.json",
+      "category": "spec",
+      "status": "pass",
+      "title": "Spec parses as JSON (examples\\eval-specs\\pricing-plan-agent.spec.json)",
+      "message": "Spec file is valid JSON.",
+      "path": "examples\\eval-specs\\pricing-plan-agent.spec.json",
+      "remediation": []
+    },
+    {
+      "id": "spec:agent-qa:examples\\eval-specs\\pricing-plan-agent.spec.json",
+      "category": "spec",
+      "status": "pass",
+      "title": "Agent QA spec validation (examples\\eval-specs\\pricing-plan-agent.spec.json)",
+      "message": "validateAgentQaSpec passed.",
+      "path": "examples\\eval-specs\\pricing-plan-agent.spec.json",
+      "remediation": []
+    },
+    {
+      "id": "spec:enforcement:examples\\eval-specs\\pricing-plan-agent.spec.json",
+      "category": "spec",
+      "status": "pass",
+      "title": "enforcementMode (examples\\eval-specs\\pricing-plan-agent.spec.json)",
+      "message": "enforcementMode is \"warn\".",
+      "path": "examples\\eval-specs\\pricing-plan-agent.spec.json",
+      "remediation": []
+    },
+    {
+      "id": "spec:checks:examples\\eval-specs\\pricing-plan-agent.spec.json",
+      "category": "spec",
+      "status": "pass",
+      "title": "Checks or test cases (examples\\eval-specs\\pricing-plan-agent.spec.json)",
+      "message": "At least one check or test case is defined.",
+      "path": "examples\\eval-specs\\pricing-plan-agent.spec.json",
+      "remediation": []
+    },
+    {
+      "id": "spec:source-of-truth:examples\\eval-specs\\pricing-plan-agent.spec.json",
+      "category": "spec",
+      "status": "pass",
+      "title": "Source-of-truth fields (examples\\eval-specs\\pricing-plan-agent.spec.json)",
+      "message": "Spec includes policies, description, or metadata.sourceOfTruth.",
+      "path": "examples\\eval-specs\\pricing-plan-agent.spec.json",
+      "remediation": []
+    },
+    {
+      "id": "budget:monthly:examples\\eval-specs\\pricing-plan-agent.spec.json",
+      "category": "budget",
+      "status": "pass",
+      "title": "Monthly routed-call budget (examples\\eval-specs\\pricing-plan-agent.spec.json)",
+      "message": "monthlyBudgetLimitUsd is 600.",
+      "path": "examples\\eval-specs\\pricing-plan-agent.spec.json → budgetGate.monthlyBudgetLimitUsd",
+      "remediation": []
+    },
+    {
+      "id": "budget:per-run:examples\\eval-specs\\pricing-plan-agent.spec.json",
+      "category": "budget",
+      "status": "pass",
+      "title": "Per-run routed-call budget (examples\\eval-specs\\pricing-plan-agent.spec.json)",
+      "message": "perRunBudgetLimitUsd is 1.5.",
+      "path": "examples\\eval-specs\\pricing-plan-agent.spec.json → budgetGate.perRunBudgetLimitUsd",
+      "remediation": []
+    },
+    {
+      "id": "budget:providers:examples\\eval-specs\\pricing-plan-agent.spec.json",
+      "category": "budget",
+      "status": "pass",
+      "title": "allowedProviders (examples\\eval-specs\\pricing-plan-agent.spec.json)",
+      "message": "allowedProviders is a non-empty string array.",
+      "path": "examples\\eval-specs\\pricing-plan-agent.spec.json → budgetGate.allowedProviders",
+      "remediation": [
+        "Set budgetGate.allowedProviders to provider ids used for routed calls."
+      ]
+    },
+    {
+      "id": "budget:models:examples\\eval-specs\\pricing-plan-agent.spec.json",
+      "category": "budget",
+      "status": "pass",
+      "title": "allowedModels (examples\\eval-specs\\pricing-plan-agent.spec.json)",
+      "message": "allowedModels is a non-empty string array.",
+      "path": "examples\\eval-specs\\pricing-plan-agent.spec.json → budgetGate.allowedModels",
+      "remediation": [
+        "Set budgetGate.allowedModels to model ids used for routed calls."
+      ]
+    },
+    {
+      "id": "budget:scope:examples\\eval-specs\\pricing-plan-agent.spec.json",
+      "category": "budget",
+      "status": "pass",
+      "title": "Routed-call scope wording (examples\\eval-specs\\pricing-plan-agent.spec.json)",
+      "message": "Description or metadata mentions routed-call scope.",
+      "path": "examples\\eval-specs\\pricing-plan-agent.spec.json",
+      "remediation": []
+    },
+    {
+      "id": "artifacts:maintenance-result",
+      "category": "artifacts",
+      "status": "pass",
+      "title": "maintenance-result.json",
+      "message": "Maintenance run artifact is present.",
+      "path": "deliverables\\maintenance\\maintenance-result.json",
+      "remediation": []
+    },
+    {
+      "id": "artifacts:agent-quality-result",
+      "category": "artifacts",
+      "status": "pass",
+      "title": "agent-quality-result.json",
+      "message": "Agent QA summary artifact is present.",
+      "path": "deliverables\\maintenance\\agent-quality-result.json",
+      "remediation": []
+    },
+    {
+      "id": "artifacts:gate-result",
+      "category": "artifacts",
+      "status": "pass",
+      "title": "gate-result.json",
+      "message": "Deploy gate artifact is present.",
+      "path": "deliverables\\maintenance\\gate-result.json",
+      "remediation": []
+    },
+    {
+      "id": "pricing:budget-state",
+      "category": "pricing",
+      "status": "pass",
+      "title": "budget-state.json",
+      "message": "Routed-call budget state artifact is present.",
+      "path": "deliverables\\maintenance\\budget-state.json",
+      "remediation": []
+    },
+    {
+      "id": "ledger:parseable",
+      "category": "ledger",
+      "status": "pass",
+      "title": "provider-call-ledger.jsonl",
+      "message": "Ledger is parseable (1 entries).",
+      "path": "deliverables\\maintenance\\provider-call-ledger.jsonl",
+      "remediation": []
+    },
+    {
+      "id": "evidence:gate-decision",
+      "category": "evidence",
+      "status": "pass",
+      "title": "Agent QA gate decision",
+      "message": "gateDecision is pass.",
+      "path": "deliverables\\maintenance\\maintenance-result.json",
+      "remediation": []
+    },
+    {
+      "id": "evidence:outputCaptured",
+      "category": "evidence",
+      "status": "pass",
+      "title": "Evidence: output captured",
+      "message": "output captured is complete.",
+      "path": "deliverables\\maintenance\\maintenance-result.json",
+      "remediation": []
+    },
+    {
+      "id": "evidence:toolTraceCaptured",
+      "category": "evidence",
+      "status": "pass",
+      "title": "Evidence: tool trace captured",
+      "message": "tool trace captured is complete.",
+      "path": "deliverables\\maintenance\\maintenance-result.json",
+      "remediation": []
+    },
+    {
+      "id": "evidence:actionTraceCaptured",
+      "category": "evidence",
+      "status": "pass",
+      "title": "Evidence: action trace captured",
+      "message": "action trace captured is complete.",
+      "path": "deliverables\\maintenance\\maintenance-result.json",
+      "remediation": []
+    },
+    {
+      "id": "evidence:budgetStateLoaded",
+      "category": "evidence",
+      "status": "pass",
+      "title": "Evidence: budget state loaded",
+      "message": "budget state loaded is complete.",
+      "path": "deliverables\\maintenance\\maintenance-result.json",
+      "remediation": []
+    },
+    {
+      "id": "evidence:pricingConfigLoaded",
+      "category": "evidence",
+      "status": "pass",
+      "title": "Evidence: pricing config loaded",
+      "message": "pricing config loaded is complete.",
+      "path": "deliverables\\maintenance\\maintenance-result.json",
+      "remediation": []
+    },
+    {
+      "id": "evidence:ledgerWriteSucceeded",
+      "category": "evidence",
+      "status": "pass",
+      "title": "Evidence: ledger write succeeded",
+      "message": "ledger write succeeded is complete.",
+      "path": "deliverables\\maintenance\\maintenance-result.json",
+      "remediation": []
+    },
+    {
+      "id": "gate:deploy",
+      "category": "gate",
+      "status": "pass",
+      "title": "Deploy gate",
+      "message": "deployAllowed=true, exitCode=0 (0 = allowed for healthy/at-risk).",
+      "path": "deliverables\\maintenance\\gate-result.json",
+      "remediation": []
+    }
+  ],
+  "summary": "69 checks passed, 0 warnings, 0 blocking issues",
+  "nextActions": [
+    "Run npm run validate:spec before changes to eval specs.",
+    "Run npm run demo:maintenance-gate after spec or observation updates.",
+    "Run npm run gate:release in CI/CD before deploy."
+  ],
+  "evaluatedAt": "2026-05-20T05:41:19.249Z"
+}
