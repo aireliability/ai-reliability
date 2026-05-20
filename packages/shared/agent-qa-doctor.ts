@@ -1,5 +1,10 @@
 import { access, readFile } from "node:fs/promises";
 import path from "node:path";
+import {
+  loadArtifactBundle,
+  reconcileAgentQaArtifacts,
+  wrapDoctorResult,
+} from "./agent-qa-artifacts";
 import { isPassingGateDecision } from "./agent-qa";
 import { validateAgentQaSpec } from "./agent-qa-spec-validator";
 import type { GateDecision } from "./maintenance-result";
@@ -61,6 +66,7 @@ export const REQUIRED_NPM_SCRIPTS = [
   "gate:release",
   "validate:spec",
   "doctor",
+  "firewall:check",
 ] as const;
 
 function check(
@@ -905,9 +911,64 @@ export async function runDoctor(input: RunDoctorInput = {}): Promise<DoctorResul
     }
   }
 
-  const status = deriveOverallStatus(checks);
+  const bundle = await loadArtifactBundle(artifactsDir);
+  const reconcile = reconcileAgentQaArtifacts(bundle);
+
+  for (const issue of reconcile.issues) {
+    checks.push(
+      check({
+        id: `consistency:${issue.code}`,
+        category: "artifacts",
+        status: issue.severity === "error" ? "fail" : "warning",
+        title: issue.code.replace(/_/g, " "),
+        message: issue.message,
+        path: issue.path,
+        remediation: issue.remediation,
+      }),
+    );
+  }
+
+  if (bundle.maintenance) {
+    checks.push(
+      check({
+        id: "run:summary",
+        category: "artifacts",
+        status: "pass",
+        title: "Run summary",
+        message: `runId=${bundle.maintenance.runId} specId=${bundle.maintenance.specId} env=${bundle.maintenance.environment} workflow=${bundle.maintenance.workflowName}`,
+        path: path.relative(cwd, path.join(artifactsDir, "maintenance-result.json")),
+      }),
+    );
+  }
+
+  let status = deriveOverallStatus(checks);
+  if (reconcile.staleGate || !reconcile.ok) {
+    if (status === "ready") status = reconcile.staleGate ? "blocked" : "warning";
+    if (reconcile.issues.some((i) => i.severity === "error") && status !== "blocked") {
+      status = "blocked";
+    }
+  }
+
   const summary = buildSummary(checks);
   const nextActions = buildNextActions(checks, status);
+
+  const runSummary = bundle.maintenance
+    ? {
+        runId: bundle.maintenance.runId,
+        specId: bundle.maintenance.specId,
+        environment: bundle.maintenance.environment,
+        workflowName: bundle.maintenance.workflowName,
+        gateDecision: bundle.maintenance.agentQa?.gateDecision,
+      }
+    : bundle.agentQuality
+      ? {
+          runId: bundle.agentQuality.runId,
+          specId: bundle.agentQuality.specId,
+          environment: bundle.agentQuality.environment,
+          workflowName: bundle.agentQuality.workflowName,
+          gateDecision: bundle.agentQuality.gateDecision,
+        }
+      : undefined;
 
   const result: DoctorResult = {
     status,
@@ -920,9 +981,10 @@ export async function runDoctor(input: RunDoctorInput = {}): Promise<DoctorResul
   if (input.writeArtifact) {
     const { mkdir, writeFile } = await import("node:fs/promises");
     await mkdir(artifactsDir, { recursive: true });
+    const artifact = wrapDoctorResult(result, runSummary);
     await writeFile(
       path.join(artifactsDir, "doctor-result.json"),
-      JSON.stringify(result, null, 2),
+      JSON.stringify(artifact, null, 2),
       "utf-8",
     );
   }

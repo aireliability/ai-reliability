@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { spawnSync } from "node:child_process";
-import { writeFile, mkdtemp, rm } from "node:fs/promises";
+import { mkdir, writeFile, mkdtemp, rm } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import {
@@ -635,6 +635,29 @@ describe("gate:release exit codes", () => {
         evidence: [],
         checks: [],
         recommendedActions: [],
+        agentQa: {
+          gateDecision: "pass",
+          enforcementMode: "enforce",
+          decisionReason: "ok",
+          confidence: "high",
+          requiresHumanReview: false,
+          remediation: [],
+          evidenceCompleteness: {
+            outputCaptured: true,
+            toolTraceCaptured: true,
+            actionTraceCaptured: true,
+            budgetStateLoaded: true,
+            pricingConfigLoaded: true,
+            ledgerWriteSucceeded: true,
+          },
+          wouldBlockCount: 0,
+          checkCounts: {
+            answer: { total: 0, passed: 0, failed: 0 },
+            tool_call: { total: 0, passed: 0, failed: 0 },
+            action: { total: 0, passed: 0, failed: 0 },
+            budget: { total: 0, passed: 0, failed: 0 },
+          },
+        },
         generatedAt: new Date().toISOString(),
       };
       const failed: MaintenanceRunResult = { ...healthy, runId: "f", status: "failed" };
@@ -644,23 +667,21 @@ describe("gate:release exit codes", () => {
         status: "misconfigured",
       };
 
-      const p0 = join(dir, "healthy.json");
-      const p1 = join(dir, "failed.json");
-      const p2 = join(dir, "mis.json");
-      await writeFile(p0, JSON.stringify(healthy));
-      await writeFile(p1, JSON.stringify(failed));
-      await writeFile(p2, JSON.stringify(mis));
-
-      const runGate = (p: string) =>
-        spawnSync("npx", ["tsx", "apps/api/gate-release.ts", p], {
+      const runGate = async (result: MaintenanceRunResult, sub: string) => {
+        const artifactDir = join(dir, sub);
+        await mkdir(artifactDir, { recursive: true });
+        const maintenancePath = join(artifactDir, "maintenance-result.json");
+        await writeFile(maintenancePath, JSON.stringify(result));
+        return spawnSync("npx", ["tsx", "apps/api/gate-release.ts", maintenancePath], {
           cwd,
           encoding: "utf-8",
           shell: true,
         });
+      };
 
-      assert.equal(runGate(p0).status ?? -1, 0);
-      assert.equal(runGate(p1).status ?? -1, 1);
-      assert.equal(runGate(p2).status ?? -1, 2);
+      assert.equal((await runGate(healthy, "healthy")).status ?? -1, 0);
+      assert.equal((await runGate(failed, "failed")).status ?? -1, 1);
+      assert.equal((await runGate(mis, "misconfigured")).status ?? -1, 2);
     } finally {
       await rm(dir, { recursive: true });
     }

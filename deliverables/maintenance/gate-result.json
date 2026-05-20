@@ -1,12 +1,29 @@
 {
-  "evaluatedAt": "2026-05-19T06:42:24.852Z",
-  "source": "deliverables\\maintenance\\maintenance-result.json",
-  "runId": "maint-53693f8f-9aa0-457a-91a6-06f684604095",
+  "artifactType": "gate_result",
+  "schemaVersion": 1,
+  "generatedAt": "2026-05-20T08:44:06.448Z",
+  "runId": "maint-38728029-3609-4529-9676-cbcde74d09ad",
+  "source": "gate-release",
   "specId": "pricing-plans-v1",
+  "specVersion": 1,
+  "workflowName": "sales_copilot",
+  "environment": "pre_production",
+  "sourceMaintenancePath": "C:\\ai-reliability-clean\\ai-reliability\\deliverables\\maintenance\\maintenance-result.json",
+  "sourceAgentQualityPath": "C:\\ai-reliability-clean\\ai-reliability\\deliverables\\maintenance\\agent-quality-result.json",
   "maintenanceStatus": "healthy",
   "agentQaGateDecision": "pass",
   "enforcementMode": "enforce",
   "requiresHumanReview": false,
+  "decisionReason": "all_checks_passed",
+  "remediation": [],
+  "blockingFailures": 0,
+  "misconfiguredCount": 0,
   "deployAllowed": true,
-  "exitCode": 0
+  "exitCode": 0,
+  "relatedArtifacts": {
+    "maintenanceResult": "C:\\ai-reliability-clean\\ai-reliability\\deliverables\\maintenance\\maintenance-result.json",
+    "agentQualityResult": "C:\\ai-reliability-clean\\ai-reliability\\deliverables\\maintenance\\agent-quality-result.json",
+    "budgetState": "C:\\ai-reliability-clean\\ai-reliability\\deliverables\\maintenance\\budget-state.json",
+    "providerCallLedger": "C:\\ai-reliability-clean\\ai-reliability\\deliverables\\maintenance\\provider-call-ledger.jsonl"
+  }
 }

@@ -1,5 +1,5 @@
 {
-  "runId": "maint-53693f8f-9aa0-457a-91a6-06f684604095",
+  "runId": "maint-38728029-3609-4529-9676-cbcde74d09ad",
   "specId": "pricing-plans-v1",
   "specVersion": 1,
   "workflowName": "sales_copilot",
@@ -463,5 +463,15 @@
       "wouldHaveBlocked": false
     }
   ],
-  "generatedAt": "2026-05-19T06:42:24.379Z"
+  "generatedAt": "2026-05-20T08:44:05.343Z",
+  "artifactType": "maintenance_result",
+  "schemaVersion": 1,
+  "source": "runMaintenanceCheck",
+  "relatedArtifacts": {
+    "agentQualityResult": "deliverables\\maintenance\\agent-quality-result.json",
+    "budgetState": "deliverables\\maintenance\\budget-state.json",
+    "providerCallLedger": "deliverables\\maintenance\\provider-call-ledger.jsonl",
+    "gateResult": "deliverables\\maintenance\\gate-result.json",
+    "doctorResult": "deliverables\\maintenance\\doctor-result.json"
+  }
 }

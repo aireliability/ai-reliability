@@ -56,6 +56,7 @@ async function writePackageJson(dir: string, scripts?: Record<string, string>): 
         "gate:release": "tsx",
         "validate:spec": "tsx",
         doctor: "tsx",
+        "firewall:check": "tsx",
       },
     }),
     "utf-8",
@@ -71,6 +72,7 @@ describe("agent-qa-doctor", () => {
       await writePackageJson(dir);
       await writeFile(specPath, JSON.stringify(validSpec));
       await mkdir(artifacts, { recursive: true });
+      const generatedAt = new Date().toISOString();
       await writeFile(
         join(artifacts, "maintenance-result.json"),
         JSON.stringify({
@@ -112,12 +114,17 @@ describe("agent-qa-doctor", () => {
               budget: { total: 0, passed: 0, failed: 0 },
             },
           },
-          generatedAt: new Date().toISOString(),
+          generatedAt,
         }),
       );
       await writeFile(
         join(artifacts, "gate-result.json"),
         JSON.stringify({
+          artifactType: "gate_result",
+          schemaVersion: 1,
+          generatedAt,
+          runId: "r1",
+          specId: "doctor-test",
           deployAllowed: true,
           exitCode: 0,
           agentQaGateDecision: "pass",
@@ -134,7 +141,15 @@ describe("agent-qa-doctor", () => {
       );
       await writeFile(
         join(artifacts, "agent-quality-result.json"),
-        JSON.stringify({ gateDecision: "pass", enforcementMode: "observe" }),
+        JSON.stringify({
+          artifactType: "agent_quality_result",
+          schemaVersion: 1,
+          generatedAt,
+          runId: "r1",
+          specId: "doctor-test",
+          gateDecision: "pass",
+          enforcementMode: "observe",
+        }),
       );
 
       const result = await runDoctor({
@@ -375,7 +390,8 @@ describe("agent-qa-doctor", () => {
         writeArtifact: true,
       });
       const raw = await readFile(join(artifacts, "doctor-result.json"), "utf-8");
-      const parsed = JSON.parse(raw) as DoctorResult;
+      const parsed = JSON.parse(raw) as { artifactType?: string; status: string; checks: unknown[] };
+      assert.equal(parsed.artifactType, "doctor_result");
       assert.ok(parsed.status);
       assert.ok(Array.isArray(parsed.checks));
     } finally {

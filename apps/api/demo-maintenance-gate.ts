@@ -14,6 +14,11 @@ import {
   type RoutedProviderCallAttempt,
 } from "../../packages/shared/maintenance-check";
 import {
+  buildAgentQualityArtifact,
+  buildBudgetStateArtifact,
+  wrapMaintenanceResult,
+} from "../../packages/shared/agent-qa-artifacts";
+import {
   appendProviderCallLedgerEntry,
   writeProviderCallLedger,
   type ProviderCallLedgerEntry,
@@ -439,26 +444,21 @@ async function main(): Promise<void> {
     }
   }
 
-  const agentQualityPayload = {
-    runId: result.runId,
-    specId: result.specId,
+  const maintenanceArtifact = wrapMaintenanceResult(result, DELIVERABLES_DIR);
+  const agentQualityPayload = buildAgentQualityArtifact({
+    result,
     scenario,
-    enforcementMode: result.agentQa?.enforcementMode,
-    gateDecision: result.agentQa?.gateDecision,
-    decisionReason: result.agentQa?.decisionReason,
-    confidence: result.agentQa?.confidence,
-    requiresHumanReview: result.agentQa?.requiresHumanReview,
-    remediation: result.agentQa?.remediation,
-    evidenceCompleteness: result.agentQa?.evidenceCompleteness,
-    wouldBlockCount: result.agentQa?.wouldBlockCount,
-    checkCounts: result.agentQa?.checkCounts,
-    maintenanceStatus: result.status,
-    generatedAt: result.generatedAt,
-  };
+    artifactsDir: DELIVERABLES_DIR,
+  });
+  const budgetArtifact = buildBudgetStateArtifact(nextBudget, {
+    runId,
+    specId: spec.specId,
+    generatedAt: now,
+  });
 
-  await writeFile(RESULT_PATH, JSON.stringify(result, null, 2), "utf-8");
+  await writeFile(RESULT_PATH, JSON.stringify(maintenanceArtifact, null, 2), "utf-8");
   await writeFile(AGENT_QA_PATH, JSON.stringify(agentQualityPayload, null, 2), "utf-8");
-  await writeFile(BUDGET_STATE_PATH, JSON.stringify(nextBudget, null, 2), "utf-8");
+  await writeFile(BUDGET_STATE_PATH, JSON.stringify(budgetArtifact, null, 2), "utf-8");
 
   console.log("Maintenance run status:", result.status);
   console.log("Agent QA gate decision:", result.agentQa?.gateDecision);
