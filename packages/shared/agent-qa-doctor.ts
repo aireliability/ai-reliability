@@ -63,6 +63,7 @@ export const REQUIRED_NPM_SCRIPTS = [
   "test:maintenance-gate",
   "test:budget-gate",
   "demo:maintenance-gate",
+  "agentqa:run",
   "gate:release",
   "validate:spec",
   "doctor",
@@ -139,17 +140,17 @@ function buildNextActions(checks: DoctorCheck[], status: DoctorStatus): string[]
     actions.add("Run npm run validate:spec");
   }
   if (checks.some((c) => c.id.startsWith("artifacts:") && c.status !== "pass")) {
-    actions.add("Run npm run demo:maintenance-gate");
+    actions.add("Run npm run agentqa:run");
     actions.add("Run npm run gate:release");
   }
   if (checks.some((c) => c.category === "ledger" && c.status === "warning")) {
     actions.add(
-      "Run npm run demo:maintenance-gate to record a sample routed provider-call in the ledger.",
+      "Run npm run agentqa:run to record a sample routed provider-call in the ledger.",
     );
   }
   if (status === "ready" && actions.size === 0) {
     actions.add("Run npm run validate:spec before changes to eval specs.");
-    actions.add("Run npm run demo:maintenance-gate after spec or observation updates.");
+    actions.add("Run npm run agentqa:run after spec or observation updates.");
     actions.add("Run npm run gate:release in CI/CD before deploy.");
   }
   return [...actions];
@@ -521,7 +522,7 @@ export async function runDoctor(input: RunDoctorInput = {}): Promise<DoctorResul
         title: "maintenance-result.json",
         message: "No maintenance run artifact found.",
         path: path.relative(cwd, maintenancePath),
-        remediation: ["Run npm run demo:maintenance-gate to generate maintenance artifacts."],
+        remediation: ["Run npm run agentqa:run to generate maintenance artifacts."],
       }),
     );
   }

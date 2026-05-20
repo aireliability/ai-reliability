@@ -53,6 +53,7 @@ async function writePackageJson(dir: string, scripts?: Record<string, string>): 
         "test:maintenance-gate": "tsx --test",
         "test:budget-gate": "tsx --test",
         "demo:maintenance-gate": "tsx",
+        "agentqa:run": "tsx",
         "gate:release": "tsx",
         "validate:spec": "tsx",
         doctor: "tsx",
@@ -235,7 +236,7 @@ describe("agent-qa-doctor", () => {
       });
       assert.equal(result.status, "warning");
       assert.ok(
-        result.nextActions.some((a) => a.includes("demo:maintenance-gate")),
+        result.nextActions.some((a) => a.includes("agentqa:run")),
       );
     } finally {
       await rm(dir, { recursive: true });

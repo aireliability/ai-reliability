@@ -508,6 +508,7 @@ export function buildAgentQualityArtifact(input: {
   result: MaintenanceRunResult;
   scenario?: string;
   artifactsDir: string;
+  source?: string;
 }): AgentQualityResultArtifact {
   const aq = input.result.agentQa;
   const generatedAt = input.result.generatedAt;
@@ -516,7 +517,7 @@ export function buildAgentQualityArtifact(input: {
     schemaVersion: ARTIFACT_SCHEMA_VERSION,
     generatedAt,
     runId: input.result.runId,
-    source: "runMaintenanceCheck",
+    source: input.source ?? "runMaintenanceCheck",
     specId: input.result.specId,
     specVersion: input.result.specVersion,
     workflowName: input.result.workflowName,
@@ -543,7 +544,7 @@ export function buildAgentQualityArtifact(input: {
 
 export function buildBudgetStateArtifact(
   state: BudgetState,
-  meta: { runId: string; specId: string; generatedAt: string },
+  meta: { runId: string; specId: string; generatedAt: string; source?: string },
 ): BudgetStateArtifact {
   return {
     ...state,
@@ -552,7 +553,7 @@ export function buildBudgetStateArtifact(
     generatedAt: meta.generatedAt,
     runId: meta.runId,
     specId: meta.specId,
-    source: "demo-maintenance-gate",
+    source: meta.source ?? "demo-maintenance-gate",
   };
 }
 

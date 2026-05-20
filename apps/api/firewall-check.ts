@@ -2,7 +2,7 @@ import { spawnSync } from "node:child_process";
 
 const steps = [
   { name: "validate:spec", cmd: "npm run validate:spec" },
-  { name: "demo:maintenance-gate", cmd: "npm run demo:maintenance-gate" },
+  { name: "agentqa:run", cmd: "npm run agentqa:run" },
   { name: "gate:release", cmd: "npm run gate:release" },
   { name: "doctor", cmd: "npm run doctor" },
 ];
@@ -13,7 +13,7 @@ function runStep(cmd: string): number {
 }
 
 async function main(): Promise<void> {
-  console.log("Agent QA Firewall check — validate → demo → gate → doctor\n");
+  console.log("Agent QA Firewall check — validate → agentqa:run → gate → doctor\n");
 
   for (const step of steps) {
     console.log(`\n=== ${step.name} ===\n`);
