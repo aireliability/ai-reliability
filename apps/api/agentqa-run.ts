@@ -9,9 +9,15 @@ async function main(): Promise<void> {
   const result = await runAgentQaFirewall({
     specPath: argv.specPath,
     artifactsDir: argv.artifactsDir,
+    observationsPath: argv.observationsPath,
   });
 
-  console.log(formatAgentQaRunReport(result, argv.specPath));
+  console.log(
+    formatAgentQaRunReport(result, {
+      specPath: argv.specPath,
+      observationsPath: argv.observationsPath,
+    }),
+  );
 
   if (!result.ok) {
     process.exit(result.exitCode);

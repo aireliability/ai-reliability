@@ -1,0 +1,39 @@
+{
+  "observationId": "obs-budget-over-001",
+  "observedAt": "2026-05-20T12:20:00.000Z",
+  "specId": "agent-budget-gate-v1",
+  "workflowName": "llm_router_agent",
+  "environment": "production",
+  "routedCalls": [
+    {
+      "provider": "openai",
+      "model": "gpt-4.1-mini",
+      "estimatedCostUsd": 2.0,
+      "currentRunSpendUsd": 0.5,
+      "inputTokens": 1200,
+      "outputTokens": 800,
+      "status": "attempted"
+    }
+  ],
+  "evidenceMetadata": {
+    "outputCaptured": true,
+    "toolTraceCaptured": true,
+    "actionTraceCaptured": true,
+    "budgetStateLoaded": true,
+    "pricingConfigLoaded": true,
+    "ledgerWriteSucceeded": true
+  },
+  "testCases": {
+    "tc-within-budget": {
+      "agentOutput": "Summarized ticket #4421 from routed model call.",
+      "toolCalls": [],
+      "actions": []
+    },
+    "tc-allowlist-provider": {
+      "agentOutput": "Draft reply using production model within configured limits.",
+      "toolCalls": [],
+      "actions": []
+    }
+  },
+  "notes": "Routed call estimate exceeds per-run budget limit in spec; applies to gate-routed calls only."
+}

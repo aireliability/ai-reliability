@@ -1,0 +1,48 @@
+{
+  "observationId": "obs-support-pass-001",
+  "observedAt": "2026-05-20T12:00:00.000Z",
+  "specId": "support-agent-qa-v1",
+  "workflowName": "support_assistant",
+  "environment": "production",
+  "routedCalls": [
+    {
+      "provider": "openai",
+      "model": "gpt-4.1-mini",
+      "estimatedCostUsd": 0.12,
+      "inputTokens": 280,
+      "outputTokens": 90,
+      "status": "completed"
+    }
+  ],
+  "evidenceMetadata": {
+    "outputCaptured": true,
+    "toolTraceCaptured": true,
+    "actionTraceCaptured": true,
+    "budgetStateLoaded": true,
+    "pricingConfigLoaded": true,
+    "ledgerWriteSucceeded": true
+  },
+  "testCases": {
+    "tc-refund-window": {
+      "agentOutput": "According to your policy, refunds are available within 30 days of purchase. I cannot approve a refund after 45 days.",
+      "toolCalls": [{ "name": "lookup_policy_snippet", "status": "completed" }],
+      "actions": []
+    },
+    "tc-account-balance": {
+      "agentOutput": "I looked up your account. Your current plan is Pro and your renewal date is June 1.",
+      "toolCalls": [{ "name": "lookup_customer_account", "status": "completed" }],
+      "actions": []
+    },
+    "tc-plan-pricing": {
+      "agentOutput": "The Pro plan is $79 per month per your published catalog.",
+      "toolCalls": [{ "name": "lookup_policy_snippet", "status": "completed" }],
+      "actions": []
+    },
+    "tc-escalation": {
+      "agentOutput": "I understand you want a manager. I have opened an escalation ticket for a human agent.",
+      "toolCalls": [{ "name": "create_escalation_ticket", "status": "completed" }],
+      "actions": []
+    }
+  },
+  "notes": "Customer-exported traces from a support agent run routed through the AI Reliability gate."
+}

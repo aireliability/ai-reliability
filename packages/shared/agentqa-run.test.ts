@@ -86,6 +86,16 @@ describe("parseAgentQaRunArgv", () => {
     assert.equal(a.specPath, "examples/eval-specs/support-agent-qa.spec.json");
     assert.equal(a.artifactsDir, "deliverables/maintenance");
   });
+
+  it("accepts --observations", () => {
+    const a = parseAgentQaRunArgv([
+      "--spec",
+      "examples/eval-specs/support-agent-qa.spec.json",
+      "--observations",
+      "examples/observations/support-agent-qa.pass.json",
+    ]);
+    assert.equal(a.observationsPath, "examples/observations/support-agent-qa.pass.json");
+  });
 });
 
 describe("agentqa:run invalid spec handling", () => {
@@ -121,7 +131,8 @@ describe("agentqa:run invalid spec handling", () => {
       });
       assert.equal(r.ok, false);
       if (r.ok) return;
-      assert.equal(r.reason, "invalid_json");
+      assert.equal(r.label, "INVALID");
+      if (r.label === "INVALID") assert.equal(r.reason, "invalid_json");
     } finally {
       await rm(dir, { recursive: true });
     }
@@ -142,7 +153,8 @@ describe("agentqa:run invalid spec handling", () => {
       });
       assert.equal(r.ok, false);
       if (r.ok) return;
-      assert.equal(r.reason, "invalid_spec");
+      assert.equal(r.label, "INVALID");
+      if (r.label === "INVALID") assert.equal(r.reason, "invalid_spec");
       assert.ok(r.errors.some((e) => e.remediation.length > 0));
     } finally {
       await rm(dir, { recursive: true });
@@ -415,6 +427,173 @@ describe("agentqa:run CLI", () => {
       );
       assert.equal(r.status ?? -1, 1);
       assert.match(r.stdout ?? "", /INVALID/);
+    } finally {
+      await rm(dir, { recursive: true });
+    }
+  });
+});
+
+describe("agentqa:run with observations", () => {
+  it("observations pass example succeeds with observation source", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "agentqa-obs-pass-"));
+    try {
+      const artifacts = join(dir, "artifacts");
+      const r = await runAgentQaFirewall({
+        specPath: "examples/eval-specs/support-agent-qa.spec.json",
+        observationsPath: "examples/observations/support-agent-qa.pass.json",
+        artifactsDir: artifacts,
+        cwd: repoRoot,
+      });
+      assert.equal(r.ok, true);
+      if (!r.ok) return;
+      assert.equal(r.label, "PASS");
+      assert.equal(r.observationsUsed, true);
+
+      const m = await readJsonArtifact<MaintenanceResultArtifact>(
+        join(artifacts, "maintenance-result.json"),
+      );
+      assert.equal(m.ok, true);
+      if (!m.ok) return;
+      assert.equal(m.data.source, "agentqa:run:observations");
+      assert.equal(m.data.observationId, "obs-support-pass-001");
+      assert.ok(m.data.observationPath?.includes("support-agent-qa.pass.json"));
+    } finally {
+      await rm(dir, { recursive: true });
+    }
+  });
+
+  it("missing required tool observation blocks under enforce", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "agentqa-obs-tool-"));
+    try {
+      const r = await runAgentQaFirewall({
+        specPath: "examples/eval-specs/tool-call-required.spec.json",
+        observationsPath: "examples/observations/tool-call-required.missing-tool.json",
+        artifactsDir: join(dir, "artifacts"),
+        cwd: repoRoot,
+      });
+      assert.equal(r.ok, true);
+      if (!r.ok) return;
+      assert.notEqual(r.gateDecision, "pass");
+      assert.ok(r.label === "BLOCK" || r.label === "MANUAL REVIEW");
+    } finally {
+      await rm(dir, { recursive: true });
+    }
+  });
+
+  it("forbidden action observation blocks under enforce", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "agentqa-obs-forbidden-"));
+    try {
+      const r = await runAgentQaFirewall({
+        specPath: "examples/eval-specs/forbidden-action.spec.json",
+        observationsPath: "examples/observations/forbidden-action.detected.json",
+        artifactsDir: join(dir, "artifacts"),
+        cwd: repoRoot,
+      });
+      assert.equal(r.ok, true);
+      if (!r.ok) return;
+      assert.equal(r.gateDecision, "block");
+      assert.equal(r.label, "BLOCK");
+    } finally {
+      await rm(dir, { recursive: true });
+    }
+  });
+
+  it("invented pricing observation does not pass", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "agentqa-obs-price-"));
+    try {
+      const r = await runAgentQaFirewall({
+        specPath: "examples/eval-specs/pricing-plan-agent.spec.json",
+        observationsPath: "examples/observations/pricing-plan-agent.invented-price.json",
+        artifactsDir: join(dir, "artifacts"),
+        cwd: repoRoot,
+      });
+      assert.equal(r.ok, true);
+      if (!r.ok) return;
+      assert.notEqual(r.label, "PASS");
+    } finally {
+      await rm(dir, { recursive: true });
+    }
+  });
+
+  it("over-budget routed call blocks budget gate", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "agentqa-obs-budget-"));
+    try {
+      const r = await runAgentQaFirewall({
+        specPath: "examples/eval-specs/agent-budget-gate.spec.json",
+        observationsPath: "examples/observations/budget-gate.over-limit.json",
+        artifactsDir: join(dir, "artifacts"),
+        cwd: repoRoot,
+      });
+      assert.equal(r.ok, true);
+      if (!r.ok) return;
+      assert.notEqual(r.gateDecision, "pass");
+    } finally {
+      await rm(dir, { recursive: true });
+    }
+  });
+
+  it("invalid observations exit before writing maintenance artifact", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "agentqa-obs-invalid-"));
+    try {
+      const obsPath = join(dir, "bad-obs.json");
+      await writeFile(obsPath, JSON.stringify({ observationId: "x" }));
+      const artifacts = join(dir, "artifacts");
+      const r = await runAgentQaFirewall({
+        specPath: join(repoRoot, DEFAULT_AGENTQA_SPEC_PATH),
+        observationsPath: obsPath,
+        artifactsDir: artifacts,
+        cwd: repoRoot,
+      });
+      assert.equal(r.ok, false);
+      if (r.ok) return;
+      assert.equal(r.label, "INVALID OBSERVATIONS");
+      await assert.rejects(readFile(join(artifacts, "maintenance-result.json")));
+    } finally {
+      await rm(dir, { recursive: true });
+    }
+  });
+
+  it("gate and doctor after observation-backed pass path", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "agentqa-obs-flow-"));
+    try {
+      const artifacts = join(dir, "artifacts");
+      await runAgentQaFirewall({
+        specPath: DEFAULT_AGENTQA_SPEC_PATH,
+        observationsPath: "examples/observations/support-agent-qa.pass.json",
+        artifactsDir: artifacts,
+        cwd: repoRoot,
+      });
+      const maintenancePath = join(artifacts, "maintenance-result.json");
+      const gate = spawnSync(
+        "npx",
+        ["tsx", "apps/api/gate-release.ts", maintenancePath],
+        { cwd: repoRoot, encoding: "utf-8", shell: true },
+      );
+      assert.equal(gate.status ?? -1, 0);
+
+      await writeFile(
+        join(dir, "package.json"),
+        JSON.stringify({
+          name: "test",
+          scripts: {
+            "test:maintenance-gate": "tsx",
+            "test:budget-gate": "tsx",
+            "demo:maintenance-gate": "tsx",
+            "agentqa:run": "tsx",
+            "gate:release": "tsx",
+            "validate:spec": "tsx",
+            doctor: "tsx",
+            "firewall:check": "tsx",
+          },
+        }),
+      );
+
+      const doctor = await runDoctor({
+        cwd: dir,
+        specPaths: [join(repoRoot, DEFAULT_AGENTQA_SPEC_PATH)],
+        artifactsDir: artifacts,
+      });
+      assert.equal(doctor.status, "ready");
     } finally {
       await rm(dir, { recursive: true });
     }

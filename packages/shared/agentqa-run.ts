@@ -12,7 +12,16 @@ import {
   wrapMaintenanceResult,
 } from "./agent-qa-artifacts";
 import { validateAgentQaSpec } from "./agent-qa-spec-validator";
+import {
+  buildRoutedCallFromObservations,
+  loadObservationsForAgentQaRun,
+  mapObservationEvidenceMetadata,
+  mapObservationsToMaintenanceInput,
+  type AgentQaObservationFile,
+  type AgentQaObservationValidationIssue,
+} from "./agent-qa-observations";
 import { parseEvalSpec, type EvalSpec, type EvalSpecTestCase } from "./eval-spec";
+import type { ObservationArtifactMeta } from "./agent-qa-artifacts";
 import type { EnforcementMode, GateDecision } from "./maintenance-result";
 import {
   runMaintenanceCheck,
@@ -36,11 +45,17 @@ export const DEFAULT_AGENTQA_ARTIFACTS_DIR = path.join(
   "maintenance",
 );
 
-export type AgentQaRunLabel = "PASS" | "BLOCK" | "MANUAL REVIEW" | "INVALID";
+export type AgentQaRunLabel =
+  | "PASS"
+  | "BLOCK"
+  | "MANUAL REVIEW"
+  | "INVALID"
+  | "INVALID OBSERVATIONS";
 
 export interface AgentQaRunArgv {
   specPath: string;
   artifactsDir: string;
+  observationsPath?: string;
 }
 
 export interface AgentQaRunSuccess {
@@ -65,6 +80,9 @@ export interface AgentQaRunSuccess {
     import("./maintenance-result").MaintenanceRunResult["agentQa"]
   >["checkCounts"];
   remediation: string[];
+  observationsUsed: boolean;
+  observationPath?: string;
+  observationId?: string;
   artifactPaths: {
     maintenance: string;
     agentQuality: string;
@@ -83,11 +101,27 @@ export interface AgentQaRunInvalid {
   errors: Array<{ code: string; path: string; message: string; remediation: string }>;
 }
 
-export type AgentQaRunResult = AgentQaRunSuccess | AgentQaRunInvalid;
+export interface AgentQaRunInvalidObservations {
+  ok: false;
+  label: "INVALID OBSERVATIONS";
+  exitCode: 1;
+  specPath: string;
+  observationsPath: string;
+  message: string;
+  errors: AgentQaObservationValidationIssue[];
+  warnings: AgentQaObservationValidationIssue[];
+  remediation: string[];
+}
+
+export type AgentQaRunResult =
+  | AgentQaRunSuccess
+  | AgentQaRunInvalid
+  | AgentQaRunInvalidObservations;
 
 export function parseAgentQaRunArgv(argv: string[]): AgentQaRunArgv {
   let specPath = DEFAULT_AGENTQA_SPEC_PATH;
   let artifactsDir = DEFAULT_AGENTQA_ARTIFACTS_DIR;
+  let observationsPath: string | undefined;
 
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
@@ -99,12 +133,16 @@ export function parseAgentQaRunArgv(argv: string[]): AgentQaRunArgv {
       artifactsDir = argv[++i]!;
       continue;
     }
+    if (arg === "--observations" && argv[i + 1]) {
+      observationsPath = argv[++i]!;
+      continue;
+    }
     if (!arg.startsWith("-")) {
       specPath = arg;
     }
   }
 
-  return { specPath, artifactsDir };
+  return { specPath, artifactsDir, observationsPath };
 }
 
 /** Build spec-conformant simulated observations for a customer self-serve run. */
@@ -279,10 +317,12 @@ export async function loadSpecForAgentQaRun(
 export async function runAgentQaFirewall(input: {
   specPath?: string;
   artifactsDir?: string;
+  observationsPath?: string;
   cwd?: string;
 }): Promise<AgentQaRunResult> {
   const cwd = input.cwd ?? process.cwd();
   const specPath = input.specPath ?? DEFAULT_AGENTQA_SPEC_PATH;
+  const observationsPath = input.observationsPath;
   const resolvedArtifacts = path.resolve(
     cwd,
     input.artifactsDir ?? DEFAULT_AGENTQA_ARTIFACTS_DIR,
@@ -291,14 +331,49 @@ export async function runAgentQaFirewall(input: {
   if (!loaded.ok) return loaded.result;
 
   const spec = loaded.spec;
+  let observationFile: AgentQaObservationFile | undefined;
+  let observationResolvedPath: string | undefined;
+  let observationMeta: ObservationArtifactMeta | undefined;
+  const observationsUsed = Boolean(observationsPath);
+
+  if (observationsPath) {
+    const obsLoaded = await loadObservationsForAgentQaRun(observationsPath, spec, cwd);
+    if (!obsLoaded.ok) {
+      return {
+        ok: false,
+        label: "INVALID OBSERVATIONS",
+        exitCode: 1,
+        specPath: loaded.resolvedPath,
+        observationsPath: obsLoaded.resolvedPath,
+        message: obsLoaded.message,
+        errors: obsLoaded.errors,
+        warnings: obsLoaded.warnings,
+        remediation: obsLoaded.remediation,
+      };
+    }
+    observationFile = obsLoaded.data;
+    observationResolvedPath = obsLoaded.resolvedPath;
+    observationMeta = {
+      observationId: observationFile.observationId,
+      observationSource: "agentqa:run:observations",
+      observationPath: observationResolvedPath,
+      observedAt: observationFile.observedAt,
+    };
+  }
+
   const runId = `maint-${randomUUID()}`;
   const now = new Date().toISOString();
-  const observations = buildSpecConformantObservations(spec);
+  const maintenanceObservations = observationFile
+    ? mapObservationsToMaintenanceInput(spec, observationFile)
+    : buildSpecConformantObservations(spec);
   const enforcementMode =
     (spec as { enforcementMode?: EnforcementMode }).enforcementMode ?? "enforce";
 
   let budget = defaultBudgetState();
   let ledgerWriteSucceeded = true;
+  const evidenceOverride = observationFile
+    ? mapObservationEvidenceMetadata(observationFile)
+    : undefined;
 
   const maintenancePath = path.join(resolvedArtifacts, "maintenance-result.json");
   const agentQualityPath = path.join(resolvedArtifacts, "agent-quality-result.json");
@@ -308,15 +383,23 @@ export async function runAgentQaFirewall(input: {
   await mkdir(resolvedArtifacts, { recursive: true });
   await writeProviderCallLedger(ledgerPath, []);
 
-  const routedCall = buildRoutedCall(runId, spec, budget);
+  const routedCall = observationFile
+    ? buildRoutedCallFromObservations(runId, spec, budget, observationFile) ??
+      buildRoutedCall(runId, spec, budget)
+    : buildRoutedCall(runId, spec, budget);
+
+  const artifactSource = observationsUsed
+    ? "agentqa:run:observations"
+    : "agentqa:run";
 
   const result = runMaintenanceCheck({
     runId,
     spec,
-    observations,
+    observations: maintenanceObservations,
     routedCall,
     enforcementMode,
     ledgerWriteSucceeded,
+    evidenceCompleteness: evidenceOverride,
     generatedAt: now,
   });
 
@@ -412,18 +495,20 @@ export async function runAgentQaFirewall(input: {
   const maintenanceArtifact = wrapMaintenanceResult(
     result,
     resolvedArtifacts,
-    "agentqa:run",
+    artifactSource,
+    observationMeta,
   );
   const agentQualityPayload = buildAgentQualityArtifact({
     result,
     artifactsDir: resolvedArtifacts,
-    source: "agentqa:run",
+    source: artifactSource,
+    observation: observationMeta,
   });
   const budgetArtifact = buildBudgetStateArtifact(budget, {
     runId,
     specId: spec.specId,
     generatedAt: now,
-    source: "agentqa:run",
+    source: artifactSource,
   });
 
   await writeFile(maintenancePath, JSON.stringify(maintenanceArtifact, null, 2), "utf-8");
@@ -448,6 +533,9 @@ export async function runAgentQaFirewall(input: {
     evidenceCompleteness: agentQa.evidenceCompleteness,
     checkCounts: agentQa.checkCounts,
     remediation: agentQa.remediation,
+    observationsUsed,
+    observationPath: observationResolvedPath,
+    observationId: observationFile?.observationId,
     artifactPaths: {
       maintenance: maintenancePath,
       agentQuality: agentQualityPath,
@@ -457,16 +545,25 @@ export async function runAgentQaFirewall(input: {
   };
 }
 
-export function formatAgentQaRunReport(result: AgentQaRunResult, specPath?: string): string {
+export function formatAgentQaRunReport(
+  result: AgentQaRunResult,
+  opts?: { specPath?: string; observationsPath?: string },
+): string {
   if (!result.ok) {
+    const invalidObs = result.label === "INVALID OBSERVATIONS";
     const lines = [
-      "AGENT QA FIREWALL RUN: INVALID",
+      invalidObs
+        ? "AGENT QA FIREWALL RUN: INVALID OBSERVATIONS"
+        : "AGENT QA FIREWALL RUN: INVALID",
       "",
       `spec: ${result.specPath}`,
-      `reason: ${result.reason}`,
-      result.message,
-      "",
     ];
+    if (invalidObs) {
+      lines.push(`observations: ${result.observationsPath}`);
+    } else {
+      lines.push(`reason: ${result.reason}`);
+    }
+    lines.push(result.message, "");
     if (result.errors.length > 0) {
       lines.push("Errors:");
       for (const err of result.errors) {
@@ -474,10 +571,26 @@ export function formatAgentQaRunReport(result: AgentQaRunResult, specPath?: stri
         lines.push(`    remediation: ${err.remediation}`);
       }
     }
+    if (invalidObs && result.warnings.length > 0) {
+      lines.push("Warnings:");
+      for (const warn of result.warnings) {
+        lines.push(`  [${warn.code}] ${warn.path}: ${warn.message}`);
+      }
+    }
+    if ("remediation" in result && result.remediation.length > 0) {
+      lines.push("", "Remediation:");
+      for (const r of result.remediation) {
+        lines.push(`  - ${r}`);
+      }
+    }
     lines.push("");
     lines.push("Next commands:");
     lines.push("  npm run validate:spec");
-    lines.push("  Fix the spec, then npm run agentqa:run");
+    lines.push(
+      invalidObs
+        ? "  Fix the observation file, then npm run agentqa:run"
+        : "  Fix the spec, then npm run agentqa:run",
+    );
     return lines.join("\n");
   }
 
@@ -515,8 +628,20 @@ export function formatAgentQaRunReport(result: AgentQaRunResult, specPath?: stri
     }
   }
 
-  if (specPath) {
-    lines.push("", `spec: ${specPath}`);
+  lines.push(
+    "",
+    `observationsUsed: ${result.observationsUsed}`,
+  );
+  if (result.observationsUsed && result.observationPath) {
+    lines.push(`observations: ${result.observationPath}`);
+    if (result.observationId) {
+      lines.push(`observationId: ${result.observationId}`);
+    }
+  } else if (opts?.observationsPath) {
+    lines.push(`observations: ${opts.observationsPath}`);
+  }
+  if (opts?.specPath) {
+    lines.push(`spec: ${opts.specPath}`);
   }
   lines.push("", "artifacts:");
   lines.push(`  ${result.artifactPaths.maintenance}`);

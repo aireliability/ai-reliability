@@ -39,11 +39,22 @@ export interface RelatedArtifacts {
   doctorResult?: string;
 }
 
+export interface ObservationArtifactMeta {
+  observationId?: string;
+  observationSource?: string;
+  observationPath?: string;
+  observedAt?: string;
+}
+
 export interface MaintenanceResultArtifact extends MaintenanceRunResult {
   artifactType: "maintenance_result";
   schemaVersion: number;
   source?: string;
   relatedArtifacts?: RelatedArtifacts;
+  observationId?: string;
+  observationSource?: string;
+  observationPath?: string;
+  observedAt?: string;
 }
 
 export interface AgentQualityResultArtifact extends ArtifactEnvelopeBase {
@@ -65,6 +76,10 @@ export interface AgentQualityResultArtifact extends ArtifactEnvelopeBase {
   maintenanceStatus: string;
   scenario?: string;
   relatedArtifacts?: RelatedArtifacts;
+  observationId?: string;
+  observationSource?: string;
+  observationPath?: string;
+  observedAt?: string;
 }
 
 export interface BudgetStateArtifact extends BudgetState, ArtifactEnvelopeBase {
@@ -488,12 +503,17 @@ export function wrapMaintenanceResult(
   result: MaintenanceRunResult,
   relatedDir: string,
   source?: string,
+  observation?: ObservationArtifactMeta,
 ): MaintenanceResultArtifact {
   return {
     ...result,
     artifactType: "maintenance_result",
     schemaVersion: ARTIFACT_SCHEMA_VERSION,
     source: source ?? "runMaintenanceCheck",
+    observationId: observation?.observationId,
+    observationSource: observation?.observationSource,
+    observationPath: observation?.observationPath,
+    observedAt: observation?.observedAt,
     relatedArtifacts: {
       agentQualityResult: artifactPath(relatedDir, "agentQuality"),
       budgetState: artifactPath(relatedDir, "budgetState"),
@@ -509,6 +529,7 @@ export function buildAgentQualityArtifact(input: {
   scenario?: string;
   artifactsDir: string;
   source?: string;
+  observation?: ObservationArtifactMeta;
 }): AgentQualityResultArtifact {
   const aq = input.result.agentQa;
   const generatedAt = input.result.generatedAt;
@@ -533,6 +554,10 @@ export function buildAgentQualityArtifact(input: {
     checkCounts: aq?.checkCounts,
     maintenanceStatus: input.result.status,
     scenario: input.scenario,
+    observationId: input.observation?.observationId,
+    observationSource: input.observation?.observationSource,
+    observationPath: input.observation?.observationPath,
+    observedAt: input.observation?.observedAt,
     relatedArtifacts: {
       maintenanceResult: artifactPath(input.artifactsDir, "maintenance"),
       gateResult: artifactPath(input.artifactsDir, "gate"),
