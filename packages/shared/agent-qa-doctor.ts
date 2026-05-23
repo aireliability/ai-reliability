@@ -651,7 +651,7 @@ export async function runDoctor(input: RunDoctorInput = {}): Promise<DoctorResul
           message: "Ledger file is empty (fresh setup).",
           path: path.relative(cwd, ledgerPath),
           remediation: [
-            "Run npm run demo:maintenance-gate to record a sample routed provider-call in the ledger.",
+            "Run npm run agentqa:run or npm run demo:routed-call-gate to record a sample routed provider-call in the ledger.",
           ],
         }),
       );
@@ -666,10 +666,48 @@ export async function runDoctor(input: RunDoctorInput = {}): Promise<DoctorResul
         message: "Ledger file not found.",
         path: path.relative(cwd, ledgerPath),
         remediation: [
-          "Run npm run demo:maintenance-gate to create provider-call-ledger.jsonl.",
+          "Run npm run agentqa:run or npm run demo:routed-call-gate to create provider-call-ledger.jsonl.",
         ],
       }),
     );
+  }
+
+  const routedCallResultPath = path.join(artifactsDir, "routed-call-result.json");
+  if (await fileExists(routedCallResultPath)) {
+    try {
+      const routed = JSON.parse(
+        await readFile(routedCallResultPath, "utf-8"),
+      ) as {
+        artifactType?: string;
+        executed?: boolean;
+        allowed?: boolean;
+        reasonCode?: string;
+      };
+      if (routed.artifactType === "routed_call_result") {
+        checks.push(
+          check({
+            id: "routed-call:artifact",
+            category: "ledger",
+            status: "pass",
+            title: "routed-call-result.json",
+            message: `Routed call artifact present (allowed=${String(routed.allowed)}, executed=${String(routed.executed)}, reason=${String(routed.reasonCode ?? "n/a")}).`,
+            path: path.relative(cwd, routedCallResultPath),
+          }),
+        );
+      }
+    } catch {
+      checks.push(
+        check({
+          id: "routed-call:parse",
+          category: "ledger",
+          status: "warning",
+          title: "routed-call-result.json",
+          message: "Could not parse routed-call-result.json.",
+          path: path.relative(cwd, routedCallResultPath),
+          remediation: ["Re-run npm run demo:routed-call-gate to regenerate the artifact."],
+        }),
+      );
+    }
   }
 
   if (artifactsExist) {

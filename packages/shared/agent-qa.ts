@@ -128,6 +128,15 @@ export function budgetReasonToRemediation(reasonCode: string): string[] {
       return ["Route calls through an allowed provider or update allowedProviders in the spec."];
     case "model_not_allowed":
       return ["Use an allowed model or update allowedModels in the spec."];
+    case "unknown_provider":
+      return ["Provide a valid provider for calls routed through the AI Reliability gate."];
+    case "unknown_model":
+      return ["Provide a valid model for calls routed through the AI Reliability gate."];
+    case "invalid_token_values":
+    case "invalid_cost_estimate":
+      return ["Fix estimated token or cost values before routing the provider call."];
+    case "ledger_write_failed":
+      return [REMEDIATION_LEDGER_WRITE];
     case "subscription_inactive":
       return ["Activate subscription before routing provider calls through the gate."];
     case "ledger_write_failed":

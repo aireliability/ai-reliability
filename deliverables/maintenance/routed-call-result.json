@@ -1,0 +1,24 @@
+{
+  "artifactType": "routed_call_result",
+  "schemaVersion": 1,
+  "generatedAt": "2026-05-22T19:30:14.002Z",
+  "runId": "routed-dbc51413-22aa-49aa-a868-92de8742d72a",
+  "source": "demo:routed-call-gate",
+  "workflowName": "llm_router_agent",
+  "environment": "production",
+  "specId": "agent-budget-gate-v1",
+  "provider": "openai",
+  "model": "gpt-4.1-mini",
+  "gateDecision": "pass",
+  "enforcementOutcome": "passed",
+  "allowed": true,
+  "executed": true,
+  "reasonCode": "routed_call_allowed",
+  "remediation": [],
+  "estimatedCostUsd": 0.15,
+  "actualCostUsd": 0.15,
+  "relatedArtifacts": {
+    "providerCallLedger": "deliverables\\maintenance\\provider-call-ledger.jsonl",
+    "budgetState": "deliverables\\maintenance\\budget-state.json"
+  }
+}
