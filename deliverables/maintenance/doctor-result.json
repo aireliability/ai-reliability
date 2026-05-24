@@ -29,6 +29,15 @@
       "remediation": []
     },
     {
+      "id": "environment:script:agentqa:run",
+      "category": "environment",
+      "status": "pass",
+      "title": "npm script agentqa:run",
+      "message": "package.json defines \"agentqa:run\".",
+      "path": "package.json",
+      "remediation": []
+    },
+    {
       "id": "environment:script:gate:release",
       "category": "environment",
       "status": "pass",
@@ -580,6 +589,15 @@
       "remediation": []
     },
     {
+      "id": "routed-call:artifact",
+      "category": "ledger",
+      "status": "pass",
+      "title": "routed-call-result.json",
+      "message": "Routed call artifact present (allowed=true, executed=true, reason=routed_call_allowed).",
+      "path": "deliverables\\maintenance\\routed-call-result.json",
+      "remediation": []
+    },
+    {
       "id": "evidence:gate-decision",
       "category": "evidence",
       "status": "pass",
@@ -656,27 +674,27 @@
       "category": "artifacts",
       "status": "pass",
       "title": "Run summary",
-      "message": "runId=maint-38728029-3609-4529-9676-cbcde74d09ad specId=pricing-plans-v1 env=pre_production workflow=sales_copilot",
+      "message": "runId=maint-2c86a346-50e8-4b79-b0cb-b0551e4af8ce specId=support-agent-qa-v1 env=production workflow=support_assistant",
       "path": "deliverables\\maintenance\\maintenance-result.json",
       "remediation": []
     }
   ],
-  "summary": "71 checks passed, 0 warnings, 0 blocking issues",
+  "summary": "73 checks passed, 0 warnings, 0 blocking issues",
   "nextActions": [
     "Run npm run validate:spec before changes to eval specs.",
-    "Run npm run demo:maintenance-gate after spec or observation updates.",
+    "Run npm run agentqa:run after spec or observation updates.",
     "Run npm run gate:release in CI/CD before deploy."
   ],
-  "evaluatedAt": "2026-05-20T08:44:07.552Z",
+  "evaluatedAt": "2026-05-24T09:19:42.820Z",
   "artifactType": "doctor_result",
   "schemaVersion": 1,
-  "generatedAt": "2026-05-20T08:44:07.552Z",
+  "generatedAt": "2026-05-24T09:19:42.820Z",
   "source": "agent-qa-doctor",
   "runSummary": {
-    "runId": "maint-38728029-3609-4529-9676-cbcde74d09ad",
-    "specId": "pricing-plans-v1",
-    "environment": "pre_production",
-    "workflowName": "sales_copilot",
+    "runId": "maint-2c86a346-50e8-4b79-b0cb-b0551e4af8ce",
+    "specId": "support-agent-qa-v1",
+    "environment": "production",
+    "workflowName": "support_assistant",
     "gateDecision": "pass"
   }
 }

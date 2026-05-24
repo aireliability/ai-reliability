@@ -1,19 +1,21 @@
 {
   "artifactType": "agent_quality_result",
   "schemaVersion": 1,
-  "generatedAt": "2026-05-20T08:44:05.343Z",
-  "runId": "maint-38728029-3609-4529-9676-cbcde74d09ad",
-  "source": "runMaintenanceCheck",
-  "specId": "pricing-plans-v1",
+  "generatedAt": "2026-05-24T09:19:41.788Z",
+  "runId": "maint-2c86a346-50e8-4b79-b0cb-b0551e4af8ce",
+  "source": "agentqa:run:observations",
+  "specId": "support-agent-qa-v1",
   "specVersion": 1,
-  "workflowName": "sales_copilot",
-  "environment": "pre_production",
-  "enforcementMode": "enforce",
+  "workflowName": "support_assistant",
+  "environment": "production",
+  "enforcementMode": "observe",
   "gateDecision": "pass",
   "requiresHumanReview": false,
   "decisionReason": "all_checks_passed",
-  "confidence": "high",
-  "remediation": [],
+  "confidence": "low",
+  "remediation": [
+    "Review agent output against spec-defined expectedBehavior."
+  ],
   "evidenceCompleteness": {
     "outputCaptured": true,
     "toolTraceCaptured": true,
@@ -22,21 +24,21 @@
     "pricingConfigLoaded": true,
     "ledgerWriteSucceeded": true
   },
-  "wouldBlockCount": 0,
+  "wouldBlockCount": 2,
   "checkCounts": {
     "answer": {
-      "total": 3,
+      "total": 7,
       "passed": 3,
-      "failed": 0
+      "failed": 4
     },
     "tool_call": {
-      "total": 3,
-      "passed": 3,
+      "total": 5,
+      "passed": 5,
       "failed": 0
     },
     "action": {
-      "total": 3,
-      "passed": 3,
+      "total": 8,
+      "passed": 8,
       "failed": 0
     },
     "budget": {
@@ -45,12 +47,15 @@
       "failed": 0
     }
   },
-  "maintenanceStatus": "healthy",
-  "scenario": "healthy",
+  "maintenanceStatus": "at_risk",
+  "observationId": "obs-support-pass-001",
+  "observationSource": "agentqa:run:observations",
+  "observationPath": "C:\\ai-reliability-clean\\ai-reliability\\examples\\observations\\support-agent-qa.pass.json",
+  "observedAt": "2026-05-20T12:00:00.000Z",
   "relatedArtifacts": {
-    "maintenanceResult": "deliverables\\maintenance\\maintenance-result.json",
-    "gateResult": "deliverables\\maintenance\\gate-result.json",
-    "budgetState": "deliverables\\maintenance\\budget-state.json",
-    "providerCallLedger": "deliverables\\maintenance\\provider-call-ledger.jsonl"
+    "maintenanceResult": "C:\\ai-reliability-clean\\ai-reliability\\deliverables\\maintenance\\maintenance-result.json",
+    "gateResult": "C:\\ai-reliability-clean\\ai-reliability\\deliverables\\maintenance\\gate-result.json",
+    "budgetState": "C:\\ai-reliability-clean\\ai-reliability\\deliverables\\maintenance\\budget-state.json",
+    "providerCallLedger": "C:\\ai-reliability-clean\\ai-reliability\\deliverables\\maintenance\\provider-call-ledger.jsonl"
   }
 }

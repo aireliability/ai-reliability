@@ -1,13 +1,13 @@
 {
   "planId": "starter",
   "creditsRemaining": 499,
-  "budgetRemainingUsd": 399.8,
+  "budgetRemainingUsd": 399.88,
   "creditsUsed": 1,
-  "budgetUsedUsd": 0.2,
+  "budgetUsedUsd": 0.12,
   "artifactType": "budget_state",
   "schemaVersion": 1,
-  "generatedAt": "2026-05-20T08:44:05.343Z",
-  "runId": "maint-38728029-3609-4529-9676-cbcde74d09ad",
-  "specId": "pricing-plans-v1",
-  "source": "demo-maintenance-gate"
+  "generatedAt": "2026-05-24T09:19:41.788Z",
+  "runId": "maint-2c86a346-50e8-4b79-b0cb-b0551e4af8ce",
+  "specId": "support-agent-qa-v1",
+  "source": "agentqa:run:observations"
 }

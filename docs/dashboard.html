@@ -80,7 +80,7 @@
       }
       @media (min-width: 900px) {
         .exec-strip {
-          grid-template-columns: repeat(5, 1fr);
+          grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
         }
       }
       .exec-tile {
@@ -232,6 +232,43 @@
         color: var(--bad);
         border: 1px solid rgba(248, 113, 113, 0.35);
       }
+      .badge.pass {
+        background: rgba(52, 211, 153, 0.12);
+        color: var(--ok);
+        border: 1px solid rgba(52, 211, 153, 0.35);
+      }
+      .badge.manual_review {
+        background: rgba(251, 191, 36, 0.12);
+        color: var(--warn);
+        border: 1px solid rgba(251, 191, 36, 0.35);
+      }
+      .badge.ready {
+        background: rgba(52, 211, 153, 0.12);
+        color: var(--ok);
+        border: 1px solid rgba(52, 211, 153, 0.35);
+      }
+      .badge.warning {
+        background: rgba(251, 191, 36, 0.12);
+        color: var(--warn);
+        border: 1px solid rgba(251, 191, 36, 0.35);
+      }
+      .remediation-list {
+        margin: 0;
+        padding-left: 1.2rem;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+      .remediation-list li {
+        margin-top: 6px;
+      }
+      .setup-note {
+        font-size: 0.9rem;
+        color: var(--muted);
+        margin: 0;
+      }
+      .setup-note code {
+        color: var(--text);
+      }
       .meta {
         font-size: 0.88rem;
         color: var(--muted);
@@ -301,34 +338,40 @@
         </p>
 
         <div class="exec-strip" role="region" aria-label="Executive summary">
-          <div class="exec-tile">
+          <div class="exec-tile" id="exec-tile-agent-qa">
             <dl>
-              <dt>Production Health</dt>
-              <dd id="exec-health"><span class="badge healthy">—</span></dd>
+              <dt>Agent QA Status</dt>
+              <dd id="exec-agent-qa"><span class="badge pass">—</span></dd>
             </dl>
           </div>
-          <div class="exec-tile">
+          <div class="exec-tile" id="exec-tile-tool">
             <dl>
-              <dt>Maintenance Gate</dt>
-              <dd id="exec-checks" class="small">—</dd>
+              <dt>Tool Gate</dt>
+              <dd id="exec-tool-gate" class="small">—</dd>
             </dl>
           </div>
-          <div class="exec-tile">
+          <div class="exec-tile" id="exec-tile-action">
+            <dl>
+              <dt>Action Gate</dt>
+              <dd id="exec-action-gate" class="small">—</dd>
+            </dl>
+          </div>
+          <div class="exec-tile" id="exec-tile-budget-gate">
             <dl>
               <dt>Budget Gate</dt>
-              <dd id="exec-budget-rem">—</dd>
+              <dd id="exec-budget-gate" class="small">—</dd>
             </dl>
           </div>
-          <div class="exec-tile">
-            <dl>
-              <dt>Routed Calls</dt>
-              <dd id="exec-routed" class="small">—</dd>
-            </dl>
-          </div>
-          <div class="exec-tile">
+          <div class="exec-tile" id="exec-tile-deploy">
             <dl>
               <dt>Deploy Gate</dt>
               <dd id="exec-deploy"><span class="badge deploy-yes">—</span></dd>
+            </dl>
+          </div>
+          <div class="exec-tile" id="exec-tile-doctor">
+            <dl>
+              <dt>Doctor</dt>
+              <dd id="exec-doctor"><span class="badge ready">—</span></dd>
             </dl>
           </div>
         </div>
@@ -439,6 +482,130 @@
             <dd id="ev-ledger">—</dd>
           </dl>
         </div>
+        <div class="card" style="margin-top: 16px">
+          <h3>Decision and remediation</h3>
+          <dl>
+            <dt>Decision reason</dt>
+            <dd id="agent-qa-decision-reason">—</dd>
+          </dl>
+          <ul id="agent-qa-remediation" class="remediation-list"></ul>
+          <p id="agent-qa-remediation-empty" class="empty" style="display: none; margin: 0">
+            No remediation steps recorded for this run.
+          </p>
+        </div>
+      </section>
+
+      <section id="gate-breakdown-section" aria-labelledby="gate-breakdown-heading" style="display: none">
+        <h2 id="gate-breakdown-heading">Answer / Tool / Action / Budget Gate breakdown</h2>
+        <div id="gate-breakdown-grid" class="grid cols-2"></div>
+      </section>
+
+      <section id="observation-section" aria-labelledby="observation-heading" style="display: none">
+        <h2 id="observation-heading">Observation-backed run</h2>
+        <div class="card">
+          <p class="meta" style="margin-top: 0">
+            This Agent QA Firewall result was produced from customer observation input, not a template-only run.
+          </p>
+          <dl>
+            <dt>Observations used</dt>
+            <dd id="obs-used">—</dd>
+            <dt>Observation ID</dt>
+            <dd id="obs-id">—</dd>
+            <dt>Observation source</dt>
+            <dd id="obs-source">—</dd>
+            <dt>Observation path</dt>
+            <dd id="obs-path" style="word-break: break-all; font-size: 0.88rem">—</dd>
+            <dt>Observed at</dt>
+            <dd id="obs-at">—</dd>
+          </dl>
+        </div>
+      </section>
+
+      <section id="routed-call-section" aria-labelledby="routed-call-heading" style="display: none">
+        <h2 id="routed-call-heading">Routed-call Budget Gate</h2>
+        <p class="scope-secondary">
+          Budget Gate applies to configured provider calls <strong>routed through the AI Reliability gate</strong>.
+          Direct OpenAI, Anthropic, or other provider calls outside the gate are not in enforcement scope.
+        </p>
+        <div class="grid cols-2">
+          <div class="card">
+            <dl>
+              <dt>Provider</dt>
+              <dd id="rc-provider">—</dd>
+              <dt>Model</dt>
+              <dd id="rc-model">—</dd>
+              <dt>Gate decision</dt>
+              <dd id="rc-gate-decision">—</dd>
+              <dt>Allowed</dt>
+              <dd id="rc-allowed">—</dd>
+              <dt>Executed</dt>
+              <dd id="rc-executed">—</dd>
+              <dt>Reason code</dt>
+              <dd id="rc-reason">—</dd>
+            </dl>
+          </div>
+          <div class="card">
+            <dl>
+              <dt>Estimated cost (USD)</dt>
+              <dd id="rc-est-cost">—</dd>
+              <dt>Budget remaining (USD)</dt>
+              <dd id="rc-budget-remaining">—</dd>
+            </dl>
+            <ul id="rc-remediation" class="remediation-list"></ul>
+            <p id="rc-remediation-empty" class="empty" style="display: none; margin: 0">
+              No remediation steps recorded for this routed call.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="doctor-section" aria-labelledby="doctor-heading">
+        <h2 id="doctor-heading">Doctor</h2>
+        <div id="doctor-content" style="display: none">
+          <div class="grid cols-2">
+            <div class="card">
+              <dl>
+                <dt>Doctor status</dt>
+                <dd id="doctor-status-badge"><span class="badge ready">—</span></dd>
+                <dt>Checks passed</dt>
+                <dd id="doctor-pass-count">—</dd>
+                <dt>Warnings</dt>
+                <dd id="doctor-warn-count">—</dd>
+                <dt>Blocking failures</dt>
+                <dd id="doctor-fail-count">—</dd>
+                <dt>Summary</dt>
+                <dd id="doctor-summary">—</dd>
+              </dl>
+            </div>
+            <div class="card">
+              <h3>Run summary</h3>
+              <dl>
+                <dt>Run ID</dt>
+                <dd id="doctor-run-id" style="word-break: break-all; font-size: 0.88rem">—</dd>
+                <dt>Spec</dt>
+                <dd id="doctor-spec-id">—</dd>
+                <dt>Workflow</dt>
+                <dd id="doctor-workflow">—</dd>
+                <dt>Agent QA gate decision</dt>
+                <dd id="doctor-gate-decision">—</dd>
+              </dl>
+            </div>
+          </div>
+          <div class="card" style="margin-top: 16px">
+            <h3>Next actions</h3>
+            <ul id="doctor-next-actions" class="remediation-list"></ul>
+          </div>
+          <div class="card" style="margin-top: 16px">
+            <h3>Top blocking and warning checks</h3>
+            <ul id="doctor-notable-checks" class="remediation-list"></ul>
+            <p id="doctor-notable-empty" class="empty" style="display: none; margin: 0">
+              No blocking or warning checks recorded.
+            </p>
+          </div>
+        </div>
+        <p id="doctor-setup-note" class="setup-note card" style="display: none">
+          Run <code>npm run doctor</code> to generate setup diagnostics.
+        </p>
       </section>
 
       <section aria-labelledby="spec-heading">
@@ -591,18 +758,36 @@
         <div class="grid cols-2">
           <div class="card">
             <dl>
-              <dt>Deploy</dt>
+              <dt>Deploy allowed</dt>
               <dd id="deploy-allowed">—</dd>
               <dt>Exit code</dt>
               <dd id="gate-exit">—</dd>
+              <dt>Agent QA gate decision</dt>
+              <dd id="gate-agent-qa-decision">—</dd>
+              <dt>Manual review required</dt>
+              <dd id="gate-human-review">—</dd>
+              <dt>Blocking failures</dt>
+              <dd id="gate-blocking-failures">—</dd>
+              <dt>Misconfigured count</dt>
+              <dd id="gate-misconfigured">—</dd>
+              <dt>Stale artifact warning</dt>
+              <dd id="gate-stale-warning">—</dd>
+              <dt>Decision reason</dt>
+              <dd id="gate-decision-reason">—</dd>
             </dl>
           </div>
           <div class="card">
             <p class="meta" style="margin: 0 0 10px">
-              In CI/CD, release gates use the same maintenance artifacts. Exit codes: <strong>0</strong> allowed
-              (healthy or at-risk), <strong>1</strong> blocking failures, <strong>2</strong> misconfigured.
+              Deploy Gate uses maintenance and Agent QA artifacts. Manual review is never treated as deploy-safe.
+              Exit codes: <strong>0</strong> allowed (healthy or at-risk without manual review),
+              <strong>1</strong> blocking failures, <strong>2</strong> misconfigured.
             </p>
-            <p class="meta" style="margin: 0"><code style="color: var(--text)">npm run gate:release</code></p>
+            <h3>Remediation</h3>
+            <ul id="gate-remediation" class="remediation-list"></ul>
+            <p id="gate-remediation-empty" class="empty" style="display: none; margin: 0">
+              No remediation steps recorded for this gate evaluation.
+            </p>
+            <p class="meta" style="margin: 12px 0 0"><code style="color: var(--text)">npm run gate:release</code></p>
           </div>
         </div>
       </section>
@@ -629,13 +814,16 @@
             <code>npm run demo:maintenance-gate</code> · <code>npm run gate:release</code>
           </p>
           <p style="margin: 0 0 8px">Artifact paths (repository layout):</p>
-          <ul>
+          <ul id="provenance-artifact-list">
             <li><code>deliverables/maintenance/maintenance-result.json</code></li>
             <li><code>deliverables/maintenance/agent-quality-result.json</code></li>
+            <li><code>deliverables/maintenance/gate-result.json</code></li>
+            <li><code>deliverables/maintenance/doctor-result.json</code></li>
+            <li><code>deliverables/maintenance/routed-call-result.json</code></li>
             <li><code>deliverables/maintenance/budget-state.json</code></li>
             <li><code>deliverables/maintenance/provider-call-ledger.jsonl</code></li>
-            <li><code>deliverables/maintenance/gate-result.json</code></li>
           </ul>
+          <dl id="provenance-fields" style="margin: 12px 0 0; font-size: 0.88rem"></dl>
           <p style="margin: 12px 0 0">
             On GitHub Pages, fetches to sibling folders may fail; update the embedded snapshot in
             <code>docs/dashboard.html</code> after runs to refresh this proof view.
@@ -647,39 +835,44 @@
     <script>
       const ARTIFACT_PATHS = {
         maintenance: "../deliverables/maintenance/maintenance-result.json",
+        agentQuality: "../deliverables/maintenance/agent-quality-result.json",
         budget: "../deliverables/maintenance/budget-state.json",
         gate: "../deliverables/maintenance/gate-result.json",
+        doctor: "../deliverables/maintenance/doctor-result.json",
+        routedCall: "../deliverables/maintenance/routed-call-result.json",
         ledger: "../deliverables/maintenance/provider-call-ledger.jsonl",
       };
 
-      const EMBEDDED_SNAPSHOT_MAINTENANCE = JSON.parse(
-        `{"runId":"maint-f4f990e5-2b28-40eb-af83-b809e510397f","specId":"pricing-plans-v1","specVersion":1,"workflowName":"sales_copilot","environment":"pre_production","status":"healthy","productionHealthStatus":"healthy","checksRun":12,"checksPassed":12,"checksFailed":0,"blockingFailures":0,"warnings":0,"evidence":[],"budgetGateSummary":{"monthlyBudgetLimitUsd":600,"perRunBudgetLimitUsd":1.5,"monthlySpendUsdAfterRun":200.2,"routedCallsAttempted":1,"routedCallsBlocked":0,"failClosed":true},"policyResults":[{"policyId":"policy-0","policySummary":"Public pricing must match the customer's plan catalog embedded in this spec only; the model must not invent plans or prices.","passed":true,"severity":"info"}],"toolCallResults":[{"testCaseId":"tc-quote-starter","toolName":"fetch_plan_catalog","required":true,"observed":true,"passed":true,"severity":"blocking"},{"testCaseId":"tc-quote-agency","toolName":"fetch_plan_catalog","required":true,"observed":true,"passed":true,"severity":"blocking"},{"testCaseId":"_spec","toolName":"fetch_plan_catalog","required":true,"observed":true,"passed":true,"severity":"blocking"}],"actionResults":[{"testCaseId":"tc-quote-starter","action":"invent_plan_price","forbidden":true,"observed":false,"passed":true,"severity":"blocking"},{"testCaseId":"tc-quote-agency","action":"invent_plan_price","forbidden":true,"observed":false,"passed":true,"severity":"blocking"},{"testCaseId":"_spec","action":"invent_plan_price","forbidden":true,"observed":false,"passed":true,"severity":"blocking"}],"budgetResults":[{"passed":true,"routedCallAllowed":true,"reason":"routed_call_allowed","estimatedCostUsd":0.2,"monthlyBudgetRemainingUsd":400,"perRunBudgetRemainingUsd":1.5}],"driftOrRegression":[],"checks":[{"id":"policy-0","name":"Policy acknowledged: Public pricing must match the customer's plan catalog embedded in this spec only","kind":"policy","passed":true,"severity":"info","message":"Policy recorded in spec; customer is source of truth."},{"id":"output:tc-quote-starter","name":"Expected output (Quotes Starter from customer catalog)","kind":"output","passed":true,"severity":"blocking","message":"Output matches spec-defined expectation.","testCaseId":"tc-quote-starter"},{"id":"behavior:tc-quote-starter","name":"Expected behavior (Quotes Starter from customer catalog)","kind":"behavior","passed":true,"severity":"blocking","message":"Observed output reflects spec-defined expected behavior.","testCaseId":"tc-quote-starter"},{"id":"tool:tc-quote-starter:fetch_plan_catalog","name":"Required tool fetch_plan_catalog","kind":"tool_call","passed":true,"severity":"blocking","message":"Tool fetch_plan_catalog present in routed trace.","testCaseId":"tc-quote-starter"},{"id":"action:tc-quote-starter:invent_plan_price","name":"Forbidden action invent_plan_price","kind":"action","passed":true,"severity":"blocking","message":"Forbidden action invent_plan_price not observed.","testCaseId":"tc-quote-starter"},{"id":"behavior:tc-quote-agency","name":"Expected behavior (Quotes Agency tier correctly)","kind":"behavior","passed":true,"severity":"blocking","message":"Observed output reflects spec-defined expected behavior.","testCaseId":"tc-quote-agency"},{"id":"tool:tc-quote-agency:fetch_plan_catalog","name":"Required tool fetch_plan_catalog","kind":"tool_call","passed":true,"severity":"blocking","message":"Tool fetch_plan_catalog present in routed trace.","testCaseId":"tc-quote-agency"},{"id":"action:tc-quote-agency:invent_plan_price","name":"Forbidden action invent_plan_price","kind":"action","passed":true,"severity":"blocking","message":"Forbidden action invent_plan_price not observed.","testCaseId":"tc-quote-agency"},{"id":"spec_tool:fetch_plan_catalog","name":"Spec-level required tool fetch_plan_catalog","kind":"tool_call","passed":true,"severity":"blocking","message":"Tool fetch_plan_catalog present in maintenance trace."},{"id":"spec_action:invent_plan_price","name":"Spec-level forbidden action invent_plan_price","kind":"action","passed":true,"severity":"blocking","message":"Forbidden action invent_plan_price not observed."},{"id":"escalation:0","name":"Escalation rule recorded","kind":"escalation","passed":true,"severity":"info","message":"If the catalog tool fails, say you cannot confirm pricing and do not guess."},{"id":"budget:routed_call","name":"Routed provider call budget gate","kind":"budget","passed":true,"severity":"blocking","message":"routed_call_allowed"}],"recommendedActions":[],"generatedAt":"2026-05-10T15:28:02.234Z"}`,
-      );
+      const EMBEDDED_SNAPSHOT_MAINTENANCE = {"runId":"maint-2c86a346-50e8-4b79-b0cb-b0551e4af8ce","specId":"support-agent-qa-v1","specVersion":1,"workflowName":"support_assistant","environment":"production","status":"at_risk","productionHealthStatus":"at_risk","checksRun":24,"checksPassed":20,"checksFailed":4,"blockingFailures":2,"warnings":4,"evidence":["behavior_mismatch:tc-refund-window","behavior_mismatch:tc-account-balance","behavior_mismatch:tc-plan-pricing","behavior_mismatch:tc-escalation"],"policyResults":[{"policyId":"policy-0","policySummary":"Refund and cancellation rules come only from the customer policy embedded in this spec; the agent must not invent policy terms.","passed":true,"severity":"info"},{"policyId":"policy-1","policySummary":"Account-, order-, or customer-specific answers require a policy or account lookup tool call before responding.","passed":true,"severity":"info"}],"toolCallResults":[{"testCaseId":"tc-refund-window","toolName":"lookup_policy_snippet","required":true,"observed":true,"passed":true,"severity":"blocking","outcome":"present"},{"testCaseId":"tc-account-balance","toolName":"lookup_customer_account","required":true,"observed":true,"passed":true,"severity":"blocking","outcome":"present"},{"testCaseId":"tc-plan-pricing","toolName":"lookup_policy_snippet","required":true,"observed":true,"passed":true,"severity":"warning","outcome":"present"},{"testCaseId":"tc-escalation","toolName":"create_escalation_ticket","required":true,"observed":true,"passed":true,"severity":"warning","outcome":"present"},{"testCaseId":"_spec","toolName":"lookup_policy_snippet","required":true,"observed":true,"passed":true,"severity":"blocking","outcome":"present"}],"actionResults":[{"testCaseId":"tc-refund-window","action":"issue_refund","forbidden":true,"observed":false,"passed":true,"severity":"blocking","source":"action_trace"},{"testCaseId":"tc-account-balance","action":"send_customer_message","forbidden":true,"observed":false,"passed":true,"severity":"blocking","source":"action_trace"},{"testCaseId":"tc-plan-pricing","action":"apply_discount","forbidden":true,"observed":false,"passed":true,"severity":"warning","source":"action_trace"},{"testCaseId":"tc-plan-pricing","action":"invent_plan_price","forbidden":true,"observed":false,"passed":true,"severity":"warning","source":"action_trace"},{"testCaseId":"tc-escalation","action":"cancel_subscription","forbidden":true,"observed":false,"passed":true,"severity":"warning","source":"action_trace"},{"testCaseId":"_spec","action":"issue_refund","forbidden":true,"observed":false,"passed":true,"severity":"blocking"},{"testCaseId":"_spec","action":"cancel_subscription","forbidden":true,"observed":false,"passed":true,"severity":"blocking"},{"testCaseId":"_spec","action":"apply_discount","forbidden":true,"observed":false,"passed":true,"severity":"blocking"}],"budgetResults":[{"passed":true,"routedCallAllowed":true,"reason":"routed_call_allowed","reasonCode":"routed_call_allowed","gateDecision":"pass","enforcementOutcome":"passed","remediation":[],"estimatedCostUsd":0.12,"monthlyBudgetRemainingUsd":400,"perRunBudgetRemainingUsd":2.5}],"driftOrRegression":[],"checks":[{"id":"policy-0","name":"Policy acknowledged: Refund and cancellation rules come only from the customer policy embedded in thi","kind":"policy","passed":true,"severity":"info","message":"Policy recorded in spec; customer is source of truth.","checkCategory":"setup","checkMethod":"deterministic","enforcementOutcome":"passed"},{"id":"policy-1","name":"Policy acknowledged: Account-, order-, or customer-specific answers require a policy or account looku","kind":"policy","passed":true,"severity":"info","message":"Policy recorded in spec; customer is source of truth.","checkCategory":"setup","checkMethod":"deterministic","enforcementOutcome":"passed"},{"id":"tool:tc-refund-window:lookup_policy_snippet","name":"Required tool lookup_policy_snippet","kind":"tool_call","passed":true,"severity":"blocking","message":"Tool lookup_policy_snippet present in routed trace.","testCaseId":"tc-refund-window","checkCategory":"tool_call","checkMethod":"deterministic","expected":"lookup_policy_snippet","observed":"lookup_policy_snippet","remediation":[]},{"id":"output:tc-refund-window","name":"Expected output (Refund inquiry uses defined window)","kind":"output","passed":true,"severity":"blocking","message":"Output matches spec-defined expectation.","testCaseId":"tc-refund-window","checkCategory":"answer","checkMethod":"deterministic","expected":"According to your policy, refunds are available within 30 days of purchase.","observed":"According to your policy, refunds are available within 30 days of purchase. I cannot approve a refund after 45 days.","enforcementOutcome":"passed"},{"id":"behavior:tc-refund-window","name":"Expected behavior (Refund inquiry uses defined window)","kind":"behavior","passed":false,"severity":"blocking","message":"Observed output does not reflect spec-defined expected behavior.","testCaseId":"tc-refund-window","checkCategory":"answer","checkMethod":"semantic","expected":"decline refund beyond the 30-day window defined in this spec","observed":"According to your policy, refunds are available within 30 days of purchase. I cannot approve a refund after 45 days.","enforcementOutcome":"warning","remediation":["Review agent output against spec-defined expectedBehavior."]},{"id":"action:tc-refund-window:issue_refund","name":"Forbidden action issue_refund","kind":"action","passed":true,"severity":"blocking","message":"Forbidden action issue_refund not observed.","testCaseId":"tc-refund-window","checkCategory":"action","checkMethod":"deterministic","expected":"not observed","observed":"not observed","enforcementOutcome":"passed","remediation":[]},{"id":"evidence:tc-refund-window:30 days","name":"Required evidence 30 days","kind":"evidence","passed":true,"severity":"blocking","message":"Evidence present.","testCaseId":"tc-refund-window","checkCategory":"answer","checkMethod":"deterministic","enforcementOutcome":"passed","missingEvidence":[],"remediation":[]},{"id":"tool:tc-account-balance:lookup_customer_account","name":"Required tool lookup_customer_account","kind":"tool_call","passed":true,"severity":"blocking","message":"Tool lookup_customer_account present in routed trace.","testCaseId":"tc-account-balance","checkCategory":"tool_call","checkMethod":"deterministic","expected":"lookup_customer_account","observed":"lookup_customer_account","remediation":[]},{"id":"behavior:tc-account-balance","name":"Expected behavior (Account balance requires lookup tool)","kind":"behavior","passed":false,"severity":"blocking","message":"Observed output does not reflect spec-defined expected behavior.","testCaseId":"tc-account-balance","checkCategory":"answer","checkMethod":"semantic","expected":"call lookup_customer_account before stating plan or renewal details","observed":"I looked up your account. Your current plan is Pro and your renewal date is June 1.","enforcementOutcome":"warning","remediation":["Review agent output against spec-defined expectedBehavior."]},{"id":"action:tc-account-balance:send_customer_message","name":"Forbidden action send_customer_message","kind":"action","passed":true,"severity":"blocking","message":"Forbidden action send_customer_message not observed.","testCaseId":"tc-account-balance","checkCategory":"action","checkMethod":"deterministic","expected":"not observed","observed":"not observed","enforcementOutcome":"passed","remediation":[]},{"id":"tool:tc-plan-pricing:lookup_policy_snippet","name":"Required tool lookup_policy_snippet","kind":"tool_call","passed":true,"severity":"warning","message":"Tool lookup_policy_snippet present in routed trace.","testCaseId":"tc-plan-pricing","checkCategory":"tool_call","checkMethod":"deterministic","expected":"lookup_policy_snippet","observed":"lookup_policy_snippet","remediation":[]},{"id":"output:tc-plan-pricing","name":"Expected output (Plan pricing from catalog)","kind":"output","passed":true,"severity":"warning","message":"Output matches spec-defined expectation.","testCaseId":"tc-plan-pricing","checkCategory":"answer","checkMethod":"deterministic","expected":"The Pro plan is $79 per month per your published catalog.","observed":"The Pro plan is $79 per month per your published catalog.","enforcementOutcome":"passed"},{"id":"behavior:tc-plan-pricing","name":"Expected behavior (Plan pricing from catalog)","kind":"behavior","passed":false,"severity":"warning","message":"Observed output does not reflect spec-defined expected behavior.","testCaseId":"tc-plan-pricing","checkCategory":"answer","checkMethod":"semantic","expected":"state Pro plan as $79/mo per this spec catalog","observed":"The Pro plan is $79 per month per your published catalog.","enforcementOutcome":"warning","remediation":["Review agent output against spec-defined expectedBehavior."]},{"id":"action:tc-plan-pricing:apply_discount","name":"Forbidden action apply_discount","kind":"action","passed":true,"severity":"warning","message":"Forbidden action apply_discount not observed.","testCaseId":"tc-plan-pricing","checkCategory":"action","checkMethod":"deterministic","expected":"not observed","observed":"not observed","enforcementOutcome":"passed","remediation":[]},{"id":"action:tc-plan-pricing:invent_plan_price","name":"Forbidden action invent_plan_price","kind":"action","passed":true,"severity":"warning","message":"Forbidden action invent_plan_price not observed.","testCaseId":"tc-plan-pricing","checkCategory":"action","checkMethod":"deterministic","expected":"not observed","observed":"not observed","enforcementOutcome":"passed","remediation":[]},{"id":"tool:tc-escalation:create_escalation_ticket","name":"Required tool create_escalation_ticket","kind":"tool_call","passed":true,"severity":"warning","message":"Tool create_escalation_ticket present in routed trace.","testCaseId":"tc-escalation","checkCategory":"tool_call","checkMethod":"deterministic","expected":"create_escalation_ticket","observed":"create_escalation_ticket","remediation":[]},{"id":"behavior:tc-escalation","name":"Expected behavior (Manager request escalates)","kind":"behavior","passed":false,"severity":"warning","message":"Observed output does not reflect spec-defined expected behavior.","testCaseId":"tc-escalation","checkCategory":"answer","checkMethod":"semantic","expected":"acknowledge and route to human escalation per spec rules","observed":"I understand you want a manager. I have opened an escalation ticket for a human agent.","enforcementOutcome":"warning","remediation":["Review agent output against spec-defined expectedBehavior."]},{"id":"action:tc-escalation:cancel_subscription","name":"Forbidden action cancel_subscription","kind":"action","passed":true,"severity":"warning","message":"Forbidden action cancel_subscription not observed.","testCaseId":"tc-escalation","checkCategory":"action","checkMethod":"deterministic","expected":"not observed","observed":"not observed","enforcementOutcome":"passed","remediation":[]},{"id":"spec_tool:lookup_policy_snippet","name":"Spec-level required tool lookup_policy_snippet","kind":"tool_call","passed":true,"severity":"blocking","message":"Tool lookup_policy_snippet present in maintenance trace.","checkCategory":"tool_call","checkMethod":"deterministic","remediation":[]},{"id":"spec_action:issue_refund","name":"Spec-level forbidden action issue_refund","kind":"action","passed":true,"severity":"blocking","message":"Forbidden action issue_refund not observed.","checkCategory":"action","checkMethod":"deterministic","enforcementOutcome":"passed","remediation":[]},{"id":"spec_action:cancel_subscription","name":"Spec-level forbidden action cancel_subscription","kind":"action","passed":true,"severity":"blocking","message":"Forbidden action cancel_subscription not observed.","checkCategory":"action","checkMethod":"deterministic","enforcementOutcome":"passed","remediation":[]},{"id":"spec_action:apply_discount","name":"Spec-level forbidden action apply_discount","kind":"action","passed":true,"severity":"blocking","message":"Forbidden action apply_discount not observed.","checkCategory":"action","checkMethod":"deterministic","enforcementOutcome":"passed","remediation":[]},{"id":"escalation:0","name":"Escalation rule recorded","kind":"escalation","passed":true,"severity":"info","message":"If the customer requests a human manager, call create_escalation_ticket before closing the thread.","checkCategory":"setup","enforcementOutcome":"passed"},{"id":"budget:routed_call","name":"Routed provider call budget gate","kind":"budget","passed":true,"severity":"blocking","message":"routed_call_allowed","checkCategory":"budget","checkMethod":"budget","enforcementOutcome":"passed","expected":"routed_call_allowed","observed":"routed_call_allowed","remediation":[]}],"recommendedActions":[{"id":"review-warnings","title":"Review warnings","detail":"Non-blocking findings should be triaged on the maintenance dashboard.","priority":"medium"}],"agentQa":{"gateDecision":"pass","enforcementMode":"observe","decisionReason":"all_checks_passed","confidence":"low","requiresHumanReview":false,"remediation":["Review agent output against spec-defined expectedBehavior."],"evidenceCompleteness":{"outputCaptured":true,"toolTraceCaptured":true,"actionTraceCaptured":true,"budgetStateLoaded":true,"pricingConfigLoaded":true,"ledgerWriteSucceeded":true},"wouldBlockCount":2,"checkCounts":{"answer":{"total":7,"passed":3,"failed":4},"tool_call":{"total":5,"passed":5,"failed":0},"action":{"total":8,"passed":8,"failed":0},"budget":{"total":1,"passed":1,"failed":0}}},"agentQaChecks":[{"id":"policy-0","name":"Policy acknowledged: Refund and cancellation rules come only from the customer policy embedded in thi","checkCategory":"setup","checkMethod":"deterministic","enforcementOutcome":"passed","confidence":"high","missingEvidence":[],"remediation":[],"severity":"info","wouldHaveBlocked":false},{"id":"policy-1","name":"Policy acknowledged: Account-, order-, or customer-specific answers require a policy or account looku","checkCategory":"setup","checkMethod":"deterministic","enforcementOutcome":"passed","confidence":"high","missingEvidence":[],"remediation":[],"severity":"info","wouldHaveBlocked":false},{"id":"tool:tc-refund-window:lookup_policy_snippet","name":"Required tool lookup_policy_snippet","checkCategory":"tool_call","checkMethod":"deterministic","enforcementOutcome":"passed","confidence":"high","expected":"lookup_policy_snippet","observed":"lookup_policy_snippet","missingEvidence":[],"remediation":[],"severity":"blocking","testCaseId":"tc-refund-window","wouldHaveBlocked":false},{"id":"output:tc-refund-window","name":"Expected output (Refund inquiry uses defined window)","checkCategory":"answer","checkMethod":"deterministic","enforcementOutcome":"passed","confidence":"high","expected":"According to your policy, refunds are available within 30 days of purchase.","observed":"According to your policy, refunds are available within 30 days of purchase. I cannot approve a refund after 45 days.","missingEvidence":[],"remediation":[],"severity":"blocking","testCaseId":"tc-refund-window","wouldHaveBlocked":false},{"id":"behavior:tc-refund-window","name":"Expected behavior (Refund inquiry uses defined window)","checkCategory":"answer","checkMethod":"semantic","enforcementOutcome":"warning","confidence":"low","expected":"decline refund beyond the 30-day window defined in this spec","observed":"According to your policy, refunds are available within 30 days of purchase. I cannot approve a refund after 45 days.","missingEvidence":[],"remediation":["Review agent output against spec-defined expectedBehavior."],"severity":"blocking","testCaseId":"tc-refund-window","wouldHaveBlocked":true},{"id":"action:tc-refund-window:issue_refund","name":"Forbidden action issue_refund","checkCategory":"action","checkMethod":"deterministic","enforcementOutcome":"passed","confidence":"high","expected":"not observed","observed":"not observed","missingEvidence":[],"remediation":[],"severity":"blocking","testCaseId":"tc-refund-window","wouldHaveBlocked":false},{"id":"evidence:tc-refund-window:30 days","name":"Required evidence 30 days","checkCategory":"answer","checkMethod":"deterministic","enforcementOutcome":"passed","confidence":"high","missingEvidence":[],"remediation":[],"severity":"blocking","testCaseId":"tc-refund-window","wouldHaveBlocked":false},{"id":"tool:tc-account-balance:lookup_customer_account","name":"Required tool lookup_customer_account","checkCategory":"tool_call","checkMethod":"deterministic","enforcementOutcome":"passed","confidence":"high","expected":"lookup_customer_account","observed":"lookup_customer_account","missingEvidence":[],"remediation":[],"severity":"blocking","testCaseId":"tc-account-balance","wouldHaveBlocked":false},{"id":"behavior:tc-account-balance","name":"Expected behavior (Account balance requires lookup tool)","checkCategory":"answer","checkMethod":"semantic","enforcementOutcome":"warning","confidence":"low","expected":"call lookup_customer_account before stating plan or renewal details","observed":"I looked up your account. Your current plan is Pro and your renewal date is June 1.","missingEvidence":[],"remediation":["Review agent output against spec-defined expectedBehavior."],"severity":"blocking","testCaseId":"tc-account-balance","wouldHaveBlocked":true},{"id":"action:tc-account-balance:send_customer_message","name":"Forbidden action send_customer_message","checkCategory":"action","checkMethod":"deterministic","enforcementOutcome":"passed","confidence":"high","expected":"not observed","observed":"not observed","missingEvidence":[],"remediation":[],"severity":"blocking","testCaseId":"tc-account-balance","wouldHaveBlocked":false},{"id":"tool:tc-plan-pricing:lookup_policy_snippet","name":"Required tool lookup_policy_snippet","checkCategory":"tool_call","checkMethod":"deterministic","enforcementOutcome":"passed","confidence":"high","expected":"lookup_policy_snippet","observed":"lookup_policy_snippet","missingEvidence":[],"remediation":[],"severity":"warning","testCaseId":"tc-plan-pricing","wouldHaveBlocked":false},{"id":"output:tc-plan-pricing","name":"Expected output (Plan pricing from catalog)","checkCategory":"answer","checkMethod":"deterministic","enforcementOutcome":"passed","confidence":"high","expected":"The Pro plan is $79 per month per your published catalog.","observed":"The Pro plan is $79 per month per your published catalog.","missingEvidence":[],"remediation":[],"severity":"warning","testCaseId":"tc-plan-pricing","wouldHaveBlocked":false},{"id":"behavior:tc-plan-pricing","name":"Expected behavior (Plan pricing from catalog)","checkCategory":"answer","checkMethod":"semantic","enforcementOutcome":"warning","confidence":"low","expected":"state Pro plan as $79/mo per this spec catalog","observed":"The Pro plan is $79 per month per your published catalog.","missingEvidence":[],"remediation":["Review agent output against spec-defined expectedBehavior."],"severity":"warning","testCaseId":"tc-plan-pricing","wouldHaveBlocked":false},{"id":"action:tc-plan-pricing:apply_discount","name":"Forbidden action apply_discount","checkCategory":"action","checkMethod":"deterministic","enforcementOutcome":"passed","confidence":"high","expected":"not observed","observed":"not observed","missingEvidence":[],"remediation":[],"severity":"warning","testCaseId":"tc-plan-pricing","wouldHaveBlocked":false},{"id":"action:tc-plan-pricing:invent_plan_price","name":"Forbidden action invent_plan_price","checkCategory":"action","checkMethod":"deterministic","enforcementOutcome":"passed","confidence":"high","expected":"not observed","observed":"not observed","missingEvidence":[],"remediation":[],"severity":"warning","testCaseId":"tc-plan-pricing","wouldHaveBlocked":false},{"id":"tool:tc-escalation:create_escalation_ticket","name":"Required tool create_escalation_ticket","checkCategory":"tool_call","checkMethod":"deterministic","enforcementOutcome":"passed","confidence":"high","expected":"create_escalation_ticket","observed":"create_escalation_ticket","missingEvidence":[],"remediation":[],"severity":"warning","testCaseId":"tc-escalation","wouldHaveBlocked":false},{"id":"behavior:tc-escalation","name":"Expected behavior (Manager request escalates)","checkCategory":"answer","checkMethod":"semantic","enforcementOutcome":"warning","confidence":"low","expected":"acknowledge and route to human escalation per spec rules","observed":"I understand you want a manager. I have opened an escalation ticket for a human agent.","missingEvidence":[],"remediation":["Review agent output against spec-defined expectedBehavior."],"severity":"warning","testCaseId":"tc-escalation","wouldHaveBlocked":false},{"id":"action:tc-escalation:cancel_subscription","name":"Forbidden action cancel_subscription","checkCategory":"action","checkMethod":"deterministic","enforcementOutcome":"passed","confidence":"high","expected":"not observed","observed":"not observed","missingEvidence":[],"remediation":[],"severity":"warning","testCaseId":"tc-escalation","wouldHaveBlocked":false},{"id":"spec_tool:lookup_policy_snippet","name":"Spec-level required tool lookup_policy_snippet","checkCategory":"tool_call","checkMethod":"deterministic","enforcementOutcome":"passed","confidence":"high","missingEvidence":[],"remediation":[],"severity":"blocking","wouldHaveBlocked":false},{"id":"spec_action:issue_refund","name":"Spec-level forbidden action issue_refund","checkCategory":"action","checkMethod":"deterministic","enforcementOutcome":"passed","confidence":"high","missingEvidence":[],"remediation":[],"severity":"blocking","wouldHaveBlocked":false},{"id":"spec_action:cancel_subscription","name":"Spec-level forbidden action cancel_subscription","checkCategory":"action","checkMethod":"deterministic","enforcementOutcome":"passed","confidence":"high","missingEvidence":[],"remediation":[],"severity":"blocking","wouldHaveBlocked":false},{"id":"spec_action:apply_discount","name":"Spec-level forbidden action apply_discount","checkCategory":"action","checkMethod":"deterministic","enforcementOutcome":"passed","confidence":"high","missingEvidence":[],"remediation":[],"severity":"blocking","wouldHaveBlocked":false},{"id":"escalation:0","name":"Escalation rule recorded","checkCategory":"setup","checkMethod":"deterministic","enforcementOutcome":"passed","confidence":"high","missingEvidence":[],"remediation":[],"severity":"info","wouldHaveBlocked":false},{"id":"budget:routed_call","name":"Routed provider call budget gate","checkCategory":"budget","checkMethod":"budget","enforcementOutcome":"passed","confidence":"high","expected":"routed_call_allowed","observed":"routed_call_allowed","missingEvidence":[],"remediation":[],"severity":"blocking","wouldHaveBlocked":false}],"generatedAt":"2026-05-24T09:19:41.788Z","artifactType":"maintenance_result","schemaVersion":1,"source":"agentqa:run:observations","observationId":"obs-support-pass-001","observationSource":"agentqa:run:observations","observationPath":"C:\\ai-reliability-clean\\ai-reliability\\examples\\observations\\support-agent-qa.pass.json","observedAt":"2026-05-20T12:00:00.000Z","relatedArtifacts":{"agentQualityResult":"C:\\ai-reliability-clean\\ai-reliability\\deliverables\\maintenance\\agent-quality-result.json","budgetState":"C:\\ai-reliability-clean\\ai-reliability\\deliverables\\maintenance\\budget-state.json","providerCallLedger":"C:\\ai-reliability-clean\\ai-reliability\\deliverables\\maintenance\\provider-call-ledger.jsonl","gateResult":"C:\\ai-reliability-clean\\ai-reliability\\deliverables\\maintenance\\gate-result.json","doctorResult":"C:\\ai-reliability-clean\\ai-reliability\\deliverables\\maintenance\\doctor-result.json"}};
 
-      const EMBEDDED_SNAPSHOT_BUDGET = {
-        planId: "starter",
-        creditsRemaining: 499,
-        budgetRemainingUsd: 399.8,
-        creditsUsed: 1,
-        budgetUsedUsd: 0.2,
+      const EMBEDDED_SNAPSHOT_AGENT_QUALITY = {"artifactType":"agent_quality_result","schemaVersion":1,"generatedAt":"2026-05-24T09:19:41.788Z","runId":"maint-2c86a346-50e8-4b79-b0cb-b0551e4af8ce","source":"agentqa:run:observations","specId":"support-agent-qa-v1","specVersion":1,"workflowName":"support_assistant","environment":"production","enforcementMode":"observe","gateDecision":"pass","requiresHumanReview":false,"decisionReason":"all_checks_passed","confidence":"low","remediation":["Review agent output against spec-defined expectedBehavior."],"evidenceCompleteness":{"outputCaptured":true,"toolTraceCaptured":true,"actionTraceCaptured":true,"budgetStateLoaded":true,"pricingConfigLoaded":true,"ledgerWriteSucceeded":true},"wouldBlockCount":2,"checkCounts":{"answer":{"total":7,"passed":3,"failed":4},"tool_call":{"total":5,"passed":5,"failed":0},"action":{"total":8,"passed":8,"failed":0},"budget":{"total":1,"passed":1,"failed":0}},"maintenanceStatus":"at_risk","observationId":"obs-support-pass-001","observationSource":"agentqa:run:observations","observationPath":"C:\\ai-reliability-clean\\ai-reliability\\examples\\observations\\support-agent-qa.pass.json","observedAt":"2026-05-20T12:00:00.000Z","relatedArtifacts":{"maintenanceResult":"C:\\ai-reliability-clean\\ai-reliability\\deliverables\\maintenance\\maintenance-result.json","gateResult":"C:\\ai-reliability-clean\\ai-reliability\\deliverables\\maintenance\\gate-result.json","budgetState":"C:\\ai-reliability-clean\\ai-reliability\\deliverables\\maintenance\\budget-state.json","providerCallLedger":"C:\\ai-reliability-clean\\ai-reliability\\deliverables\\maintenance\\provider-call-ledger.jsonl"}};
+
+      const EMBEDDED_SNAPSHOT_BUDGET = {"planId":"starter","creditsRemaining":499,"budgetRemainingUsd":399.88,"creditsUsed":1,"budgetUsedUsd":0.12,"artifactType":"budget_state","schemaVersion":1,"generatedAt":"2026-05-24T09:19:41.788Z","runId":"maint-2c86a346-50e8-4b79-b0cb-b0551e4af8ce","specId":"support-agent-qa-v1","source":"agentqa:run:observations"};
+
+      const EMBEDDED_SNAPSHOT_GATE = {"artifactType":"gate_result","schemaVersion":1,"generatedAt":"2026-05-24T09:19:42.297Z","runId":"maint-2c86a346-50e8-4b79-b0cb-b0551e4af8ce","source":"gate-release","specId":"support-agent-qa-v1","specVersion":1,"workflowName":"support_assistant","environment":"production","sourceMaintenancePath":"C:\\ai-reliability-clean\\ai-reliability\\deliverables\\maintenance\\maintenance-result.json","sourceAgentQualityPath":"C:\\ai-reliability-clean\\ai-reliability\\deliverables\\maintenance\\agent-quality-result.json","maintenanceStatus":"at_risk","agentQaGateDecision":"pass","enforcementMode":"observe","requiresHumanReview":false,"decisionReason":"all_checks_passed","remediation":["Review agent output against spec-defined expectedBehavior."],"blockingFailures":2,"misconfiguredCount":0,"deployAllowed":true,"exitCode":0,"relatedArtifacts":{"maintenanceResult":"C:\\ai-reliability-clean\\ai-reliability\\deliverables\\maintenance\\maintenance-result.json","agentQualityResult":"C:\\ai-reliability-clean\\ai-reliability\\deliverables\\maintenance\\agent-quality-result.json","budgetState":"C:\\ai-reliability-clean\\ai-reliability\\deliverables\\maintenance\\budget-state.json","providerCallLedger":"C:\\ai-reliability-clean\\ai-reliability\\deliverables\\maintenance\\provider-call-ledger.jsonl"}};
+
+      const EMBEDDED_SNAPSHOT_DOCTOR = {"status":"ready","summary":"73 checks passed, 0 warnings, 0 blocking issues","nextActions":["Run npm run validate:spec before changes to eval specs.","Run npm run agentqa:run after spec or observation updates.","Run npm run gate:release in CI/CD before deploy."],"evaluatedAt":"2026-05-24T09:19:42.820Z","generatedAt":"2026-05-24T09:19:42.820Z","artifactType":"doctor_result","schemaVersion":1,"source":"agent-qa-doctor","runSummary":{"runId":"maint-2c86a346-50e8-4b79-b0cb-b0551e4af8ce","specId":"support-agent-qa-v1","environment":"production","workflowName":"support_assistant","gateDecision":"pass"},"checkStats":{"pass":73,"warning":0,"fail":0},"notableChecks":[]};
+
+      const EMBEDDED_SNAPSHOT_ROUTED_CALL = {"artifactType":"routed_call_result","schemaVersion":1,"generatedAt":"2026-05-24T09:19:43.327Z","runId":"routed-a6dd23d8-752b-49e6-a81b-77008d1b47a7","source":"demo:routed-call-gate","workflowName":"llm_router_agent","environment":"production","specId":"agent-budget-gate-v1","provider":"openai","model":"gpt-4.1-mini","gateDecision":"pass","enforcementOutcome":"passed","allowed":true,"executed":true,"reasonCode":"routed_call_allowed","remediation":[],"estimatedCostUsd":0.15,"actualCostUsd":0.15,"relatedArtifacts":{"providerCallLedger":"deliverables\\maintenance\\provider-call-ledger.jsonl","budgetState":"deliverables\\maintenance\\budget-state.json"}};
+
+      const EMBEDDED_SNAPSHOT_LEDGER = "{\"callId\":\"call-5ccdfbd0-2bb1-4a9f-b1a2-9b854b70255c\",\"runId\":\"routed-a6dd23d8-752b-49e6-a81b-77008d1b47a7\",\"specId\":\"agent-budget-gate-v1\",\"provider\":\"openai\",\"model\":\"gpt-4.1-mini\",\"estimatedInputTokens\":200,\"estimatedOutputTokens\":80,\"estimatedCostUsd\":0.15,\"actualInputTokens\":180,\"actualOutputTokens\":60,\"actualCostUsd\":0.15,\"status\":\"completed\",\"createdAt\":\"2026-05-24T09:19:43.322Z\"}\n{\"callId\":\"call-f1ab47e5-2361-4199-9771-322dc593ee96\",\"runId\":\"routed-a6dd23d8-752b-49e6-a81b-77008d1b47a7\",\"specId\":\"agent-budget-gate-v1\",\"provider\":\"openai\",\"model\":\"gpt-4.1-mini\",\"estimatedInputTokens\":0,\"estimatedOutputTokens\":0,\"estimatedCostUsd\":0.8,\"status\":\"blocked\",\"blockReason\":\"per_run_budget_exceeded\",\"actualCostUsd\":0,\"createdAt\":\"2026-05-24T09:19:43.324Z\"}\n{\"callId\":\"call-a3d8ce5b-bef6-4bf0-aaff-d2768f3e6c53\",\"runId\":\"routed-a6dd23d8-752b-49e6-a81b-77008d1b47a7\",\"provider\":\"openai\",\"model\":\"\",\"estimatedInputTokens\":0,\"estimatedOutputTokens\":0,\"estimatedCostUsd\":0.1,\"status\":\"blocked\",\"blockReason\":\"unknown_model\",\"actualCostUsd\":0,\"createdAt\":\"2026-05-24T09:19:43.325Z\"}\n{\"callId\":\"call-acb97fc5-13a1-482a-8691-d02f8b732740\",\"runId\":\"routed-a6dd23d8-752b-49e6-a81b-77008d1b47a7\",\"provider\":\"anthropic\",\"model\":\"gpt-4.1-mini\",\"estimatedInputTokens\":0,\"estimatedOutputTokens\":0,\"estimatedCostUsd\":0.1,\"status\":\"blocked\",\"blockReason\":\"provider_not_allowed\",\"actualCostUsd\":0,\"createdAt\":\"2026-05-24T09:19:43.326Z\"}\n{\"callId\":\"call-e4af855a-dd9f-4cf1-8dbe-31454870d660\",\"runId\":\"routed-a6dd23d8-752b-49e6-a81b-77008d1b47a7\",\"provider\":\"openai\",\"model\":\"gpt-4.1-mini\",\"estimatedInputTokens\":0,\"estimatedOutputTokens\":0,\"estimatedCostUsd\":0.1,\"status\":\"blocked\",\"blockReason\":\"missing_budget_state\",\"actualCostUsd\":0,\"createdAt\":\"2026-05-24T09:19:43.327Z\"}";
+
+      const SPEC_DISPLAY_BY_ID = {
+        "pricing-plans-v1": {
+          specName: "Plan and price accuracy (customer catalog)",
+          sourceFile: "examples/eval-specs/pricing-and-plan-accuracy.spec.json",
+        },
+        "support-agent-qa-v1": {
+          specName: "Support agent QA",
+          sourceFile: "examples/eval-specs/support-agent-qa.spec.json",
+        },
+        "agent-budget-gate-v1": {
+          specName: "Agent budget gate",
+          sourceFile: "examples/eval-specs/agent-budget-gate.spec.json",
+        },
       };
 
-      const EMBEDDED_SNAPSHOT_GATE = {
-        evaluatedAt: "2026-05-10T15:29:12.123Z",
-        source: "deliverables/maintenance/maintenance-result.json",
-        runId: "maint-f4f990e5-2b28-40eb-af83-b809e510397f",
-        specId: "pricing-plans-v1",
-        maintenanceStatus: "healthy",
-        deployAllowed: true,
-        exitCode: 0,
-      };
-
-      const EMBEDDED_SNAPSHOT_LEDGER = `{"callId":"call-maint-f4f990e5-2b28-40eb-af83-b809e510397f","runId":"maint-f4f990e5-2b28-40eb-af83-b809e510397f","specId":"pricing-plans-v1","provider":"openai","model":"gpt-4.1-mini","estimatedInputTokens":400,"estimatedOutputTokens":120,"estimatedCostUsd":0.2,"createdAt":"2026-05-10T15:28:02.234Z","status":"completed","actualInputTokens":400,"actualOutputTokens":120,"actualCostUsd":0.2}`;
-
-      const SPEC_DISPLAY = {
-        specName: "Plan and price accuracy (customer catalog)",
-        sourceFile: "examples/eval-specs/pricing-and-plan-accuracy.spec.json",
-      };
+      const SPEC_DISPLAY = SPEC_DISPLAY_BY_ID["pricing-plans-v1"];
 
       function formatEnvironment(env) {
         if (!env) return "—";
@@ -908,9 +1101,273 @@
         el.className = "badge " + badgeClass(status);
       }
 
-      function render(maintenance, budget, gate, ledgerRows) {
+      function isUsableAgentQuality(a) {
+        if (!isPlainObject(a)) return false;
+        return typeof a.gateDecision === "string" || isPlainObject(a.checkCounts);
+      }
+
+      function isUsableDoctor(d) {
+        if (!isPlainObject(d)) return false;
+        return typeof d.status === "string";
+      }
+
+      function isUsableRoutedCall(r) {
+        if (!isPlainObject(r)) return false;
+        return typeof r.provider === "string" || typeof r.allowed === "boolean";
+      }
+
+      function resolveAgentQa(maintenance, agentQuality) {
+        const base = maintenance && maintenance.agentQa ? { ...maintenance.agentQa } : {};
+        if (!isUsableAgentQuality(agentQuality)) return Object.keys(base).length ? base : null;
+        return {
+          ...base,
+          gateDecision: agentQuality.gateDecision ?? base.gateDecision,
+          enforcementMode: agentQuality.enforcementMode ?? base.enforcementMode,
+          requiresHumanReview: agentQuality.requiresHumanReview ?? base.requiresHumanReview,
+          decisionReason: agentQuality.decisionReason ?? base.decisionReason,
+          confidence: agentQuality.confidence ?? base.confidence,
+          remediation: agentQuality.remediation ?? base.remediation,
+          evidenceCompleteness: agentQuality.evidenceCompleteness ?? base.evidenceCompleteness,
+          wouldBlockCount: agentQuality.wouldBlockCount ?? base.wouldBlockCount,
+          checkCounts: agentQuality.checkCounts ?? base.checkCounts,
+        };
+      }
+
+      function resolveObservationFields(maintenance, agentQuality) {
+        const src = isUsableAgentQuality(agentQuality) ? agentQuality : maintenance || {};
+        const hasObs =
+          src.observationId ||
+          src.observationSource ||
+          src.observationPath ||
+          src.observedAt ||
+          (typeof src.source === "string" && src.source.includes("observations"));
+        if (!hasObs) return null;
+        return {
+          observationsUsed: Boolean(src.observationId || src.observationPath || src.observationSource),
+          observationId: src.observationId,
+          observationSource: src.observationSource || src.source,
+          observationPath: src.observationPath,
+          observedAt: src.observedAt,
+        };
+      }
+
+      function formatGateDecisionLabel(decision) {
+        const d = String(decision || "").toLowerCase();
+        if (d === "pass") return "Pass";
+        if (d === "block") return "Block";
+        if (d === "manual_review") return "Manual review";
+        if (d === "warning") return "Warning";
+        return decision ? String(decision).replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) : "—";
+      }
+
+      function gateDecisionBadgeClass(decision) {
+        const d = String(decision || "").toLowerCase();
+        if (d === "pass") return "pass";
+        if (d === "block") return "failed";
+        if (d === "manual_review") return "manual_review";
+        if (d === "warning") return "at_risk";
+        return "healthy";
+      }
+
+      function formatDoctorStatus(status) {
+        const s = String(status || "").toLowerCase();
+        if (s === "ready") return "READY";
+        if (s === "warning") return "WARNING";
+        if (s === "blocked") return "BLOCKED";
+        return String(status || "—").toUpperCase();
+      }
+
+      function doctorStatusBadgeClass(status) {
+        const s = String(status || "").toLowerCase();
+        if (s === "ready") return "ready";
+        if (s === "warning") return "warning";
+        if (s === "blocked") return "failed";
+        return "healthy";
+      }
+
+      function formatCheckCountLine(counts) {
+        if (!counts || typeof counts.total !== "number") return null;
+        const parts = [];
+        if (typeof counts.passed === "number") parts.push(`${counts.passed} passed`);
+        if (typeof counts.failed === "number" && counts.failed > 0) parts.push(`${counts.failed} blocked`);
+        if (typeof counts.warning === "number" && counts.warning > 0) parts.push(`${counts.warning} warning`);
+        if (typeof counts.manual_review === "number" && counts.manual_review > 0) {
+          parts.push(`${counts.manual_review} manual review`);
+        }
+        return parts.length ? parts.join(" · ") : `${counts.total} checks`;
+      }
+
+      function summarizeAgentQaChecksByCategory(checks, category) {
+        const rows = (checks || []).filter((c) => c.checkCategory === category);
+        if (!rows.length) return null;
+        const summary = { passed: 0, blocked: 0, manual_review: 0, warning: 0 };
+        let latestIssue = null;
+        rows.forEach((c) => {
+          const o = String(c.enforcementOutcome || "").toLowerCase();
+          if (o === "passed" || o === "pass") summary.passed += 1;
+          else if (o === "blocked" || o === "block") summary.blocked += 1;
+          else if (o === "manual_review") summary.manual_review += 1;
+          else if (o === "warning") summary.warning += 1;
+          if (o && o !== "passed" && o !== "pass" && !latestIssue) {
+            latestIssue = c;
+          }
+        });
+        return { summary, latestIssue, total: rows.length };
+      }
+
+      function gateCategoryLabel(category) {
+        const map = {
+          answer: "Answer Gate",
+          tool_call: "Tool Gate",
+          action: "Action Gate",
+          budget: "Budget Gate",
+          setup: "Setup Gate",
+          deploy: "Deploy Gate",
+        };
+        return map[category] || category;
+      }
+
+      function resolveDeployAllowed(gate, agentQa, maintenance) {
+        const needsReview =
+          gate.requiresHumanReview === true ||
+          (agentQa && agentQa.requiresHumanReview === true) ||
+          String(gate.agentQaGateDecision || agentQa?.gateDecision || "").toLowerCase() === "manual_review";
+        if (needsReview) return false;
+        if (typeof gate.deployAllowed === "boolean") return gate.deployAllowed;
+        const s = String(maintenance?.status || "").toLowerCase();
+        return s === "healthy" || s === "at_risk";
+      }
+
+      function setTileVisible(id, visible) {
+        const el = document.getElementById(id);
+        if (el) el.style.display = visible ? "" : "none";
+      }
+
+      function renderRemediationList(listId, emptyId, items) {
+        const ul = document.getElementById(listId);
+        const empty = emptyId ? document.getElementById(emptyId) : null;
+        if (!ul) return;
+        ul.innerHTML = "";
+        const rows = Array.isArray(items) ? items.filter(Boolean) : [];
+        if (!rows.length) {
+          if (empty) empty.style.display = "block";
+          return;
+        }
+        if (empty) empty.style.display = "none";
+        rows.forEach((item) => {
+          const li = document.createElement("li");
+          li.textContent = typeof item === "string" ? item : item.detail || item.title || String(item);
+          ul.appendChild(li);
+        });
+      }
+
+      function setGateDecisionBadge(el, decision) {
+        if (!el) return;
+        el.textContent = formatGateDecisionLabel(decision);
+        el.className = "badge " + gateDecisionBadgeClass(decision);
+      }
+
+      function render(maintenance, budget, gate, ledgerRows, agentQuality, doctor, routedCall) {
         const status = maintenance.status || maintenance.productionHealthStatus || "unknown";
-        setHealthBadgeSafe("#exec-health .badge", status);
+        const agentQa = resolveAgentQa(maintenance, agentQuality);
+        const agentQaChecks = maintenance.agentQaChecks || [];
+        const deployAllowed = resolveDeployAllowed(gate, agentQa, maintenance);
+
+        if (agentQa && agentQa.gateDecision) {
+          setTileVisible("exec-tile-agent-qa", true);
+          const execAgentQa = document.querySelector("#exec-agent-qa .badge");
+          setGateDecisionBadge(execAgentQa, agentQa.gateDecision);
+        } else {
+          setTileVisible("exec-tile-agent-qa", false);
+        }
+
+        const toolLine = agentQa && formatCheckCountLine(agentQa.checkCounts && agentQa.checkCounts.tool_call);
+        if (toolLine) {
+          setTileVisible("exec-tile-tool", true);
+          setText("exec-tool-gate", toolLine);
+        } else {
+          setTileVisible("exec-tile-tool", false);
+        }
+
+        const actionLine = agentQa && formatCheckCountLine(agentQa.checkCounts && agentQa.checkCounts.action);
+        if (actionLine) {
+          setTileVisible("exec-tile-action", true);
+          setText("exec-action-gate", actionLine);
+        } else {
+          setTileVisible("exec-tile-action", false);
+        }
+
+        let budgetExecLine = null;
+        if (isUsableRoutedCall(routedCall)) {
+          budgetExecLine = `${formatGateDecisionLabel(routedCall.gateDecision)} · ${routedCall.allowed ? "allowed" : "blocked"}`;
+        } else if (agentQa && formatCheckCountLine(agentQa.checkCounts && agentQa.checkCounts.budget)) {
+          budgetExecLine = formatCheckCountLine(agentQa.checkCounts.budget);
+        } else if (maintenance.budgetGateSummary) {
+          const bg = maintenance.budgetGateSummary;
+          budgetExecLine = `${bg.routedCallsAttempted - (bg.routedCallsBlocked || 0)} completed · ${bg.routedCallsBlocked || 0} blocked`;
+        }
+        if (budgetExecLine) {
+          setTileVisible("exec-tile-budget-gate", true);
+          setText("exec-budget-gate", budgetExecLine);
+        } else {
+          setTileVisible("exec-tile-budget-gate", false);
+        }
+
+        setTileVisible("exec-tile-deploy", typeof gate.deployAllowed === "boolean" || maintenance.status != null);
+        const deployEl = document.querySelector("#exec-deploy .badge");
+        if (deployEl) {
+          deployEl.textContent = deployAllowed ? "Allowed" : "Blocked";
+          deployEl.className = "badge " + (deployAllowed ? "deploy-yes" : "deploy-no");
+        }
+
+        if (isUsableDoctor(doctor)) {
+          setTileVisible("exec-tile-doctor", true);
+          const doctorExec = document.querySelector("#exec-doctor .badge");
+          if (doctorExec) {
+            doctorExec.textContent = formatDoctorStatus(doctor.status);
+            doctorExec.className = "badge " + doctorStatusBadgeClass(doctor.status);
+          }
+        } else {
+          setTileVisible("exec-tile-doctor", false);
+        }
+
+        setHealthBadgeSafe("#health-badge", status);
+        const agentQaSection = document.getElementById("agent-qa-section");
+        if (agentQaSection) {
+          agentQaSection.style.display = agentQa ? "block" : "none";
+        }
+        if (agentQa) {
+          const gateDecision = agentQa.gateDecision || "—";
+          setGateDecisionBadge(document.querySelector("#agent-qa-status .badge"), gateDecision);
+          setText("agent-qa-gate-decision", formatGateDecisionLabel(gateDecision));
+          setText("agent-qa-enforcement-mode", agentQa.enforcementMode || "—");
+          setText("agent-qa-human-review", agentQa.requiresHumanReview ? "Yes" : "No");
+          setText("agent-qa-confidence", agentQa.confidence || "—");
+          setText("agent-qa-would-block", String(agentQa.wouldBlockCount ?? "—"));
+          const fmtCounts = (c) => formatCheckCountLine(c) || "—";
+          setText("agent-qa-answer-counts", fmtCounts(agentQa.checkCounts && agentQa.checkCounts.answer));
+          setText("agent-qa-tool-counts", fmtCounts(agentQa.checkCounts && agentQa.checkCounts.tool_call));
+          setText("agent-qa-action-counts", fmtCounts(agentQa.checkCounts && agentQa.checkCounts.action));
+          setText("agent-qa-budget-counts", fmtCounts(agentQa.checkCounts && agentQa.checkCounts.budget));
+          if (agentQa.checkCounts && agentQa.checkCounts.setup) {
+            const setupEl = document.getElementById("agent-qa-setup-counts");
+            if (setupEl) setText("agent-qa-setup-counts", fmtCounts(agentQa.checkCounts.setup));
+          }
+          if (agentQa.checkCounts && agentQa.checkCounts.deploy) {
+            const deployCountsEl = document.getElementById("agent-qa-deploy-counts");
+            if (deployCountsEl) setText("agent-qa-deploy-counts", fmtCounts(agentQa.checkCounts.deploy));
+          }
+          const ev = agentQa.evidenceCompleteness || {};
+          const yn = (v) => (v === true ? "Yes" : v === false ? "No" : "—");
+          setText("ev-output", yn(ev.outputCaptured));
+          setText("ev-tool-trace", yn(ev.toolTraceCaptured));
+          setText("ev-action-trace", yn(ev.actionTraceCaptured));
+          setText("ev-budget-state", yn(ev.budgetStateLoaded));
+          setText("ev-pricing", yn(ev.pricingConfigLoaded));
+          setText("ev-ledger", yn(ev.ledgerWriteSucceeded));
+          setText("agent-qa-decision-reason", agentQa.decisionReason || "—");
+          renderRemediationList("agent-qa-remediation", "agent-qa-remediation-empty", agentQa.remediation);
+        }
 
         const policies = maintenance.policyResults || [];
         const checks = maintenance.checks || [];
@@ -922,62 +1379,144 @@
         ) {
           checksPassed = maintenance.checksRun - maintenance.checksFailed;
         }
-        const totalChecks = maintenance.checksRun;
-        if (typeof checksPassed === "number" && typeof totalChecks === "number") {
-          setText("exec-checks", `${checksPassed} / ${totalChecks} passed`);
+
+        const gateBreakdownSection = document.getElementById("gate-breakdown-section");
+        const gateBreakdownGrid = document.getElementById("gate-breakdown-grid");
+        const gateCategories = ["answer", "tool_call", "action", "budget", "setup", "deploy"];
+        let gateCards = 0;
+        if (gateBreakdownGrid) gateBreakdownGrid.innerHTML = "";
+        gateCategories.forEach((category) => {
+          const counts = agentQa && agentQa.checkCounts ? agentQa.checkCounts[category] : null;
+          const detail = summarizeAgentQaChecksByCategory(agentQaChecks, category);
+          if (!counts && !detail) return;
+          gateCards += 1;
+          const card = document.createElement("div");
+          card.className = "card";
+          const title = document.createElement("h3");
+          title.textContent = gateCategoryLabel(category);
+          card.appendChild(title);
+          const dl = document.createElement("dl");
+          const addRow = (label, value) => {
+            if (value == null || value === "—") return;
+            const dt = document.createElement("dt");
+            dt.textContent = label;
+            const dd = document.createElement("dd");
+            dd.textContent = value;
+            dl.appendChild(dt);
+            dl.appendChild(dd);
+          };
+          const countLine = formatCheckCountLine(counts);
+          if (countLine) addRow("Check counts", countLine);
+          if (detail) {
+            const s = detail.summary;
+            const outcomeParts = [];
+            if (s.passed) outcomeParts.push(`${s.passed} passed`);
+            if (s.blocked) outcomeParts.push(`${s.blocked} blocked`);
+            if (s.manual_review) outcomeParts.push(`${s.manual_review} manual review`);
+            if (s.warning) outcomeParts.push(`${s.warning} warning`);
+            if (outcomeParts.length) addRow("Enforcement outcomes", outcomeParts.join(" · "));
+            if (detail.latestIssue) {
+              const issue = detail.latestIssue;
+              const missing = (issue.missingEvidence || []).filter(Boolean).join("; ");
+              addRow(
+                "Latest issue",
+                missing || issue.name || issue.message || issue.enforcementOutcome || "—",
+              );
+              if (issue.remediation && issue.remediation.length) {
+                addRow("Remediation", issue.remediation.join(" "));
+              }
+            }
+          }
+          card.appendChild(dl);
+          if (gateBreakdownGrid) gateBreakdownGrid.appendChild(card);
+        });
+        if (gateBreakdownSection) gateBreakdownSection.style.display = gateCards ? "block" : "none";
+
+        const observation = resolveObservationFields(maintenance, agentQuality);
+        const observationSection = document.getElementById("observation-section");
+        if (observationSection) observationSection.style.display = observation ? "block" : "none";
+        if (observation) {
+          setText("obs-used", observation.observationsUsed ? "Yes" : "No");
+          setText("obs-id", observation.observationId || "—");
+          setText("obs-source", observation.observationSource || "—");
+          setText("obs-path", observation.observationPath || "—");
+          setText("obs-at", observation.observedAt || "—");
+        }
+
+        const routedCallSection = document.getElementById("routed-call-section");
+        if (routedCallSection) {
+          routedCallSection.style.display = isUsableRoutedCall(routedCall) ? "block" : "none";
+        }
+        if (isUsableRoutedCall(routedCall)) {
+          setText("rc-provider", routedCall.provider || "—");
+          setText("rc-model", routedCall.model || "—");
+          setText("rc-gate-decision", formatGateDecisionLabel(routedCall.gateDecision));
+          setText("rc-allowed", routedCall.allowed === true ? "Yes" : routedCall.allowed === false ? "No" : "—");
+          setText("rc-executed", routedCall.executed === true ? "Yes" : routedCall.executed === false ? "No" : "—");
+          setText("rc-reason", routedCall.reasonCode ? String(routedCall.reasonCode).replace(/_/g, " ") : "—");
+          setText("rc-est-cost", formatUsd(routedCall.estimatedCostUsd));
+          const rcBudgetRemaining =
+            routedCall.budgetRemainingUsd !== undefined
+              ? routedCall.budgetRemainingUsd
+              : budget.budgetRemainingUsd;
+          setText("rc-budget-remaining", formatUsd(rcBudgetRemaining));
+          renderRemediationList("rc-remediation", "rc-remediation-empty", routedCall.remediation);
+        }
+
+        const doctorContent = document.getElementById("doctor-content");
+        const doctorSetupNote = document.getElementById("doctor-setup-note");
+        if (isUsableDoctor(doctor)) {
+          if (doctorContent) doctorContent.style.display = "block";
+          if (doctorSetupNote) doctorSetupNote.style.display = "none";
+          const doctorBadge = document.querySelector("#doctor-status-badge .badge");
+          if (doctorBadge) {
+            doctorBadge.textContent = formatDoctorStatus(doctor.status);
+            doctorBadge.className = "badge " + doctorStatusBadgeClass(doctor.status);
+          }
+          const stats =
+            doctor.checkStats ||
+            (Array.isArray(doctor.checks)
+              ? {
+                  pass: doctor.checks.filter((c) => c.status === "pass").length,
+                  warning: doctor.checks.filter((c) => c.status === "warning").length,
+                  fail: doctor.checks.filter((c) => c.status === "fail").length,
+                }
+              : null);
+          if (stats) {
+            setText("doctor-pass-count", String(stats.pass ?? "—"));
+            setText("doctor-warn-count", String(stats.warning ?? "—"));
+            setText("doctor-fail-count", String(stats.fail ?? "—"));
+          }
+          setText("doctor-summary", doctor.summary || "—");
+          const rs = doctor.runSummary || {};
+          setText("doctor-run-id", rs.runId || "—");
+          setText("doctor-spec-id", rs.specId || "—");
+          setText("doctor-workflow", formatWorkflow(rs.workflowName));
+          setText("doctor-gate-decision", formatGateDecisionLabel(rs.gateDecision));
+          renderRemediationList("doctor-next-actions", null, doctor.nextActions);
+          const notableUl = document.getElementById("doctor-notable-checks");
+          const notableEmpty = document.getElementById("doctor-notable-empty");
+          const notable = doctor.notableChecks ||
+            (Array.isArray(doctor.checks)
+              ? doctor.checks.filter((c) => c.status === "fail" || c.status === "warning").slice(0, 10)
+              : []);
+          if (notableUl) {
+            notableUl.innerHTML = "";
+            if (!notable.length) {
+              if (notableEmpty) notableEmpty.style.display = "block";
+            } else {
+              if (notableEmpty) notableEmpty.style.display = "none";
+              notable.forEach((c) => {
+                const li = document.createElement("li");
+                const rem = (c.remediation || []).filter(Boolean).join(" ");
+                li.innerHTML = `<strong>${escapeHtml(c.title || c.id || "Check")}</strong> (${escapeHtml(String(c.status || "—"))}) — ${escapeHtml(c.message || "")}${rem ? " · " + escapeHtml(rem) : ""}`;
+                notableUl.appendChild(li);
+              });
+            }
+          }
         } else {
-          setText("exec-checks", "—");
-        }
-
-        setText("exec-budget-rem", formatUsd(budget.budgetRemainingUsd));
-
-        const bgSum = maintenance.budgetGateSummary;
-        const routedLine =
-          bgSum != null
-            ? `${bgSum.routedCallsAttempted - (bgSum.routedCallsBlocked || 0)} completed · ${bgSum.routedCallsBlocked || 0} blocked`
-            : "—";
-        setText("exec-routed", routedLine);
-
-        const deployEl = document.querySelector("#exec-deploy .badge");
-        const deployAllowed =
-          typeof gate.deployAllowed === "boolean"
-            ? gate.deployAllowed
-            : String(maintenance.status || "").toLowerCase() === "healthy" ||
-              String(maintenance.status || "").toLowerCase() === "at_risk";
-        if (deployEl) {
-          deployEl.textContent = deployAllowed ? "Allowed" : "Blocked";
-          deployEl.className = "badge " + (deployAllowed ? "deploy-yes" : "deploy-no");
-        }
-
-        setHealthBadgeSafe("#health-badge", status);
-
-        const agentQa = maintenance.agentQa;
-        const agentQaSection = document.getElementById("agent-qa-section");
-        if (agentQaSection) {
-          agentQaSection.style.display = agentQa ? "block" : "none";
-        }
-        if (agentQa) {
-          const gateDecision = agentQa.gateDecision || "—";
-          setHealthBadgeSafe("#agent-qa-status .badge", gateDecision === "pass" ? "healthy" : gateDecision === "block" ? "failed" : "at_risk");
-          setText("agent-qa-gate-decision", gateDecision);
-          setText("agent-qa-enforcement-mode", agentQa.enforcementMode || "—");
-          setText("agent-qa-human-review", agentQa.requiresHumanReview ? "Yes" : "No");
-          setText("agent-qa-confidence", agentQa.confidence || "—");
-          setText("agent-qa-would-block", String(agentQa.wouldBlockCount ?? "—"));
-          const fmtCounts = (c) =>
-            c && typeof c.passed === "number" ? `${c.passed} / ${c.total} passed` : "—";
-          setText("agent-qa-answer-counts", fmtCounts(agentQa.checkCounts && agentQa.checkCounts.answer));
-          setText("agent-qa-tool-counts", fmtCounts(agentQa.checkCounts && agentQa.checkCounts.tool_call));
-          setText("agent-qa-action-counts", fmtCounts(agentQa.checkCounts && agentQa.checkCounts.action));
-          setText("agent-qa-budget-counts", fmtCounts(agentQa.checkCounts && agentQa.checkCounts.budget));
-          const ev = agentQa.evidenceCompleteness || {};
-          const yn = (v) => (v === true ? "Yes" : v === false ? "No" : "—");
-          setText("ev-output", yn(ev.outputCaptured));
-          setText("ev-tool-trace", yn(ev.toolTraceCaptured));
-          setText("ev-action-trace", yn(ev.actionTraceCaptured));
-          setText("ev-budget-state", yn(ev.budgetStateLoaded));
-          setText("ev-pricing", yn(ev.pricingConfigLoaded));
-          setText("ev-ledger", yn(ev.ledgerWriteSucceeded));
+          if (doctorContent) doctorContent.style.display = "none";
+          if (doctorSetupNote) doctorSetupNote.style.display = "block";
         }
 
         setText("run-time", maintenance.generatedAt || "—");
@@ -995,9 +1534,10 @@
           formatProductionHealthLabel(maintenance.productionHealthStatus || maintenance.status),
         );
 
+        const specDisplay = SPEC_DISPLAY_BY_ID[maintenance.specId] || SPEC_DISPLAY;
         setText(
           "spec-label",
-          (SPEC_DISPLAY.specName ? SPEC_DISPLAY.specName + " · " : "") + (maintenance.specId || "—"),
+          (specDisplay.specName ? specDisplay.specName + " · " : "") + (maintenance.specId || "—"),
         );
         setText("spec-workflow", formatWorkflow(maintenance.workflowName));
         setText("count-policies", String(policies.length));
@@ -1198,12 +1738,76 @@
           deployDd.appendChild(dBadge);
         }
 
+        setText("gate-agent-qa-decision", formatGateDecisionLabel(gate.agentQaGateDecision || agentQa?.gateDecision));
+        setText(
+          "gate-human-review",
+          gate.requiresHumanReview === true || agentQa?.requiresHumanReview === true ? "Yes" : "No",
+        );
+        setText(
+          "gate-blocking-failures",
+          gate.blockingFailures !== undefined ? String(gate.blockingFailures) : String(blockingFailures),
+        );
+        setText(
+          "gate-misconfigured",
+          gate.misconfiguredCount !== undefined ? String(gate.misconfiguredCount) : "—",
+        );
+        setText(
+          "gate-stale-warning",
+          typeof gate.staleArtifactWarning === "string" && gate.staleArtifactWarning
+            ? gate.staleArtifactWarning
+            : gate.staleArtifactWarning === false
+              ? "No"
+              : "—",
+        );
+        setText("gate-decision-reason", gate.decisionReason || agentQa?.decisionReason || "—");
+        renderRemediationList("gate-remediation", "gate-remediation-empty", gate.remediation || agentQa?.remediation);
+
         const code = gate.exitCode;
         let codeLine = "—";
-        if (code === 0) codeLine = "0 — release may proceed (healthy or at-risk)";
+        if (code === 0) codeLine = "0 — release may proceed (healthy or at-risk without manual review)";
         else if (code === 1) codeLine = "1 — blocking failures";
         else if (code === 2) codeLine = "2 — misconfigured";
         setText("gate-exit", typeof code === "number" ? codeLine : "—");
+
+        const provenanceDl = document.getElementById("provenance-fields");
+        if (provenanceDl) {
+          provenanceDl.innerHTML = "";
+          const addProv = (label, value) => {
+            if (value == null || value === "") return;
+            const dt = document.createElement("dt");
+            dt.textContent = label;
+            const dd = document.createElement("dd");
+            dd.textContent = String(value);
+            provenanceDl.appendChild(dt);
+            provenanceDl.appendChild(dd);
+          };
+          addProv("Maintenance generatedAt", maintenance.generatedAt);
+          addProv("Maintenance runId", maintenance.runId);
+          addProv("Maintenance source", maintenance.source);
+          if (isUsableAgentQuality(agentQuality)) {
+            addProv("Agent QA generatedAt", agentQuality.generatedAt);
+            addProv("Agent QA schemaVersion", agentQuality.schemaVersion);
+            addProv("Agent QA source", agentQuality.source);
+            if (agentQuality.relatedArtifacts) {
+              addProv("Related artifacts", JSON.stringify(agentQuality.relatedArtifacts));
+            }
+          }
+          if (isUsableGate(gate)) {
+            addProv("Gate generatedAt", gate.generatedAt);
+            addProv("Gate schemaVersion", gate.schemaVersion);
+            addProv("Gate source", gate.source);
+          }
+          if (isUsableDoctor(doctor)) {
+            addProv("Doctor generatedAt", doctor.generatedAt);
+            addProv("Doctor schemaVersion", doctor.schemaVersion);
+            addProv("Doctor source", doctor.source);
+          }
+          if (isUsableRoutedCall(routedCall)) {
+            addProv("Routed call generatedAt", routedCall.generatedAt);
+            addProv("Routed call runId", routedCall.runId);
+            addProv("Routed call source", routedCall.source);
+          }
+        }
       }
 
       function escapeHtml(s) {
@@ -1219,12 +1823,19 @@
         const warnEl = document.getElementById("provenance-load-warning");
 
         const mRes = await fetchJsonArtifact(ARTIFACT_PATHS.maintenance);
+        const aqRes = await fetchJsonArtifact(ARTIFACT_PATHS.agentQuality);
         const bRes = await fetchJsonArtifact(ARTIFACT_PATHS.budget);
         const gRes = await fetchJsonArtifact(ARTIFACT_PATHS.gate);
+        const dRes = await fetchJsonArtifact(ARTIFACT_PATHS.doctor);
+        const rcRes = await fetchJsonArtifact(ARTIFACT_PATHS.routedCall);
         const lRes = await fetchTextArtifact(ARTIFACT_PATHS.ledger);
 
         const mOk = isUsableMaintenance(mRes.json);
         const maintenance = mOk ? mRes.json : EMBEDDED_SNAPSHOT_MAINTENANCE;
+
+        const aqOk = isUsableAgentQuality(aqRes.json);
+        const agentQuality =
+          aqOk ? aqRes.json : typeof EMBEDDED_SNAPSHOT_AGENT_QUALITY !== "undefined" ? EMBEDDED_SNAPSHOT_AGENT_QUALITY : null;
 
         const bOk = isUsableBudget(bRes.json);
         const budgetBase = bOk ? bRes.json : EMBEDDED_SNAPSHOT_BUDGET;
@@ -1232,12 +1843,32 @@
 
         const gate = pickGateForMaintenance(maintenance, gRes.json, EMBEDDED_SNAPSHOT_GATE);
 
+        const doctorOk = isUsableDoctor(dRes.json);
+        const doctor =
+          doctorOk ? dRes.json : typeof EMBEDDED_SNAPSHOT_DOCTOR !== "undefined" ? EMBEDDED_SNAPSHOT_DOCTOR : null;
+
+        const routedCallOk = isUsableRoutedCall(rcRes.json);
+        const routedCall =
+          routedCallOk
+            ? rcRes.json
+            : typeof EMBEDDED_SNAPSHOT_ROUTED_CALL !== "undefined"
+              ? EMBEDDED_SNAPSHOT_ROUTED_CALL
+              : null;
+
         let ledgerRows = [];
         if (lRes.httpOk && lRes.text != null) ledgerRows = parseLedgerJsonl(lRes.text);
         if (!ledgerRows.length) ledgerRows = parseLedgerJsonl(EMBEDDED_SNAPSHOT_LEDGER);
 
         const dataSourceLive =
-          mRes.httpOk && bRes.httpOk && gRes.httpOk && lRes.httpOk && mOk && bOk;
+          mRes.httpOk &&
+          bRes.httpOk &&
+          gRes.httpOk &&
+          lRes.httpOk &&
+          mOk &&
+          bOk &&
+          (!aqRes.httpOk || aqOk) &&
+          (!dRes.httpOk || doctorOk) &&
+          (!rcRes.httpOk || routedCallOk);
         if (indicator) {
           indicator.textContent = dataSourceLive
             ? "Data source: live artifacts"
@@ -1248,7 +1879,7 @@
         }
 
         try {
-          render(maintenance, budget, gate, ledgerRows);
+          render(maintenance, budget, gate, ledgerRows, agentQuality, doctor, routedCall);
         } catch (err) {
           console.error(err);
           if (warnEl) warnEl.style.display = "block";
@@ -1257,6 +1888,9 @@
             normalizeBudgetView(EMBEDDED_SNAPSHOT_MAINTENANCE, EMBEDDED_SNAPSHOT_BUDGET),
             EMBEDDED_SNAPSHOT_GATE,
             parseLedgerJsonl(EMBEDDED_SNAPSHOT_LEDGER),
+            typeof EMBEDDED_SNAPSHOT_AGENT_QUALITY !== "undefined" ? EMBEDDED_SNAPSHOT_AGENT_QUALITY : null,
+            typeof EMBEDDED_SNAPSHOT_DOCTOR !== "undefined" ? EMBEDDED_SNAPSHOT_DOCTOR : null,
+            typeof EMBEDDED_SNAPSHOT_ROUTED_CALL !== "undefined" ? EMBEDDED_SNAPSHOT_ROUTED_CALL : null,
           );
           if (indicator) indicator.textContent = "Data source: embedded snapshot";
         }

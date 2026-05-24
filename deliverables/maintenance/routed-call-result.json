@@ -1,8 +1,8 @@
 {
   "artifactType": "routed_call_result",
   "schemaVersion": 1,
-  "generatedAt": "2026-05-22T19:30:14.002Z",
-  "runId": "routed-dbc51413-22aa-49aa-a868-92de8742d72a",
+  "generatedAt": "2026-05-24T09:19:43.327Z",
+  "runId": "routed-a6dd23d8-752b-49e6-a81b-77008d1b47a7",
   "source": "demo:routed-call-gate",
   "workflowName": "llm_router_agent",
   "environment": "production",
