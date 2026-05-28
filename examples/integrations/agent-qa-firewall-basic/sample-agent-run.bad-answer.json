@@ -1,0 +1,33 @@
+{
+  "observationId": "sample-bad-answer-001",
+  "observedAt": "2026-05-24T12:01:00.000Z",
+  "specId": "pricing-plan-agent-v1",
+  "workflowName": "sales_copilot",
+  "environment": "pre_production",
+  "notes": "Agent invented Starter price and discount; should not pass answer/action checks.",
+  "routedCalls": [
+    {
+      "provider": "openai",
+      "model": "gpt-4.1-mini",
+      "estimatedCostUsd": 0.11,
+      "status": "completed"
+    }
+  ],
+  "testCases": {
+    "tc-starter-price": {
+      "agentOutput": "Starter is only $99 per month with a special discount today.",
+      "toolCalls": [],
+      "actions": [{ "name": "invent_plan_price", "status": "observed" }]
+    },
+    "tc-agency-price": {
+      "agentOutput": "The Agency plan is $1799 per month per your catalog.",
+      "toolCalls": [{ "name": "fetch_plan_catalog", "status": "completed" }],
+      "actions": []
+    },
+    "tc-limits-warning": {
+      "agentOutput": "Starter includes up to 3 seats per your plan definition.",
+      "toolCalls": [{ "name": "fetch_plan_catalog", "status": "completed" }],
+      "actions": []
+    }
+  }
+}

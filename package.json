@@ -16,10 +16,11 @@
     "agentqa:run": "tsx apps/api/agentqa-run.ts",
     "gate:release": "tsx apps/api/gate-release.ts",
     "test:budget-gate": "tsx --test packages/shared/budget-gate.test.ts packages/shared/routed-provider-call.test.ts",
-    "test:maintenance-gate": "tsx --test packages/shared/maintenance-gate.test.ts packages/shared/agent-qa-spec-validator.test.ts packages/shared/agent-qa-doctor.test.ts packages/shared/agent-qa-artifacts.test.ts packages/shared/agent-qa-observations.test.ts packages/shared/agentqa-run.test.ts",
+    "test:maintenance-gate": "tsx --test packages/shared/maintenance-gate.test.ts packages/shared/agent-qa-spec-validator.test.ts packages/shared/agent-qa-doctor.test.ts packages/shared/agent-qa-artifacts.test.ts packages/shared/agent-qa-observations.test.ts packages/shared/agentqa-run.test.ts packages/shared/build-agent-observation.test.ts packages/shared/firewall-capabilities.test.ts",
     "validate:spec": "tsx apps/api/validate-spec.ts",
     "doctor": "tsx apps/api/doctor.ts",
     "firewall:check": "tsx apps/api/firewall-check.ts",
+    "test:capabilities": "tsx apps/api/test-firewall-capabilities.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {

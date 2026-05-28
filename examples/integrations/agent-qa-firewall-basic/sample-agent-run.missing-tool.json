@@ -1,0 +1,33 @@
+{
+  "observationId": "sample-missing-tool-001",
+  "observedAt": "2026-05-24T12:02:00.000Z",
+  "specId": "tool-call-required-v1",
+  "workflowName": "operations_agent",
+  "environment": "staging",
+  "notes": "Reservation confirmed without required inventory_api_reserve tool call.",
+  "routedCalls": [
+    {
+      "provider": "openai",
+      "model": "gpt-4.1-mini",
+      "estimatedCostUsd": 0.08,
+      "status": "completed"
+    }
+  ],
+  "testCases": {
+    "tc-reserve-stock": {
+      "agentOutput": "Reservation confirmed for SKU-441 without calling the inventory API.",
+      "toolCalls": [],
+      "actions": []
+    },
+    "tc-read-stock": {
+      "agentOutput": "SKU-441 has 12 units available.",
+      "toolCalls": [{ "name": "inventory_api_get_stock", "status": "completed" }],
+      "actions": []
+    },
+    "tc-wrong-tool-scenario": {
+      "agentOutput": "Attempted reservation via legacy lookup only.",
+      "toolCalls": [{ "name": "lookup_legacy_inventory", "status": "completed" }],
+      "actions": []
+    }
+  }
+}
